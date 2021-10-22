@@ -1,11 +1,10 @@
-import VueRouter from "vue-router"
 import A from "../components/A"
 import B from "../components/B"
 
-const router = new VueRouter({
+const routerOption = {
     routes: [
         {
-            path: "/a",
+            path: "/",
             component: A
         },
         {
@@ -13,6 +12,6 @@ const router = new VueRouter({
             component: B
         }
     ]
-})
+}
 
-export default router
+export default routerOption
