@@ -1,27 +1,37 @@
 const connector = (options) => {
-    const {createInstance, storeModule} = options
+  const { App, routerOption, beforeEach, afterEach, storeModule } = options;
 
-    let _instance
-    let _store
-    let _name
-    const mount = ({root, store, Vue, VueRouter, name}) => {
-        if (storeModule) {
-            store.registerModule(name, {
-                ...storeModule,
-                namespaced: true
-            })
-        }
-        _instance = createInstance({store, Vue, VueRouter}).$mount(root)
-        _store = store
-        _name = name
+  return ({ root, store, Vue, VueRouter, name }) => {
+    if (storeModule) {
+      store.registerModule(name, {
+        ...storeModule,
+        namespaced: true
+      });
     }
 
-    const unmount = () => {
-        _instance.$destroy()
-        _store.unregisterModule(_name)
+    const router = new VueRouter(routerOption)
+
+    if (beforeEach) {
+      router.beforeEach(beforeEach)
     }
 
-    return {mount, unmount}
-}
+    if (afterEach) {
+      router.afterEach(afterEach)
+    }
 
-export default connector
+    const instance = new Vue({
+      render: h => h(App),
+      router,
+      store,
+    }).$mount(root);
+
+    return () => {
+      instance.$destroy();
+      if (storeModule) {
+        store.unregisterModule(name);
+      }
+    };
+  };
+};
+
+export default connector;

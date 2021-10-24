@@ -5,7 +5,7 @@
     </button>
     <div>{{$store.state.count}}</div>
     <div>----{{ ($store.state["appDevice"] || []).deviceList }}----</div>
-    <router-view :key="routeKey" />
+    <router-view />
   </div>
 </template>
 
@@ -34,9 +34,9 @@ export default {
   methods: {
     handleClick(item) {
       if (item.to === this.$route.path) {
-        this.routeKey++
+        return
       }
-      this.$router.push(item.to)
+      this.$router.replace(item.to)
     }
   }
 }

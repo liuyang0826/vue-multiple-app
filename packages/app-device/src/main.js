@@ -1,47 +1,55 @@
-import App from './App.vue'
-import routerOption from './router-option'
+import App from "./App.vue";
+import routerOption from "./router-option";
 
 const connector = (options) => {
-  const {createInstance, storeModule} = options
+  const { App, routerOption, beforeEach, afterEach, storeModule } = options;
 
-  let _instance
-  let _store
-  let _name
-  const mount = ({root, store, Vue, VueRouter, name}) => {
+  return ({ root, store, Vue, VueRouter, name }) => {
     if (storeModule) {
       store.registerModule(name, {
         ...storeModule,
         namespaced: true
-      })
+      });
     }
-    _instance = createInstance({store, Vue, VueRouter}).$mount(root)
-    _store = store
-    _name = name
-  }
 
-  const unmount = () => {
-    _instance.$destroy()
-    _store.unregisterModule(_name)
-  }
+    const router = new VueRouter(routerOption)
 
-  return {mount, unmount}
-}
+    if (beforeEach) {
+      router.beforeEach(beforeEach)
+    }
+
+    if (afterEach) {
+      router.afterEach(afterEach)
+    }
+
+    const instance = new Vue({
+      render: h => h(App),
+      router,
+      store,
+    }).$mount(root);
+
+    return () => {
+      instance.$destroy();
+      if (storeModule) {
+        store.unregisterModule(name);
+      }
+    };
+  };
+};
+
 
 export default connector({
-  createInstance: ({store, Vue, VueRouter}) => new Vue({
-    render: h => h(App),
-    router: new VueRouter(routerOption),
-    store
-  }),
+  App,
+  routerOption,
   storeModule: {
-    state() {
+    state () {
       return {
         deviceList: [
           {
             name: "dsdasda"
           }
         ]
-      }
+      };
     }
   }
-})
+});
