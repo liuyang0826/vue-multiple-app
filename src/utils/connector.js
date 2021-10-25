@@ -8,7 +8,6 @@ const connector = (options) => {
         namespaced: true
       });
     }
-
     const router = new VueRouter(routerOption)
 
     if (beforeEach) {
@@ -23,10 +22,14 @@ const connector = (options) => {
       render: h => h(App),
       router,
       store,
-    }).$mount(root);
+    }).$mount();
+    root.appendChild(instance.$el)
+    document.body.classList.add(name)
 
     return () => {
       instance.$destroy();
+      root.removeChild(instance.$el)
+      document.body.classList.remove(name)
       if (storeModule) {
         store.unregisterModule(name);
       }

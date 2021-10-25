@@ -4,12 +4,14 @@
       {{item.text}}
     </button>
     <div>{{$store.state.count}}</div>
-    <div>----{{ ($store.state["appDevice"] || []).deviceList }}----</div>
+    <div>----{{ ($store.state["app_device"] || []).deviceList }}----</div>
     <router-view />
   </div>
 </template>
 
 <script>
+import loadable from "./utils/loadable";
+
 export default {
   name: 'App',
   data() {
@@ -21,7 +23,7 @@ export default {
         },
         {
           text: "user",
-          to: "/user/a",
+          to: "/user/home",
         },
         {
           text: "device",
@@ -30,6 +32,22 @@ export default {
       ],
       routeKey: 1
     }
+  },
+  created() {
+    fetch("/multiple.config")
+    .then(res => res.json())
+    .then((apps) => {
+      this.$router.addRoutes(apps.map((app) => {
+        const { name, path, entry } = app
+        return {
+          path,
+          component: loadable({
+            name,
+            entry
+          })
+        }
+      }))
+    })
   },
   methods: {
     handleClick(item) {

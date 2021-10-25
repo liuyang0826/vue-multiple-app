@@ -97,6 +97,6 @@ function withMultipleApp(options) {
 }
 
 module.exports = withMultipleApp({
-    appName: "app_device",
-    port: 8081
+    appName: "app_user",
+    port: 8082
 })()
