@@ -2,7 +2,7 @@ const connector = (options) => {
   const { App, routerOption, beforeEach, afterEach, storeModule } = options;
 
   return ({ root, store, Vue, VueRouter, name }) => {
-    if (storeModule) {
+    if (store && storeModule) {
       store.registerModule(name, {
         ...storeModule,
         namespaced: true
@@ -23,14 +23,16 @@ const connector = (options) => {
       router,
       store,
     }).$mount();
+
     root.appendChild(instance.$el)
-    document.body.classList.add(name)
+    const htmlNode = document.getElementsByTagName("html")[0]
+    htmlNode.classList.add(name)
 
     return () => {
       instance.$destroy();
       root.removeChild(instance.$el)
-      document.body.classList.remove(name)
-      if (storeModule) {
+      htmlNode.classList.remove(name)
+      if (store && storeModule) {
         store.unregisterModule(name);
       }
     };

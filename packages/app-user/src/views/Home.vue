@@ -16,3 +16,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.home ::v-deep a {
+  color: red;
+}
+</style>

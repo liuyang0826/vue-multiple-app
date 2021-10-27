@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import loadable from "./utils/loadable";
+import loadable from "../../../src/loadable";
 
 export default {
   name: 'App',

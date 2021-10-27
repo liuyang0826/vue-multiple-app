@@ -1,6 +1,3 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-
 const moduleNameMap = new Map();
 
 const scriptLoader = async (js, entry) => {
@@ -37,18 +34,19 @@ const styleLoader = async (css, entry) => {
   await Promise.all(css.map(d => loader(d)))
 }
 
-const entryLoader = (entry) => {
-  return fetch(`${entry}/assets.json`)
-      .then((res) => res.json())
-}
-
 const remoteLoader = async ({ entry, name }) => {
   return moduleNameMap.get(name) || await (async () => {
     const realEntry = entry.endsWith("/") ? entry.slice(0, -1) : entry
 
-    const { css, js } = await entryLoader(realEntry)
+    await scriptLoader(["assets.js"], realEntry)
+    const { css, js } = window[name]
+    delete window[name]
+
     await Promise.all([styleLoader(css, realEntry), scriptLoader(js, realEntry)])
-    return moduleNameMap.set(name, window[name]).get(name);
+
+    const result = window[name]
+    delete window[name]
+    return moduleNameMap.set(name, result).get(name);
   })()
 };
 
@@ -59,8 +57,8 @@ const loadable = ({ name, entry }) => {
       const unmount = (await (typeof entry === "function" ? entry() : remoteLoader({ name, entry }))).default({
         root: this.$root.$el,
         store: this.$store,
-        Vue,
-        VueRouter,
+        Vue: this.$root.constructor,
+        VueRouter: this.$router.constructor,
         name
       });
       this.$on("hook:beforeDestroy", () => {

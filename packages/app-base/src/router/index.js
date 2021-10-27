@@ -1,6 +1,6 @@
 import VueRouter from "vue-router"
 import Vue from "vue"
-import loadable from "../utils/loadable";
+import loadable from "../../../../src/loadable";
 
 const router = new VueRouter({
     routes: [

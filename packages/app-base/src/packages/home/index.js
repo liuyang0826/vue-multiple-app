@@ -1,5 +1,5 @@
 import App from "./App";
-import connector from "../../utils/connector";
+import connector from "../../../../../src/connector";
 import routerOption from "./router-option"
 
 export default connector({
