@@ -71,6 +71,11 @@ const chainWebpack = (config, { name }) => {
 
     config.plugin("DumpAssetsPlugin")
         .use(DumpAssetsPlugin, [{ name }])
+
+    config.module
+        .rule('js')
+        .exclude
+        .add(/node_modules\/@cisdiliuyang/);
 }
 
 const globalNamespacePlugin = postcss.plugin('postcss-global-namespace', (options) => {

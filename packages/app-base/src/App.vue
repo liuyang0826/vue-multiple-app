@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import loadable from "../../../src/loadable";
+import loadable from "@cisdiliuyang/vue-multiple-app/src/loadable";
 
 export default {
   name: 'App',

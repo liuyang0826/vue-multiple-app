@@ -1,6 +1,6 @@
 import VueRouter from "vue-router"
 import Vue from "vue"
-import loadable from "../../../../src/loadable";
+import loadable from "@cisdiliuyang/vue-multiple-app/src/loadable";
 
 const router = new VueRouter({
     routes: [
