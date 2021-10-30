@@ -1,71 +1,71 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    --{{age}}--
-    <button @click="handleClick">点击</button>
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    {{ searchLoading }}
+    <button @click="handleSearch">点击</button>
+    <button @click="handleAdd">新增</button>
+    <div>212</div>
+    <el-dialog :visible.sync="visible" title="dsadsa">
+      <dialog-form />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import HelloWorld from "@/components/HelloWorld.vue";
+import { Dialog } from "element-ui"
+import DialogForm from "./DialogForm";
+import {
+  pipe,
+  useFormCtrl,
+  useModalCtrl,
+  usePager,
+  useSearch
+} from "../utils";
 
-const injectData = (options, injectData) => {
-  const data = options.data
-  options.data = () => {
-    return {
-      ...data?.(),
-      ...injectData
-    }
-  }
-}
+const searchOptions = {
+  getTableData () {
+    console.log("getTableData", this);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 1000);
+    });
+  },
+  immediate: true
+};
 
-const injectMethods = (options, injectMethods) => {
-  const methods = options.methods
-  const newOptions = Object.keys(injectMethods).reduce((options, key) => {
-    const injectFn = injectMethods[key]
-    options[key] = methods[key] ? function () {
-      injectFn.call(this)
-      methods[key].call(this)
-    } : injectFn
-    return options
-  }, {})
-
-  options.methods = {
-    ...methods,
-    ...newOptions,
-  }
-}
-
-const withAge = (options) => {
-  injectData(options, {
-    age: 0
-  })
-
-  injectMethods(options, {
-    handleClick() {
-      this.age++
-    }
-  })
-  return options
-}
-
-export default withAge({
-  name: 'Home',
+export default pipe(useSearch(searchOptions), usePager(), useModalCtrl(), useFormCtrl())({
+  name: "Home",
   components: {
-    HelloWorld
+    HelloWorld,
+    ElDialog: Dialog,
+    DialogForm,
+  },
+  created () {
+    console.log(this);
   },
   methods: {
-    handleClick() {
+    handleClick () {
       console.log(1);
     }
   }
-})
+});
 </script>
 
 <style scoped>
 .home ::v-deep a {
   color: red;
+  animation: fn 1s linear;
+}
+
+@keyframes fn {
+  0% {
+    color: #ffffff;
+  }
+  100% {
+    color: blue;
+  }
 }
 </style>

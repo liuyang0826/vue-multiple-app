@@ -66,23 +66,27 @@ const before = (app) => {
 
 const chainWebpack = (config, { name }) => {
     config.output
-        .libraryTarget("umd")
-        .library(name);
+    .libraryTarget("umd")
+    .library(name);
 
     config.plugin("DumpAssetsPlugin")
-        .use(DumpAssetsPlugin, [{ name }])
+    .use(DumpAssetsPlugin, [{ name }])
 
     config.module
-        .rule('js')
-        .exclude
-        .add(/node_modules\/@cisdiliuyang/);
+    .rule('js')
+    .exclude
+    .add(/node_modules\/@cisdiliuyang/);
 }
 
 const globalNamespacePlugin = postcss.plugin('postcss-global-namespace', (options) => {
     const { name } = options
     return root => {
         root.walk(node => {
-            return node.selector = (((node.selector || '').split(',') || []).map((item) => {
+            // @keyframes fn 动画函数不修改
+            if (node.parent.type === "atrule" && node.parent.name === "keyframes") {
+                return
+            }
+            node.selector = (((node.selector || '').split(',') || []).map((item) => {
                 return item.match(/^(\s*)(html|body)(\s*)$/) ? item : name + ' ' + item.trim()
             }).join(','))
         })
