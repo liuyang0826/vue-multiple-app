@@ -2,16 +2,23 @@
   <div>Dialog</div>
 </template>
 
-<script>/**
+<script>
+/**
  * @Describe: Describe
  * @Author: 丿Coder
  * @Date: 2021-10-30 22:11
  */
-import { pipe, useForm } from "../utils";
+import {pipe, useModalForm} from "../utils";
 
-export default pipe(useForm())({
+export default pipe(useModalForm({
+  onShow() {
+    console.log("onShow", this);
+  }
+}))({
   name: "DialogForm",
-  created () {}
+  created () {
+    console.log(1111, this);
+  }
 });
 </script>
 

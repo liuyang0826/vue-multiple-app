@@ -903,10 +903,10 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@cisdiliuyang/vue-multiple-app@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/@cisdiliuyang/vue-multiple-app/-/vue-multiple-app-0.0.1.tgz#fc22d108eeb6f6023783398f619ef0be8707bdc3"
-  integrity sha512-Mz92DkFtWKgPcj9mES5Z0NdAEwrDIJk5A/ZIWaYwZI7hdT4hOmDfIZHX+6qCk7/1iNOtvLvAFXrqK3BGu+1ZlQ==
+"@cisdiliuyang/vue-multiple-app@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/@cisdiliuyang/vue-multiple-app/-/vue-multiple-app-0.0.2.tgz#e8ffa8e3875f268f2a38ab56da4a522f45849c0e"
+  integrity sha512-v+WNIaUbwKIaCoudYS4AcWG19WIFB9z9E7h1eGRBm/IEePEb6yxVDieRDiXYvEvblcWoUZa9Mrbc6l7YAKN5aQ==
   dependencies:
     postcss "^7.0.39"
 

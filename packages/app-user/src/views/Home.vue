@@ -1,12 +1,14 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
     {{ searchLoading }}
+    <el-form>
+      <el-form-item label=""></el-form-item>
+    </el-form>
     <button @click="handleSearch">点击</button>
     <button @click="handleAdd">新增</button>
     <div>212</div>
-    <el-dialog :visible.sync="visible" title="dsadsa">
-      <dialog-form />
+    <el-dialog :visible.sync="addVisible" title="dsadsa">
+      <dialog-form :visible="addVisible" :data="addForm" />
     </el-dialog>
   </div>
 </template>
@@ -17,9 +19,7 @@ import HelloWorld from "@/components/HelloWorld.vue";
 import { Dialog } from "element-ui"
 import DialogForm from "./DialogForm";
 import {
-  pipe,
-  useFormCtrl,
-  useModalCtrl,
+  pipe, useModalFormCtrl,
   usePager,
   useSearch
 } from "../utils";
@@ -36,7 +36,17 @@ const searchOptions = {
   immediate: true
 };
 
-export default pipe(useSearch(searchOptions), usePager(), useModalCtrl(), useFormCtrl())({
+export default pipe(
+    useSearch(searchOptions),
+    usePager(),
+    useModalFormCtrl({
+      name: "add",
+      afterHandler() {
+        console.log(this, arguments);
+      }
+    }),
+    useModalFormCtrl({ name: "edit" }),
+)({
   name: "Home",
   components: {
     HelloWorld,

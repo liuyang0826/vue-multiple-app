@@ -1,4 +1,5 @@
 export const pipe = (...fns) => x => fns.reduce((x, f) => f(x), x);
+const makeCamelCase = (first, ...args) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
 
 export const injectLifecycle = (lifecycle, fn) => options => {
   const originFn = options[lifecycle];
@@ -56,6 +57,15 @@ export const injectWatch = (injectWatch) => options => {
   return options;
 }
 
+export const injectComponents = (injectComponents) => options => {
+  const components = options.components
+  options.components = {
+    ...injectComponents,
+    ...components,
+  };
+  return options;
+}
+
 export const usePager = (pagerOptions = {}) => {
   const { name } = pagerOptions
   console.log(name);
@@ -76,12 +86,12 @@ export const usePager = (pagerOptions = {}) => {
   )(options)
 };
 
-export const useSearch = (searchOptions = {}) => {
-  const { getTableData, immediate } = searchOptions;
+export const useSearch = ({ getTableData, immediate } = {}) => {
   return options => pipe(
   injectData({
     query: {},
-    searchLoading: false
+    searchLoading: false,
+    tableData: []
   }),
   injectMethods({
     async handleSearch () {
@@ -98,32 +108,29 @@ export const useSearch = (searchOptions = {}) => {
   )(options);
 };
 
-export const useModalCtrl = (modalCtrlOptions = {}) => {
-  const { name } = modalCtrlOptions;
-  const visible = name ? `${name}Visible` : "visible"
+export const useModalCtrl = ({ name, title } = {}) => {
   return options => pipe(
     injectData({
-      [visible]: false
-    }),
-    injectMethods({
-      handleAdd() {
-        this[visible] = true
-      }
+      [makeCamelCase(name, "visible")]: false,
+      [makeCamelCase(name, "title")]: title,
     })
   )(options);
 };
 
 export const useModal = (modalOptions = {}) => {
-  const { name, onShow } = modalOptions;
+  const { onShow } = modalOptions;
   return options => pipe(
   injectProps({
-    [name ? `${name}Visible` : "visible"]: Boolean
+    visible: Boolean
   }),
   injectWatch({
-    visible(visible) {
-      if (visible) {
-        onShow?.call(this)
-      }
+    visible: {
+      handler(visible) {
+        if (visible) {
+          onShow?.call(this)
+        }
+      },
+      immediate: true
     }
   })
   )(options);
@@ -132,27 +139,55 @@ export const useModal = (modalOptions = {}) => {
 export const useFormCtrl = (formOptions = {}) => {
   const { name } = formOptions;
   return options => injectData({
-    [name ? `${name}Form` : "form"]: {}
+    [makeCamelCase(name, "form")]: {}
   })(options);
 };
 
-export const useForm = (formOptions = {}) => {
-  const { name, doSubmit } = formOptions
+export const useModalFormCtrl = ({ name, title, afterHandler } = {}) => {
   return options => pipe(
-  injectProps({
-    [name ? `${name}Form` : "form"]: Object
-  }),
-  injectData({
-    formLoading: false
-  }),
-  injectMethods({
-    handleSubmit() {
-      this.formLoading = true
-      doSubmit.call(this)
-      .finally(() => {
-        this.formLoading = false
+      useModalCtrl({ name, title }),
+      useFormCtrl({ name }),
+      injectMethods({
+        [makeCamelCase("handle", name)](row, ...args) {
+          console.log(row);
+          this[makeCamelCase(name, "visible")] = true
+          this[makeCamelCase(name, "form")] = row.constructor === Object ? row : {}
+          afterHandler?.call(this, row, ...args)
+        }
       })
-    }
-  })
   )(options)
+}
+
+export const useModalForm = ({ doSubmit, onShow, formRules = {} } = {} ) => {
+  return pipe(
+      useModal({
+        onShow() {
+          this.formLoading = false
+          this.form = JSON.parse(JSON.stringify(this.data))
+          onShow?.()
+        }
+      }),
+      injectProps({
+        data: Object,
+        title: String
+      }),
+      injectData({
+        formLoading: false,
+        form: {},
+        formRules,
+      }),
+      injectMethods({
+        handleSubmit() {
+          this.$refs.form.validate((flag) => {
+            if (flag) {
+              this.formLoading = true
+              doSubmit.call(this)
+                  .finally(() => {
+                    this.formLoading = false
+                  })
+            }
+          })
+        }
+      })
+  )
 };

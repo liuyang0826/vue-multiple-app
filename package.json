@@ -1,8 +1,13 @@
 {
   "name": "@cisdiliuyang/vue-multiple-app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
+    "koa": "^2.13.4",
+    "koa-router": "^10.1.1",
     "postcss": "^7.0.39"
   },
-  "files": ["src", "package.json"]
+  "files": [
+    "src",
+    "package.json"
+  ]
 }
