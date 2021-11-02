@@ -22,7 +22,7 @@ const descriptions = [
 
 ]
 
-const process = ({ name, options}) => {
+const process = ({ name, options, parentOptions}) => {
     const { formItems, width = 440 } = options
 
     const pipeMethods = [
@@ -31,13 +31,18 @@ const process = ({ name, options}) => {
     formRules: {
       ${formItems?.filter(d => d.required).map(d => `${d.prop}: { required: true, message: "请输入${d.label}" }`).join(",\n      ")}
     },
-    async onSubmit() {}
+    async onSubmit() {
+      await ${parentOptions.namespace}(this.form)
+    }
   })`
     ]
-    const serviceImports = []
-    const utilImports = new Set(["useModalForm"])
-    const componentImports = new Set()
-
+    const services = [
+        {
+            name: parentOptions.namespace,
+            method: "post",
+            api: `/api/${parentOptions.namespace}`
+        }
+    ]
 
     return {
         options: {
@@ -50,25 +55,24 @@ const process = ({ name, options}) => {
                 width,
             }), 2),
             pipeMethods,
-            componentImports: [...componentImports],
-            utilImports: [...utilImports],
-            serviceImports,
         },
         components: [],
-        services: []
+        services
     }
 }
 
 const injectParent = (options) => {
-    const utilImports = []
-    const pipeMethods = []
-    utilImports.push("useModalFormCtrl")
-    pipeMethods.push(`useModalFormCtrl({ name: "${options.namespace}", title: "${options.title}" })`)
+    const pipeMethods = [
+        `useModalFormCtrl({ name: "${options.namespace}", title: "${options.title}" })`
+    ]
 
-    const props = [`:visible.sync="${options.namespace}Visible"`, `:data="${options.namespace}Form"`, `:title="${options.namespace}Title"`]
+    const props = [
+        `:visible.sync="${options.namespace}Visible"`,
+        `:data="${options.namespace}Form"`,
+        `:title="${options.namespace}Title"`
+    ]
 
     return {
-        utilImports,
         pipeMethods,
         props,
     }

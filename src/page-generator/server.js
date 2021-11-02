@@ -31,9 +31,9 @@ const createServer = () => {
                     { label: "备注", prop: "remarks" },
                 ],
                 hasPagination: true,
-                addFormDialog: {
+                addForm: {
                     templateId: "dialog-form",
-                    name: "AddFormDialog",
+                    name: "AddForm",
                     parentOptions: {
                         title: "新增用户"
                     },
@@ -46,9 +46,9 @@ const createServer = () => {
                         ]
                     }
                 },
-                editFormDialog: {
+                updateForm: {
                     templateId: "dialog-form",
-                    name: "EditFormDialog",
+                    name: "UpdateForm",
                     parentOptions: {
                         title: "编辑用户"
                     },

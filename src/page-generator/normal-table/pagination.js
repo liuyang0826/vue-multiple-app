@@ -5,12 +5,12 @@ const template = `
   style="margin-top: 16px;"
   small
   background
-  :total="<%total%>"
-  :page-size="<%pageSize%>"
-  :current-page="<%pageNum%>"
-  @sizeChange="<%handleSizeChange%>"
-  @currentChange="<%handleCurrentChange%>"
+  :total="total"
+  :page-size="pageSize"
+  :current-page="pageNum"
+  @sizeChange="handleSizeChange"
+  @currentChange="handleCurrentChange"
 />
 `
 
-module.exports = ({ total, pageSize, pageNum, handleSizeChange, handleCurrentChange }) => injectTemplate(template, { total, pageSize, pageNum, handleSizeChange, handleCurrentChange }, 2)
+module.exports = () => injectTemplate(template, {}, 2)

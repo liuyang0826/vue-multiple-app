@@ -23,6 +23,10 @@ import pipe from "../../utils/pipe";
 import {
   useModalForm
 } from "../../utils"
+import {
+  update
+} from "../services"
+
 export default pipe(
   useModalForm({
     onShow() {},
@@ -30,10 +34,12 @@ export default pipe(
       username: { required: true, message: "请输入用户名" },
       password: { required: true, message: "请输入密码" }
     },
-    async onSubmit() {}
+    async onSubmit() {
+      await update(this.form)
+    }
   })
 )({
-  name: "EditFormDialog",
+  name: "UpdateForm",
 })
 </script>
 

@@ -16,26 +16,6 @@ const template = `
 </div>
 `
 
-const makeCustomOptions = ({ formItems, tableCols, hasPagination, hasBatchDel, addFormDialog }) => {
-    return {
-        searchForm: searchForm({
-            formItems
-        }),
-        table: table({
-            loading: "searchLoading",
-            tableCols
-        }),
-        pagination: hasPagination && pagination({
-            total: "total",
-            pageSize: "pageSize",
-            pageNum: "pageNum",
-            handleCurrentChange: "handleCurrentChange",
-            handleSizeChange: "handleSizeChange",
-        }),
-        handleButton: handleButton({hasBatchDel, addFormDialog}),
-    }
-}
-
 const descriptions = [
     {
         label: "查询表单项",
@@ -59,7 +39,7 @@ const descriptions = [
     },
 ]
 
-const process = ({ name, options }) => {
+const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatchDel, addForm, updateForm } }) => {
     const pipeMethods = [
         `useSearch({
     async getTableData() {
@@ -70,41 +50,61 @@ const process = ({ name, options }) => {
   })`,
     ]
 
-    const utilImports = [
-        "useSearch",
+    const services = [
+        {
+            name: "getTableData",
+            method: "get",
+            api: "/api/list"
+        },
     ]
 
-    const serviceImports = ["getTableData"]
-
-    if (options.hasPagination) {
-        utilImports.push("usePager")
+    if (hasPagination) {
         pipeMethods.push("usePager()")
     }
 
-    if (options.addFormDialog) {
-        options.addFormDialog.parentOptions.namespace = "add"
+    if (addForm) {
+        addForm.parentOptions.namespace = "add"
     }
 
-    if (options.editFormDialog) {
-        options.editFormDialog.parentOptions.namespace = "edit"
+    if (updateForm) {
+        updateForm.parentOptions.namespace = "update"
     }
 
     return {
         options: {
             name,
-            template: injectTemplate(template, makeCustomOptions(options), 2),
+            template: injectTemplate(template, {
+                searchForm: searchForm({
+                    formItems
+                }),
+                table: table({
+                    tableCols
+                }),
+                pagination: hasPagination && pagination(),
+                handleButton: handleButton({hasBatchDel, addForm}),
+            }, 2),
             pipeMethods,
-            utilImports,
-            serviceImports,
         },
-        components: [options.addFormDialog, options.editFormDialog].filter(Boolean),
-        services: [{
-            name: "getTableData"
-        }]
+        components: [addForm, updateForm].filter(Boolean),
+        services
+    }
+}
+
+const injectParent = () => {
+    const pipeMethods = []
+
+    const props = [
+        `:data="addForm"`,
+    ]
+
+    return {
+        pipeMethods,
+        props,
     }
 }
 
 module.exports = {
     process,
     descriptions,
+    injectParent,
 }

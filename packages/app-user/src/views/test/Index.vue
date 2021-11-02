@@ -32,7 +32,7 @@
       <el-table-column label="备注" prop="remarks" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
-          <el-button size="small" @click="handleEdit(row)">编辑</el-button>
+          <el-button size="small" @click="handleUpdate(row)">编辑</el-button>
           <el-button size="small" @click="handleDelete(row)" type="danger">删除</el-button>
         </template>
       </el-table-column>
@@ -47,8 +47,8 @@
       @sizeChange="handleSizeChange"
       @currentChange="handleCurrentChange"
     />
-    <add-form-dialog :visible.sync="addVisible" :data="addForm" :title="addTitle" />
-    <edit-form-dialog :visible.sync="editVisible" :data="editForm" :title="editTitle" />
+    <add-form :visible.sync="addVisible" :data="addForm" :title="addTitle" />
+    <update-form :visible.sync="updateVisible" :data="updateForm" :title="updateTitle" />
   </div>
 </template>
 
@@ -60,15 +60,15 @@ import {
   useModalFormCtrl,
   injectComponents
 } from "../../utils"
-import AddFormDialog from "./components/AddFormDialog"
-import EditFormDialog from "./components/EditFormDialog"
+import AddForm from "./components/AddForm"
+import UpdateForm from "./components/UpdateForm"
 import {
   getTableData
 } from "./services"
 
 export default pipe(
   useSearch({
-    async getTableData() {\
+    async getTableData() {
       const data = await getTableData()
       this.tableData = data
     },
@@ -76,8 +76,8 @@ export default pipe(
   }),
   usePager(),
   useModalFormCtrl({ name: "add", title: "新增用户" }),
-  useModalFormCtrl({ name: "edit", title: "编辑用户" }),
-  injectComponents({ AddFormDialog, EditFormDialog })
+  useModalFormCtrl({ name: "update", title: "编辑用户" }),
+  injectComponents({ AddForm, UpdateForm })
 )({
   name: "Test",
 })
