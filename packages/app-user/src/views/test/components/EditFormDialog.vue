@@ -33,7 +33,7 @@ export default pipe(
     async onSubmit() {}
   })
 )({
-  name: "EditForm",
+  name: "EditFormDialog",
 })
 </script>
 

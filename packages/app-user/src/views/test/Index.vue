@@ -19,7 +19,6 @@
         </el-form-item>
       </el-form>
       <div>
-        <el-button size="small" @click="handleBatchDel">批量删除</el-button>
         <el-button size="small" icon="el-icon-plus" @click="handleAdd" type="primary">添加</el-button>
       </div>
     </div>
@@ -34,11 +33,21 @@
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-          <el-button size="small" @click="handleEdit(row)" type="danger">删除</el-button>
+          <el-button size="small" @click="handleDelete(row)" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <add-form :visible.sync="addVisible" :data="addForm" :title="addTitle" />
+    <el-pagination
+      style="margin-top: 16px;"
+      small
+      background
+      :total="total"
+      :page-size="pageSize"
+      :current-page="pageNum"
+      @sizeChange="handleSizeChange"
+      @currentChange="handleCurrentChange"
+    />
+    <add-form-dialog :visible.sync="addVisible" :data="addForm" :title="addTitle" />
     <edit-form-dialog :visible.sync="editVisible" :data="editForm" :title="editTitle" />
   </div>
 </template>
@@ -47,26 +56,28 @@
 import pipe from "../../utils/pipe";
 import {
   useSearch,
-  injectComponents,
-  useModalFormCtrl
+  usePager,
+  useModalFormCtrl,
+  injectComponents
 } from "../../utils"
-import AddForm from "./components/AddForm"
+import AddFormDialog from "./components/AddFormDialog"
 import EditFormDialog from "./components/EditFormDialog"
 import {
   getTableData
-} from "./services/test"
+} from "./services"
 
 export default pipe(
   useSearch({
-    async getTableData() {
+    async getTableData() {\
       const data = await getTableData()
       this.tableData = data
     },
     immediate: true
   }),
-  useModalFormCtrl({ name: "add", title: "新增" }),
-  useModalFormCtrl({ name: "edit", title: "编辑" }),
-  injectComponents({ AddForm, EditFormDialog })
+  usePager(),
+  useModalFormCtrl({ name: "add", title: "新增用户" }),
+  useModalFormCtrl({ name: "edit", title: "编辑用户" }),
+  injectComponents({ AddFormDialog, EditFormDialog })
 )({
   name: "Test",
 })

@@ -15,5 +15,5 @@ const formItemTemp = `
 </el-form-item>`
 
 module.exports = ({formItems}) => injectTemplate(template, {
-    formItems: formItems.map(d => injectTemplate(formItemTemp, d, 2)).join("\n"),
+    formItems: formItems?.map(d => injectTemplate(formItemTemp, d, 2)).join("\n") || " ",
 }, 4)

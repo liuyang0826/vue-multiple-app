@@ -1,6 +1,6 @@
 const Koa = require("koa")
 const KoaRouter = require("koa-router")
-const createFile = require("./component")
+const writeFile = require("./write-file")
 
 const createServer = () => {
     const app = new Koa()
@@ -11,7 +11,7 @@ const createServer = () => {
     })
 
     router.get("/", async (ctx) => {
-        createFile({
+        writeFile({
             templateId: "normal-table",
             name: "Test",
             options: {
@@ -30,29 +30,38 @@ const createServer = () => {
                     { label: "备注", prop: "remarks" },
                     { label: "备注", prop: "remarks" },
                 ],
-                // hasPagination: true,
-                addDialog: {
+                hasPagination: true,
+                addFormDialog: {
                     templateId: "dialog-form",
-                    name: "AddForm",
-                    formItems: [
-                        { label: "用户名", prop: "username", maxlength: 100, required: true },
-                        { label: "密码", prop: "password", maxlength: 100, required: true },
-                        // { label: "年龄", prop: "age", maxlength: 2, required: true },
-                        { label: "班级", prop: "class", maxlength: 100 },
-                    ]
+                    name: "AddFormDialog",
+                    parentOptions: {
+                        title: "新增用户"
+                    },
+                    options: {
+                        formItems: [
+                            { label: "用户名", prop: "username", maxlength: 100, required: true },
+                            { label: "密码", prop: "password", maxlength: 100, required: true },
+                            // { label: "年龄", prop: "age", maxlength: 2, required: true },
+                            { label: "班级", prop: "class", maxlength: 100 },
+                        ]
+                    }
                 },
-                editDialog: {
+                editFormDialog: {
                     templateId: "dialog-form",
-                    name: "EditForm",
-                    formItems: [
-                        { label: "用户名", prop: "username", maxlength: 100, required: true },
-                        { label: "密码", prop: "password", maxlength: 100, required: true },
-                        // { label: "年龄", prop: "age", maxlength: 2, required: true },
-                        { label: "班级", prop: "class", maxlength: 100 },
-                    ],
+                    name: "EditFormDialog",
+                    parentOptions: {
+                        title: "编辑用户"
+                    },
+                    options: {
+                        formItems: [
+                            { label: "用户名", prop: "username", maxlength: 100, required: true },
+                            { label: "密码", prop: "password", maxlength: 100, required: true },
+                            // { label: "年龄", prop: "age", maxlength: 2, required: true },
+                            { label: "班级", prop: "class", maxlength: 100 },
+                        ],
+                    }
                 },
             },
-            components: []
         })
         ctx.body = "success"
     })

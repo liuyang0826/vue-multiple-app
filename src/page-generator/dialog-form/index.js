@@ -9,6 +9,7 @@ const template = `
     <el-button size="small" @click="$emit('update:visible', false)">取消</el-button>
     <el-button size="small" type="primary" :loading="formLoading" @click="handleSubmit">确定</el-button>
   </template>
+  <%components%>
 </el-dialog>
 `
 
@@ -21,7 +22,9 @@ const descriptions = [
 
 ]
 
-const process = ({ name, formItems, width = 440 }) => {
+const process = ({ name, options}) => {
+    const { formItems, width = 440 } = options
+
     const pipeMethods = [
         `useModalForm({
     onShow() {},
@@ -56,7 +59,22 @@ const process = ({ name, formItems, width = 440 }) => {
     }
 }
 
+const injectParent = (options) => {
+    const utilImports = []
+    const pipeMethods = []
+    utilImports.push("useModalFormCtrl")
+    pipeMethods.push(`useModalFormCtrl({ name: "${options.namespace}", title: "${options.title}" })`)
+
+    const props = [`:visible.sync="${options.namespace}Visible"`, `:data="${options.namespace}Form"`, `:title="${options.namespace}Title"`]
+
+    return {
+        utilImports,
+        pipeMethods,
+        props,
+    }
+}
 module.exports = {
     process,
     descriptions,
+    injectParent,
 }

@@ -1,32 +1,25 @@
 const searchForm = require("./search-form")
 const table = require("./table")
 const pagination = require("./pagination")
-const headerButton = require("./header-button")
-const dialogForm = require("./dialog-form")
-const { injectTemplate, componentNameToTagName } = require("../utils")
+const handleButton = require("./handle-button")
+const { injectTemplate } = require("../utils")
 
 const template = `
 <div>
   <div>
     <%searchForm%>
-    <%headerButton%>
+    <%handleButton%>
   </div>
   <%table%>
   <%pagination%>
-  <%addDialogForm%>
-  <%editDialogForm%>
   <%components%>
 </div>
 `
 
-const makeCustomOptions = ({ formItems, tableCols, hasPagination, addDialog, editDialog, components }) => {
+const makeCustomOptions = ({ formItems, tableCols, hasPagination, hasBatchDel, addFormDialog }) => {
     return {
         searchForm: searchForm({
             formItems
-        }),
-        headerButton: headerButton({
-            handleAdd: "handleAdd",
-            handleBatchDel: "handleBatchDel",
         }),
         table: table({
             loading: "searchLoading",
@@ -39,19 +32,7 @@ const makeCustomOptions = ({ formItems, tableCols, hasPagination, addDialog, edi
             handleCurrentChange: "handleCurrentChange",
             handleSizeChange: "handleSizeChange",
         }),
-        addDialogForm: addDialog && dialogForm({
-            visible: "addVisible",
-            tag: componentNameToTagName(addDialog.name),
-            data: "addForm",
-            title: "addTitle",
-        }),
-        editDialogForm: editDialog && dialogForm({
-            visible: "editVisible",
-            tag: componentNameToTagName(editDialog.name),
-            data: "editForm",
-            title: "editTitle",
-        }),
-        components: components.map(d => `<${componentNameToTagName(d.name)} />`).join("\n  ")
+        handleButton: handleButton({hasBatchDel, addFormDialog}),
     }
 }
 
@@ -78,7 +59,7 @@ const descriptions = [
     },
 ]
 
-const process = ({ name, formItems, tableCols, hasPagination, addDialog, editDialog, components }) => {
+const process = ({ name, options }) => {
     const pipeMethods = [
         `useSearch({
     async getTableData() {
@@ -89,52 +70,37 @@ const process = ({ name, formItems, tableCols, hasPagination, addDialog, editDia
   })`,
     ]
 
-    const utilImports = new Set([
+    const utilImports = [
         "useSearch",
-        "injectComponents",
-    ])
-
-    const componentImports = new Set(components.map(d => d.name))
+    ]
 
     const serviceImports = ["getTableData"]
 
-    if (hasPagination) {
-        utilImports.add("usePager")
+    if (options.hasPagination) {
+        utilImports.push("usePager")
         pipeMethods.push("usePager()")
     }
 
-    if (addDialog) {
-        componentImports.add(addDialog.name)
-        utilImports.add("useModalFormCtrl")
-        pipeMethods.push(`useModalFormCtrl({ name: "add", title: "新增" })`)
+    if (options.addFormDialog) {
+        options.addFormDialog.parentOptions.namespace = "add"
     }
 
-    if (editDialog) {
-        componentImports.add(editDialog.name)
-        utilImports.add("useModalFormCtrl")
-        pipeMethods.push(`useModalFormCtrl({ name: "edit", title: "编辑" })`)
+    if (options.editFormDialog) {
+        options.editFormDialog.parentOptions.namespace = "edit"
     }
-
-    pipeMethods.push(`injectComponents({ ${[...componentImports].join(", ")} })`)
 
     return {
         options: {
             name,
-            template: injectTemplate(template, makeCustomOptions({
-                formItems,
-                tableCols,
-                hasPagination,
-                addDialog,
-                editDialog,
-                components,
-            }), 2),
+            template: injectTemplate(template, makeCustomOptions(options), 2),
             pipeMethods,
-            componentImports: [...componentImports],
-            utilImports: [...utilImports],
+            utilImports,
             serviceImports,
         },
-        components: [...components, addDialog, editDialog].filter(Boolean),
-        services: []
+        components: [options.addFormDialog, options.editFormDialog].filter(Boolean),
+        services: [{
+            name: "getTableData"
+        }]
     }
 }
 

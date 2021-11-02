@@ -1,4 +1,4 @@
-const { injectTemplate, firstToLowerCase, firstToUpperCase } = require("./utils")
+const { injectTemplate, componentNameToTagName, firstToLowerCase, firstToUpperCase } = require("./utils")
 
 const baseTemplate =
 `<template>
@@ -29,23 +29,62 @@ const utilImportsTemplate =
 const serviceImportsTemplate =
 `import {
   <%imports%>
-} from "./services/<%fileName%>"`
+} from "./services<%fileName%>"`
 
-const componentImportsTemplate =
-`import <%name%> from "./components/<%name%>"`
+const componentImportsTemplate = `import <%name%> from "./components/<%name%>"`
 
-module.exports = ({ template, utilImports, componentImports, serviceImports, pipeMethods, name }) => {
-    return injectTemplate(baseTemplate, {
-        template,
-        name: firstToUpperCase(name),
-        utilImports: utilImports?.length ? injectTemplate(utilImportsTemplate, {
-            imports: utilImports.join(",\n  ")
-        }) : " ",
-        componentImports: componentImports?.map(name => injectTemplate(componentImportsTemplate, { name })).join("\n") || " ",
-        serviceImports: serviceImports?.length ? injectTemplate(serviceImportsTemplate, {
-            imports: serviceImports.join(",\n  "),
-            fileName: firstToLowerCase(name),
-        }) : " ",
-        pipeMethods: pipeMethods?.join(",\n  ") || " ",
+const componentsTemplate = `<<%component%><%props%>/>`
+
+module.exports = (config, type) => {
+    const { components } = config
+    const { options, components: privateComponents, services } = require(`./${config.templateId}`).process(config)
+
+    const mergedComponents = [...(privateComponents || []), ...(components || [])]
+
+    const { template, utilImports, serviceImports, pipeMethods, name } = options
+
+    const realUtilImports = new Set(utilImports)
+
+    const injectParents = mergedComponents.map((item) => require(`./${item.templateId}`).injectParent(item.parentOptions))
+
+    injectParents?.forEach(({ utilImports: injectUtilImports, pipeMethods: injectPipeMethods }) => {
+        injectUtilImports.forEach((item) => {
+            realUtilImports.add(item)
+        })
+        injectPipeMethods.forEach((item) => {
+            pipeMethods.push(item)
+        })
     })
+
+    const componentNames = [...new Set(mergedComponents.map(d => d.name))]
+    if (mergedComponents.length) {
+        realUtilImports.add("injectComponents")
+        pipeMethods.push(`injectComponents({ ${componentNames.join(", ")} })`)
+    }
+
+    return {
+        template: injectTemplate(injectTemplate(baseTemplate, {
+            template,
+            name: firstToUpperCase(name),
+            utilImports: realUtilImports.size ? injectTemplate(utilImportsTemplate, {
+                imports: [...realUtilImports].join(",\n  ")
+            }) : " ",
+            componentImports: componentNames.map(name => injectTemplate(componentImportsTemplate, { name })).join("\n") || " ",
+            serviceImports: serviceImports?.length ? injectTemplate(serviceImportsTemplate, {
+                imports: serviceImports.join(",\n  "),
+                fileName: type === "page" ? "" : `/${firstToLowerCase(name)}`,
+            }) : " ",
+            pipeMethods: pipeMethods?.join(",\n  ") || " ",
+        }), {
+            components: mergedComponents.map((item, index) => {
+                const props = injectParents[index].props || []
+                return injectTemplate(componentsTemplate, {
+                    component: componentNameToTagName(item.name),
+                    props: props.length ?` ${injectParents[index].props?.join(" ")} ` : " "
+                }, 4)
+            }) .join("\n    ")|| " "
+        }),
+        components: mergedComponents,
+        services
+    }
 }
