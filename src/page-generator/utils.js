@@ -21,7 +21,7 @@ const firstToLowerCase = str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.to
 const firstToUpperCase = str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)
 const componentNameToTagName = str => firstToUpperCase(str).replace(/[A-Z]/g, (a) => `-${a.toLowerCase()}`).slice(1)
 
-const finishInject = template => replace(template, /<%(\w+?)%>/, () => "").replace(/\n\s+\n/g, "\n")
+const prettier = template => replace(template, /<%(\w+?)%>/, () => "").replace(/\n\s+\n/g, "\n")
 
 module.exports = {
     injectTemplate,
@@ -29,5 +29,5 @@ module.exports = {
     firstToUpperCase,
     componentNameToTagName,
     replace,
-    finishInject,
+    prettier,
 }

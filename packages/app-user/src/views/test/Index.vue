@@ -39,7 +39,7 @@
       </el-table-column>
     </el-table>
     <add-form :visible.sync="addVisible" :data="addForm" :title="addTitle" />
-    <edit-form :visible.sync="editVisible" :data="editForm" :title="editTitle" />
+    <edit-form-dialog :visible.sync="editVisible" :data="editForm" :title="editTitle" />
   </div>
 </template>
 
@@ -51,7 +51,7 @@ import {
   useModalFormCtrl
 } from "../../utils"
 import AddForm from "./components/AddForm"
-import EditForm from "./components/EditForm"
+import EditFormDialog from "./components/EditFormDialog"
 import {
   getTableData
 } from "./services/test"
@@ -66,7 +66,7 @@ export default pipe(
   }),
   useModalFormCtrl({ name: "add", title: "新增" }),
   useModalFormCtrl({ name: "edit", title: "编辑" }),
-  injectComponents({ AddForm, EditForm })
+  injectComponents({ AddForm, EditFormDialog })
 )({
   name: "Test",
 })

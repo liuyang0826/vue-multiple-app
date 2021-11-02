@@ -41,13 +41,13 @@ const makeCustomOptions = ({ formItems, tableCols, hasPagination, addDialog, edi
         }),
         addDialogForm: addDialog && dialogForm({
             visible: "addVisible",
-            tag: "add-form",
+            tag: componentNameToTagName(addDialog.name),
             data: "addForm",
             title: "addTitle",
         }),
         editDialogForm: editDialog && dialogForm({
             visible: "editVisible",
-            tag: "edit-form",
+            tag: componentNameToTagName(editDialog.name),
             data: "editForm",
             title: "editTitle",
         }),
@@ -104,13 +104,13 @@ const process = ({ name, formItems, tableCols, hasPagination, addDialog, editDia
     }
 
     if (addDialog) {
-        componentImports.add("AddForm")
+        componentImports.add(addDialog.name)
         utilImports.add("useModalFormCtrl")
         pipeMethods.push(`useModalFormCtrl({ name: "add", title: "新增" })`)
     }
 
     if (editDialog) {
-        componentImports.add("EditForm")
+        componentImports.add(editDialog.name)
         utilImports.add("useModalFormCtrl")
         pipeMethods.push(`useModalFormCtrl({ name: "edit", title: "编辑" })`)
     }
