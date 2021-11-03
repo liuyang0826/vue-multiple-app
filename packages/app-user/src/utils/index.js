@@ -1,4 +1,4 @@
-export const pipe = (...fns) => x => fns.reduce((x, f) => f(x), x);
+export const pipe = (...fns) => x => fns.reduce((x, f) => typeof f === "function" ? f(x) : x, x);
 const makeCamelCase = (first, ...args) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
 
 export const injectLifecycle = (lifecycle, fn) => options => {
@@ -66,8 +66,7 @@ export const injectComponents = (injectComponents) => options => {
   return options;
 }
 
-export const usePager = (pagerOptions = {}) => {
-  const { name } = pagerOptions
+export const usePager = ({ name, onChange } = {}) => {
   console.log(name);
   return options => pipe(
   injectData({
@@ -78,9 +77,19 @@ export const usePager = (pagerOptions = {}) => {
   injectMethods({
     handleCurrentChange (val) {
       this.pageNum = val;
+      if (typeof onChange === "string") {
+        this[onChange]()
+      } else {
+        onChange.call(this, val)
+      }
     },
     handleSizeChange (val) {
       this.pageSize = val;
+      if (typeof onChange === "string") {
+        this[onChange]()
+      } else {
+        onChange.call(this, val)
+      }
     }
   })
   )(options)
@@ -102,11 +111,34 @@ export const useSearch = ({ getTableData, immediate } = {}) => {
       });
     }
   }),
-  (options) => immediate ? injectLifecycle("created", function () {
+  immediate && injectLifecycle("created", function () {
     this.handleSearch();
-  })(options) : options
+  })
   )(options);
 };
+
+export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, immediate, dep }) => {
+  const methodName = makeCamelCase("get", namespace, "options")
+  return options => pipe(
+    injectData({
+      [makeCamelCase(namespace, "options")]: selectOptions
+    }),
+    getOptions && injectMethods({
+      [methodName]: getOptions
+    }),
+    immediate && !dep && getOptions && injectLifecycle("created", function () {
+      this[methodName]();
+    }),
+    dep && getOptions && injectWatch({
+      [dep]: {
+        handler () {
+          this[methodName]();
+        },
+        immediate
+      }
+    })
+  )(options)
+}
 
 export const useModalCtrl = ({ name, title } = {}) => {
   return options => pipe(

@@ -9,11 +9,25 @@ const template = `
 </el-form>
 `
 
-const formItemTemp = `
+const inputItemTemp = `
 <el-form-item label="<%label%>">
-  <el-input v-model="query.<%prop%>" maxlength="<%maxlength%>" />
+  <el-input clearable v-model="query.<%prop%>" maxlength="<%maxlength%>" />
+</el-form-item>`
+
+const selectItemTemp = `
+<el-form-item label="<%label%>">
+  <el-select clearable v-model="query.<%prop%>"<%disabled%>>
+    <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
+  </el-select>
 </el-form-item>`
 
 module.exports = ({formItems}) => injectTemplate(template, {
-    formItems: formItems?.map(d => injectTemplate(formItemTemp, d, 2)).join("\n") || " ",
+    formItems: formItems?.map(item => {
+        if (item.type === "input") {
+            return injectTemplate(inputItemTemp, item.props, 2)
+        }
+        if (item.type === "select") {
+            return injectTemplate(selectItemTemp, item.props, 2)
+        }
+    }).join("\n") || " ",
 }, 4)

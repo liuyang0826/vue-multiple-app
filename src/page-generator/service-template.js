@@ -1,6 +1,7 @@
 const { injectTemplate } = require("./utils")
 const template =
-`import http from "@http"
+`//import http from "@http"
+const http = () => {}
 
 <%template%>`
 

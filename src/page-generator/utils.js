@@ -23,6 +23,8 @@ const componentNameToTagName = str => firstToUpperCase(str).replace(/[A-Z]/g, (a
 
 const prettier = template => replace(template, /<%(\w+?)%>/, () => "").replace(/\n\s+\n/g, "\n")
 
+const makeCamelCase = (first, ...args) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
+
 module.exports = {
     injectTemplate,
     firstToLowerCase,
@@ -30,4 +32,5 @@ module.exports = {
     componentNameToTagName,
     replace,
     prettier,
+    makeCamelCase,
 }

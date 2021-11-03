@@ -2,7 +2,7 @@ const searchForm = require("./search-form")
 const table = require("./table")
 const pagination = require("./pagination")
 const handleButton = require("./handle-button")
-const { injectTemplate } = require("../utils")
+const { injectTemplate, makeCamelCase } = require("../utils")
 
 const template = `
 <div>
@@ -25,9 +25,18 @@ const descriptions = [
             { label: "名称", prop: "label" },
             { label: "字段名", prop: "prop" },
             { label: "最大长度", prop: "maxlength" },
+            { label: "类型", prop: "itemType", type: "select", options: ["input", "select"] },
         ]
     },
-    { label: "表格列", prop: "tableCols", type: "array" },
+    {
+        label: "表格列",
+        prop: "tableCols",
+        type: "array",
+        items: [
+            { label: "名称", prop: "label" },
+            { label: "字段名", prop: "prop" },
+        ]
+    },
     { label: "显示分页", prop: "hasPagination", type: "boolean" },
     {
         label: "新增弹窗",
@@ -43,8 +52,12 @@ const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatc
     const pipeMethods = [
         `useSearch({
     async getTableData() {
-      const data = await getTableData()
-      this.tableData = data
+      const { status, data, message } = await getTableData()
+      if (status) {
+        this.tableData = data
+      } else {
+        this.$message.error(message)
+      }
     },
     immediate: true
   })`,
@@ -59,7 +72,7 @@ const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatc
     ]
 
     if (hasPagination) {
-        pipeMethods.push("usePager()")
+        pipeMethods.push(`usePager({ onChange: "handleSearch" })`)
     }
 
     if (addForm) {
@@ -69,6 +82,39 @@ const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatc
     if (updateForm) {
         updateForm.parentOptions.namespace = "update"
     }
+
+    if (formItems) {
+        formItems.filter(d => d.type === "select").forEach((item) => {
+            const dep = item.dep && `query.${formItems.find(d => d.id === item.dep).props.prop}`
+            if (dep) {
+                item.props.disabled = ` :disabled="!${dep}"`
+            }
+            pipeMethods.push(
+                `useSelectOptions({
+    namespace: "${item.props.prop}",
+    options: [${item.options ? "\n      " : ""}${item.options
+                    ?.map(({value, label}) => `{ value: "${value}", label: "${label}" }`)
+                    .join(",\n      ") || ""}${item.options ? "\n    " : ""}]${item.api ? `,\n    immediate: ${item.immediate || false},
+    async getOptions () {
+      const { status, data, message } = await ${makeCamelCase("get", item.props.prop, "options")}()
+      if (status) {
+        this.${item.props.prop}Options = data
+      } else {
+        this.$message.error(message)
+      }
+    }` : ""}${dep ? `,\n    dep: "${dep}"` : ""}
+  })`
+            )
+            if (item.api) {
+                services.push({
+                    method: "get",
+                    name: makeCamelCase("get", item.props.prop, "options"),
+                    api: item.api
+                })
+            }
+        })
+    }
+
 
     return {
         options: {
@@ -94,7 +140,7 @@ const injectParent = () => {
     const pipeMethods = []
 
     const props = [
-        `:data="addForm"`,
+        `:data="subTableData"`,
     ]
 
     return {

@@ -1,13 +1,10 @@
-import http from "@http"
+//import http from "@http"
+const http = () => {}
 
 export const getTableData = async (params) => {
   return await http.get("/api/list", params)
 }
 
-export const update = async (params) => {
-  return await http.post("/api/update", params)
-}
-
-export const add = async (params) => {
-  return await http.post("/api/add", params)
+export const getClassOptions = async (params) => {
+  return await http.get("/api/select/getSelectOptions", params)
 }

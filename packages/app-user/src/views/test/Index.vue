@@ -3,24 +3,28 @@
     <div>
       <el-form size="small" :model="query" inline>
         <el-form-item label="用户名">
-          <el-input v-model="query.username" maxlength="100" />
+          <el-input clearable v-model="query.username" maxlength="100" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="query.password" maxlength="100" />
+          <el-input clearable v-model="query.password" maxlength="100" />
         </el-form-item>
         <el-form-item label="年龄">
-          <el-input v-model="query.age" maxlength="2" />
+          <el-input clearable v-model="query.age" maxlength="2" />
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-select clearable v-model="query.sex">
+            <el-option v-for="{ label, value } in sexOptions" :key="value" :label="label" :value="value"  />
+          </el-select>
         </el-form-item>
         <el-form-item label="班级">
-          <el-input v-model="query.class" maxlength="100" />
+          <el-select clearable v-model="query.class" :disabled="!query.sex">
+            <el-option v-for="{ label, value } in classOptions" :key="value" :label="label" :value="value"  />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button @click="handleSearch" type="primary">查询</el-button>
         </el-form-item>
       </el-form>
-      <div>
-        <el-button size="small" icon="el-icon-plus" @click="handleAdd" type="primary">添加</el-button>
-      </div>
     </div>
     <el-table size="small" :data="tableData" v-loading="searchLoading">
       <el-table-column label="用户名" prop="username" />
@@ -47,8 +51,6 @@
       @sizeChange="handleSizeChange"
       @currentChange="handleCurrentChange"
     />
-    <add-form :visible.sync="addVisible" :data="addForm" :title="addTitle" />
-    <update-form :visible.sync="updateVisible" :data="updateForm" :title="updateTitle" />
   </div>
 </template>
 
@@ -57,27 +59,47 @@ import pipe from "../../utils/pipe";
 import {
   useSearch,
   usePager,
-  useModalFormCtrl,
-  injectComponents
+  useSelectOptions
 } from "../../utils"
-import AddForm from "./components/AddForm"
-import UpdateForm from "./components/UpdateForm"
 import {
-  getTableData
+  getTableData,
+  getClassOptions
 } from "./services"
 
 export default pipe(
   useSearch({
     async getTableData() {
-      const data = await getTableData()
-      this.tableData = data
+      const { status, data, message } = await getTableData()
+      if (status) {
+        this.tableData = data
+      } else {
+        this.$message.error(message)
+      }
     },
     immediate: true
   }),
-  usePager(),
-  useModalFormCtrl({ name: "add", title: "新增用户" }),
-  useModalFormCtrl({ name: "update", title: "编辑用户" }),
-  injectComponents({ AddForm, UpdateForm })
+  usePager({ onChange: "handleSearch" }),
+  useSelectOptions({
+    namespace: "sex",
+    options: [
+      { value: "1", label: "男" },
+      { value: "2", label: "女" }
+    ]
+  }),
+  useSelectOptions({
+    namespace: "class",
+    options: [],
+    immediate: false,
+    async getOptions () {
+      const { status, data, message } = await getClassOptions()
+      if (status) {
+        this.classOptions = data
+      } else {
+        this.$message.error(message)
+      }
+    },
+    dep: "query.sex"
+  })
 )({
   name: "Test",
 })

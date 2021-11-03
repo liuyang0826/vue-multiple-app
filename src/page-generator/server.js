@@ -16,10 +16,34 @@ const createServer = () => {
             name: "Test",
             options: {
                 formItems: [
-                    { label: "用户名", prop: "username", maxlength: 100 },
-                    { label: "密码", prop: "password", maxlength: 100 },
-                    { label: "年龄", prop: "age", maxlength: 2 },
-                    { label: "班级", prop: "class", maxlength: 100 },
+                    {
+                        type: "input",
+                        props: { label: "用户名", prop: "username", maxlength: 100, }
+                    },
+                    {
+                        type: "input",
+                        props: { label: "密码", prop: "password", maxlength: 100, }
+                    },
+                    {
+                        type: "input",
+                        props: { label: "年龄", prop: "age", maxlength: 2 }
+                    },
+                    {
+                        type: "select",
+                        props: { label: "性别", prop: "sex" },
+                        options: [
+                            { value: "1", label: "男" },
+                            { value: "2", label: "女" },
+                        ],
+                        immediate: true,
+                        id: "sex"
+                    },
+                    {
+                        type: "select",
+                        props: {  label: "班级", prop: "class", maxlength: 100, },
+                        api: "/api/select/getSelectOptions",
+                        dep: "sex"
+                    },
                 ],
                 tableCols: [
                     { label: "用户名", prop: "username" },
@@ -31,36 +55,36 @@ const createServer = () => {
                     { label: "备注", prop: "remarks" },
                 ],
                 hasPagination: true,
-                addForm: {
-                    templateId: "dialog-form",
-                    name: "AddForm",
-                    parentOptions: {
-                        title: "新增用户"
-                    },
-                    options: {
-                        formItems: [
-                            { label: "用户名", prop: "username", maxlength: 100, required: true },
-                            { label: "密码", prop: "password", maxlength: 100, required: true },
-                            // { label: "年龄", prop: "age", maxlength: 2, required: true },
-                            { label: "班级", prop: "class", maxlength: 100 },
-                        ]
-                    }
-                },
-                updateForm: {
-                    templateId: "dialog-form",
-                    name: "UpdateForm",
-                    parentOptions: {
-                        title: "编辑用户"
-                    },
-                    options: {
-                        formItems: [
-                            { label: "用户名", prop: "username", maxlength: 100, required: true },
-                            { label: "密码", prop: "password", maxlength: 100, required: true },
-                            // { label: "年龄", prop: "age", maxlength: 2, required: true },
-                            { label: "班级", prop: "class", maxlength: 100 },
-                        ],
-                    }
-                },
+                // addForm: {
+                //     templateId: "dialog-form",
+                //     name: "AddForm",
+                //     parentOptions: {
+                //         title: "新增用户"
+                //     },
+                //     options: {
+                //         formItems: [
+                //             { label: "用户名", prop: "username", maxlength: 100, required: true },
+                //             { label: "密码", prop: "password", maxlength: 100, required: true },
+                //             // { label: "年龄", prop: "age", maxlength: 2, required: true },
+                //             { label: "班级", prop: "class", maxlength: 100 },
+                //         ]
+                //     }
+                // },
+                // updateForm: {
+                //     templateId: "dialog-form",
+                //     name: "UpdateForm",
+                //     parentOptions: {
+                //         title: "编辑用户"
+                //     },
+                //     options: {
+                //         formItems: [
+                //             { label: "用户名", prop: "username", maxlength: 100, required: true },
+                //             { label: "密码", prop: "password", maxlength: 100, required: true },
+                //             // { label: "年龄", prop: "age", maxlength: 2, required: true },
+                //             { label: "班级", prop: "class", maxlength: 100 },
+                //         ],
+                //     }
+                // },
             },
         })
         ctx.body = "success"

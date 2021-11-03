@@ -7,7 +7,7 @@ const { prettier, firstToLowerCase, componentNameToTagName } = require("./utils"
 
 const writeFile = (config) => {
     const root = firstToLowerCase(config.name)
-    const rootDir = path.join(process.cwd(), `../../packages/app-user/src/views/${root}`)
+    const rootDir = path.join(process.cwd(), `../packages/app-user/src/views/${root}`)
     if (!fs.existsSync(rootDir)) {
         fs.mkdirSync(rootDir)
     }
