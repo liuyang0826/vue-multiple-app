@@ -48,14 +48,18 @@ export const injectProps = (injectProps) => options => {
   return options;
 };
 
-export const injectWatch = (injectWatch) => options => {
-  const watch = options.watch
-  options.watch = {
-    ...injectWatch,
-    ...watch,
-  };
-  return options;
-}
+export const injectWatch = (injectWatch) => pipe(
+  injectLifecycle("created", function () {
+    Object.keys(injectWatch).forEach((key) => {
+      const watch = injectWatch[key]
+      if (typeof watch === "function") {
+        this.$watch(key, watch)
+      } else {
+        this.$watch(key, watch.handler, watch)
+      }
+    })
+  })
+)
 
 export const injectComponents = (injectComponents) => options => {
   const components = options.components
@@ -68,158 +72,157 @@ export const injectComponents = (injectComponents) => options => {
 
 export const usePager = ({ name, onChange } = {}) => {
   console.log(name);
-  return options => pipe(
-  injectData({
-    pageSize: 10,
-    pageNum: 1,
-    total: 0
-  }),
-  injectMethods({
-    handleCurrentChange (val) {
-      this.pageNum = val;
-      if (typeof onChange === "string") {
-        this[onChange]()
-      } else {
-        onChange.call(this, val)
+  return pipe(
+    injectData({
+      pageSize: 10,
+      pageNum: 1,
+      total: 0
+    }),
+    injectMethods({
+      handleCurrentChange (val) {
+        this.pageNum = val;
+        if (typeof onChange === "string") {
+          this[onChange]()
+        } else {
+          onChange.call(this, val)
+        }
+      },
+      handleSizeChange (val) {
+        this.pageSize = val;
+        if (typeof onChange === "string") {
+          this[onChange]()
+        } else {
+          onChange.call(this, val)
+        }
       }
-    },
-    handleSizeChange (val) {
-      this.pageSize = val;
-      if (typeof onChange === "string") {
-        this[onChange]()
-      } else {
-        onChange.call(this, val)
-      }
-    }
-  })
-  )(options)
+    })
+  )
 };
 
 export const useSearch = ({ getTableData, immediate } = {}) => {
-  return options => pipe(
-  injectData({
-    query: {},
-    searchLoading: false,
-    tableData: []
-  }),
-  injectMethods({
-    async handleSearch () {
-      this.searchLoading = true;
-      getTableData.call(this)
-      .finally(() => {
-        this.searchLoading = false;
-      });
-    }
-  }),
-  immediate && injectLifecycle("created", function () {
-    this.handleSearch();
-  })
-  )(options);
+  return pipe(
+    injectData({
+      query: {},
+      searchLoading: false,
+      tableData: []
+    }),
+    injectMethods({
+      async handleSearch () {
+        this.searchLoading = true;
+        getTableData.call(this)
+        .finally(() => {
+          this.searchLoading = false;
+        });
+      }
+    }),
+    immediate && injectLifecycle("created", function () {
+      this.handleSearch();
+    })
+  );
 };
 
-export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, immediate, dep }) => {
+export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, dep }) => {
   const methodName = makeCamelCase("get", namespace, "options")
-  return options => pipe(
+  return pipe(
     injectData({
       [makeCamelCase(namespace, "options")]: selectOptions
     }),
     getOptions && injectMethods({
       [methodName]: getOptions
     }),
-    immediate && !dep && getOptions && injectLifecycle("created", function () {
+    !dep && getOptions && injectLifecycle("created", function () {
       this[methodName]();
     }),
     dep && getOptions && injectWatch({
       [dep]: {
-        handler () {
-          this[methodName]();
+        handler (value) {
+          value && this[methodName]();
         },
-        immediate
+        immediate: true
       }
     })
-  )(options)
+  )
 }
 
 export const useModalCtrl = ({ name, title } = {}) => {
-  return options => pipe(
+  return pipe(
     injectData({
       [makeCamelCase(name, "visible")]: false,
       [makeCamelCase(name, "title")]: title,
     })
-  )(options);
+  );
 };
 
 export const useModal = (modalOptions = {}) => {
   const { onShow } = modalOptions;
-  return options => pipe(
-  injectProps({
-    visible: Boolean
-  }),
-  injectWatch({
-    visible: {
-      handler(visible) {
-        if (visible) {
-          onShow?.call(this)
-        }
-      },
-      immediate: true
-    }
-  })
-  )(options);
+  return pipe(
+    injectProps({
+      visible: Boolean
+    }),
+    injectWatch({
+      visible: {
+        handler(visible) {
+          if (visible) {
+            onShow?.call(this)
+          }
+        },
+        immediate: true
+      }
+    })
+  );
 };
 
 export const useFormCtrl = (formOptions = {}) => {
   const { name } = formOptions;
-  return options => injectData({
+  return injectData({
     [makeCamelCase(name, "form")]: {}
-  })(options);
+  });
 };
 
 export const useModalFormCtrl = ({ name, title, afterHandler } = {}) => {
-  return options => pipe(
-      useModalCtrl({ name, title }),
-      useFormCtrl({ name }),
-      injectMethods({
-        [makeCamelCase("handle", name)](row, ...args) {
-          console.log(row);
-          this[makeCamelCase(name, "visible")] = true
-          this[makeCamelCase(name, "form")] = row.constructor === Object ? row : {}
-          afterHandler?.call(this, row, ...args)
-        }
-      })
-  )(options)
+  return pipe(
+    useModalCtrl({ name, title }),
+    useFormCtrl({ name }),
+    injectMethods({
+      [makeCamelCase("handle", name)](row, ...args) {
+        this[makeCamelCase(name, "visible")] = true
+        this[makeCamelCase(name, "form")] = row.constructor === Object ? row : {}
+        afterHandler?.call(this, row, ...args)
+      }
+    })
+  )
 }
 
 export const useModalForm = ({ doSubmit, onShow, formRules = {} } = {} ) => {
   return pipe(
-      useModal({
-        onShow() {
-          this.formLoading = false
-          this.form = JSON.parse(JSON.stringify(this.data))
-          onShow?.()
-        }
-      }),
-      injectProps({
-        data: Object,
-        title: String
-      }),
-      injectData({
-        formLoading: false,
-        form: {},
-        formRules,
-      }),
-      injectMethods({
-        handleSubmit() {
-          this.$refs.form.validate((flag) => {
-            if (flag) {
-              this.formLoading = true
-              doSubmit.call(this)
-                  .finally(() => {
-                    this.formLoading = false
-                  })
-            }
-          })
-        }
-      })
+    useModal({
+      onShow() {
+        this.formLoading = false
+        this.form = JSON.parse(JSON.stringify(this.data))
+        onShow?.()
+      }
+    }),
+    injectProps({
+      data: Object,
+      title: String
+    }),
+    injectData({
+      formLoading: false,
+      form: {},
+      formRules,
+    }),
+    injectMethods({
+      handleSubmit() {
+        this.$refs.form.validate((flag) => {
+          if (flag) {
+            this.formLoading = true
+            doSubmit.call(this)
+              .finally(() => {
+                this.formLoading = false
+              })
+          }
+        })
+      }
+    })
   )
 };

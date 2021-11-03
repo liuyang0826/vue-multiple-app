@@ -89,7 +89,7 @@ export default pipe(
   useSelectOptions({
     namespace: "class",
     options: [],
-    immediate: false,
+    immediate: true,
     async getOptions () {
       const { status, data, message } = await getClassOptions()
       if (status) {

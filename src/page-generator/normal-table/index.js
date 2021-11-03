@@ -94,7 +94,7 @@ const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatc
     namespace: "${item.props.prop}",
     options: [${item.options ? "\n      " : ""}${item.options
                     ?.map(({value, label}) => `{ value: "${value}", label: "${label}" }`)
-                    .join(",\n      ") || ""}${item.options ? "\n    " : ""}]${item.api ? `,\n    immediate: ${item.immediate || false},
+                    .join(",\n      ") || ""}${item.options ? "\n    " : ""}]${item.api ? `,\n    immediate: true,
     async getOptions () {
       const { status, data, message } = await ${makeCamelCase("get", item.props.prop, "options")}()
       if (status) {
