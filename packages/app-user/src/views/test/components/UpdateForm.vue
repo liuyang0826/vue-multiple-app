@@ -30,18 +30,18 @@ import {
   useSelectOptions
 } from "@/utils"
 import {
-  update
+  doSubmit
 } from "../services/update-form"
 
 export default pipe(
   useModalForm({
     onShow() {},
     formRules: {
-      username: { required: true, message: "请输入用户名" },
-      password: { required: true, message: "请输入密码" }
+      username: { required: true, message: "请输入用户名", trigger: ["change", "blur"] },
+      password: { required: true, message: "请输入密码", trigger: ["change", "blur"] }
     },
     async onSubmit() {
-      const { status, message } = await update(this.form)
+      const { status, message } = await doSubmit(this.form)
       if (status) {
         this.$message.error("操作成功")
         this.$emit("update:visible", false)

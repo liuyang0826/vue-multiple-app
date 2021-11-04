@@ -1,4 +1,4 @@
-const { injectTemplate } = require("../../utils")
+import { injectTemplate } from "../../utils"
 
 const template = `
 <el-pagination
@@ -13,4 +13,4 @@ const template = `
 />
 `
 
-module.exports = () => injectTemplate(template, {}, 2)
+export default () => injectTemplate(template, {}, 2)

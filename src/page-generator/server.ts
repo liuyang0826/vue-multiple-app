@@ -1,6 +1,6 @@
-const Koa = require("koa")
-const KoaRouter = require("koa-router")
-const writeFile = require("./write-file")
+import Koa from "koa"
+import KoaRouter from "koa-router"
+import writeFile from "./write-file"
 
 const createServer = () => {
     const app = new Koa()
@@ -57,10 +57,8 @@ const createServer = () => {
                 addForm: {
                     templateId: "dialog-form",
                     name: "AddForm",
-                    parentOptions: {
-                        title: "新增用户"
-                    },
                     options: {
+                        title: "新增用户",
                         formItems: [
                             {
                                 type: "input",
@@ -85,7 +83,8 @@ const createServer = () => {
                                 id: "sex"
                             },
                         ],
-                        width: 1000
+                        width: 1000,
+                        api: "/api/add"
                     },
                     components: [
                         {
@@ -138,10 +137,8 @@ const createServer = () => {
                 updateForm: {
                     templateId: "dialog-form",
                     name: "UpdateForm",
-                    parentOptions: {
-                        title: "编辑用户"
-                    },
                     options: {
+                        title: "编辑用户",
                         formItems: [
                             {
                                 type: "input",
@@ -166,9 +163,21 @@ const createServer = () => {
                                 id: "sex"
                             },
                         ],
+                        api: "/api/update"
                     }
                 },
             },
+            components: [
+                {
+                    templateId: "dialog",
+                    namespace: "detail",
+                    name: "Detail",
+                    options: {
+                        title: "详情",
+                        width: 500,
+                    }
+                }
+            ]
         })
         ctx.body = "success"
     })
@@ -180,4 +189,4 @@ const createServer = () => {
     })
 }
 
-module.exports = createServer
+export default createServer

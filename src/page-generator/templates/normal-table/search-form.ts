@@ -1,4 +1,4 @@
-const { injectTemplate } = require("../../utils")
+import { injectTemplate } from "../../utils"
 
 const template = `
 <el-form size="small" :model="query" inline>
@@ -11,18 +11,18 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>">
-  <el-input clearable v-model="query.<%prop%>" maxlength="<%maxlength%>" />
+  <el-input clearable v-model="query.<%prop%>" maxlength="<%maxlength%>" @change="handleSearch" />
 </el-form-item>`
 
 const selectItemTemp = `
 <el-form-item label="<%label%>">
-  <el-select clearable v-model="query.<%prop%>"<%disabled%>>
+  <el-select clearable v-model="query.<%prop%>"  @change="handleSearch"<%disabled%>>
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
 
-module.exports = ({formItems}) => injectTemplate(template, {
-    formItems: formItems?.map(item => {
+export default ({formItems}: any) => injectTemplate(template, {
+    formItems: formItems?.map((item: any) => {
         if (item.type === "input") {
             return injectTemplate(inputItemTemp, item.props, 2)
         }

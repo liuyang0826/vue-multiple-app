@@ -1,13 +1,31 @@
 {
   "name": "@cisdiliuyang/vue-multiple-app",
   "version": "0.0.2",
+  "files": [
+    "src",
+    "package.json"
+  ],
+  "scripts": {
+    "dev": "nodemon",
+    "build": "npx tsc"
+  },
   "dependencies": {
     "koa": "^2.13.4",
     "koa-router": "^10.1.1",
     "postcss": "^7.0.39"
   },
-  "files": [
-    "src",
-    "package.json"
-  ]
+  "devDependencies": {
+    "@types/koa": "^2.13.4",
+    "@types/koa-router": "^7.4.4",
+    "nodemon": "^2.0.14",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "*.ts",
+    "exec": "ts-node src/page-generator/index.ts"
+  }
 }

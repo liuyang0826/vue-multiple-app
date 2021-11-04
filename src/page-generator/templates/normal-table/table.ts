@@ -1,4 +1,4 @@
-const { injectTemplate } = require("../../utils")
+import { injectTemplate } from "../../utils"
 
 const template = `
 <el-table size="small" :data="tableData" v-loading="searchLoading">
@@ -19,7 +19,7 @@ const handleColTemp = `
 </el-table-column>
 `
 
-module.exports = ({ tableCols }) => injectTemplate(template, {
-    tableCols: tableCols?.map(item => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
+export default ({ tableCols }: any) => injectTemplate(template, {
+    tableCols: tableCols?.map((item: any) => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
     handleCol: injectTemplate(handleColTemp, {}, 2)
 }, 2)

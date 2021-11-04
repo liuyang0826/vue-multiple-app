@@ -1,9 +1,10 @@
-const searchForm = require("./search-form")
-const table = require("./table")
-const pagination = require("./pagination")
-const handleButton = require("./handle-button")
-const { injectTemplate } = require("../../utils")
-const processFormItems = require("../utils/process-form-items")
+import searchForm from "./search-form"
+import table from "./table"
+import pagination from "./pagination"
+import handleButton from "./handle-button"
+import { injectTemplate } from "../../utils"
+import processFormItems from "../utils/process-form-items"
+import {IComponentConfig, IProcessTemplate, IService} from "../../@types";
 
 const template = `
 <div>
@@ -17,7 +18,7 @@ const template = `
 </div>
 `
 
-const descriptions = [
+export const descriptions = [
     {
         label: "查询表单项",
         prop: "formItems",
@@ -49,8 +50,26 @@ const descriptions = [
     },
 ]
 
-const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatchDel, addForm, updateForm } }) => {
-    const pipeMethods = [
+interface INormalTableOptions {
+    formItems: any
+    tableCols: any
+    hasPagination: boolean
+    hasBatchDel: boolean
+    addForm: IComponentConfig
+    updateForm: IComponentConfig
+}
+
+export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, options}) => {
+    const {
+        formItems,
+        tableCols,
+        hasPagination,
+        hasBatchDel,
+        addForm,
+        updateForm
+    } = options
+
+    const hooks = [
         `useSearch({
     async getTableData() {
       const { status, data, message } = await getTableData()
@@ -64,7 +83,7 @@ const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatc
   })`,
     ]
 
-    const services = [
+    const services: IService[] = [
         {
             name: "getTableData",
             method: "get",
@@ -73,55 +92,49 @@ const process = ({ name, options: { formItems, tableCols, hasPagination, hasBatc
     ]
 
     if (hasPagination) {
-        pipeMethods.push(`usePager({ onChange: "handleSearch" })`)
+        hooks.push(`usePager({ onChange: "handleSearch" })`)
     }
 
     if (addForm) {
-        addForm.parentOptions.namespace = "add"
+        addForm.namespace = "add"
     }
 
     if (updateForm) {
-        updateForm.parentOptions.namespace = "update"
+        updateForm.namespace = "update"
     }
 
-    processFormItems({ formItems, pipeMethods, services })
+    processFormItems({ formItems, hooks, services })
 
     return {
-        options: {
-            name,
-            template: injectTemplate(template, {
-                searchForm: searchForm({
-                    formItems
-                }),
-                table: table({
-                    tableCols
-                }),
-                pagination: hasPagination && pagination(),
-                handleButton: handleButton({hasBatchDel, addForm}),
-            }, 2),
-            pipeMethods,
-        },
+        name,
+        template: injectTemplate(template, {
+            searchForm: searchForm({
+                formItems
+            }),
+            table: table({
+                tableCols
+            }),
+            pagination: hasPagination && pagination(),
+            handleButton: handleButton({
+                hasBatchDel,
+                addForm: !!addForm
+            }),
+        }, 2),
+        hooks,
         components: [addForm, updateForm].filter(Boolean),
         services
     }
 }
 
-const injectParent = () => {
-    const pipeMethods = []
+export const injectParent = () => {
+    const hooks: string[] = []
 
     const props = [
         `:data="subTableData"`,
     ]
 
     return {
-        pipeMethods,
+        hooks,
         props,
     }
-}
-
-module.exports = {
-    process,
-    descriptions,
-    injectParent,
-    processFormItems,
 }
