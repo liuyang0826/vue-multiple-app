@@ -1,4 +1,5 @@
 import { injectTemplate } from "../../utils";
+import {IProcessTemplate} from "../../@types";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -6,10 +7,13 @@ const template = `
 </el-dialog>
 `
 
-export const processTemplate = ({ name, options }: any) => {
+export const processTemplate: IProcessTemplate = ({ name, options }) => {
     return {
         name,
-        template: injectTemplate(template, options)
+        template: injectTemplate(template, options, 2),
+        hooks: [
+            `useModal({})`
+        ]
   }
 }
 

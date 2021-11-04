@@ -45,17 +45,17 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
         hooks = [],
         components: privateComponents,
         services
-    } = require(`./templates/${config.templateId}`).processTemplate(config) as ReturnType<IProcessTemplate>
+    } = require(`./templates/${config.templateId}`).processTemplate(config, type) as ReturnType<IProcessTemplate>
 
     const realName = firstToUpperCase(name)
 
     const mergedComponents = [...(privateComponents || []), ...(components || [])]
-    if (type !== IComponentEnum.page) {
-        // 给组件内的组件添加命名空间
-        mergedComponents.forEach((item) => {
-            item.name = `${realName}${firstToUpperCase(item.name)}`
-        })
-    }
+    // if (type !== IComponentEnum.page) {
+    //     // 给组件内的组件添加命名空间
+    //     mergedComponents.forEach((item) => {
+    //         item.name = `${realName}${firstToUpperCase(item.name)}`
+    //     })
+    // }
 
     const injectParents = mergedComponents
         .map((item) => require(`./templates/${item.templateId}`)

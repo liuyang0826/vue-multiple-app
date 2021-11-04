@@ -20,7 +20,7 @@
       <el-button size="small" @click="$emit('update:visible', false)">取消</el-button>
       <el-button size="small" type="primary" :loading="formLoading" @click="handleSubmit">确定</el-button>
     </template>
-    <add-form-data-table :data="subTableData" />
+    <data-table :data="subTableData" />
   </el-dialog>
 </template>
 
@@ -29,16 +29,17 @@ import pipe from "@/utils/pipe";
 import {
   injectComponents,
   useModalForm,
-  useSelectOptions
+  useSelectOptions,
+  injectData
 } from "@/utils"
-import AddFormDataTable from "./AddFormDataTable"
+import DataTable from "./DataTable"
 import {
   doSubmit
 } from "../services/add-form"
 
 export default pipe(
   injectComponents({
-    AddFormDataTable
+    DataTable
   }),
   useModalForm({
     onShow() {},
@@ -62,6 +63,9 @@ export default pipe(
       { value: "1", label: "男" },
       { value: "2", label: "女" }
     ]
+  }),
+  injectData({
+    undefinedTableData: {}
   })
 )({
   name: "AddForm",

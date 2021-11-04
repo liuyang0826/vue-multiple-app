@@ -13,15 +13,15 @@ export interface IComponentConfig<T extends {} = {}> {
 }
 
 // 模板处理函数
-export type IProcessTemplate<T = {}> = (config: IComponentConfig<T>) => {
+export type IProcessTemplate<T = {}> = (config: IComponentConfig<T>, type: IComponentEnum) => {
     name: string // 组件名称
     template: string // 处理完成的组件模板内容
     hooks?: string[] // 依赖的hook方法
-    components: IComponentConfig[] // 子组件
-    services: IService[] //依赖的 service
+    components?: IComponentConfig[] // 子组件
+    services?: IService[] //依赖的 service
 }
 
-// 自组件注入父组件的处理函数
+// 子组件注入父组件的处理函数
 export type IInjectParent<T = {}> = (config: IComponentConfig<T>) => {
     hooks: string[]
     props: string[]
@@ -46,11 +46,24 @@ export interface IOption {
     label: string
 }
 
-export interface IFormItem<P = {}> {
-    type: "input" | "select"
-    props: P & IBaseFormItemProp
-    options?: IOption[]
-    api?: string
-    id?: string
-    dep?: string
+export interface IFormItem<T = {}> {
+    type: "input" | "select" // 表单项类型
+    props: T & IBaseFormItemProp // 表单项配置
+    options?: IOption[] // 下拉框选项
+    api?: string // 下拉框依赖的数据接口
+    id?: string // 表单项id
+    dep?: string // 依赖的其他的表单项的id
+}
+
+export interface ITemplateForm {
+    label: string
+    prop: string
+    type: "array" | "select" | "text" | "number" | "boolean" | "component"
+    options?: {
+        label: "输入框" | "下拉框",
+        value: "input" | "select",
+    }[]
+    items?: ITemplateForm[]
+    templateId?: string
+    remarks?: string
 }

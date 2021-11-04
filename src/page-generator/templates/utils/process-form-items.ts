@@ -24,7 +24,7 @@ const processFormItems = ({ formItems, hooks, services  }: IProcessFormItemsProp
     namespace: "${item.props.prop}",
     options: [${item.options ? "\n      " : ""}${item.options
                 ?.map(({value, label}) => `{ value: "${value}", label: "${label}" }`)
-                .join(",\n      ") || ""}${item.options ? "\n    " : ""}]${item.api ? `,\n    immediate: true,
+                .join(",\n      ") || ""}${item.options ? "\n    " : ""}]${item.api ? `,
     async getOptions() {
       const { status, data, message } = await ${makeCamelCase("get", item.props.prop, "options")}()
       if (status) {

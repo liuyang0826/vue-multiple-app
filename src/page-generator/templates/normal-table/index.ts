@@ -2,9 +2,9 @@ import searchForm from "./search-form"
 import table from "./table"
 import pagination from "./pagination"
 import handleButton from "./handle-button"
-import { injectTemplate } from "../../utils"
+import {injectTemplate} from "../../utils"
 import processFormItems from "../utils/process-form-items"
-import {IComponentConfig, IProcessTemplate, IService} from "../../@types";
+import {IComponentConfig, IComponentEnum, IInjectParent, IProcessTemplate, IService, ITemplateForm} from "../../@types";
 
 const template = `
 <div>
@@ -18,38 +18,6 @@ const template = `
 </div>
 `
 
-export const descriptions = [
-    {
-        label: "查询表单项",
-        prop: "formItems",
-        type: "array",
-        items: [
-            { label: "名称", prop: "label" },
-            { label: "字段名", prop: "prop" },
-            { label: "最大长度", prop: "maxlength" },
-            { label: "类型", prop: "itemType", type: "select", options: ["input", "select"] },
-        ]
-    },
-    {
-        label: "表格列",
-        prop: "tableCols",
-        type: "array",
-        items: [
-            { label: "名称", prop: "label" },
-            { label: "字段名", prop: "prop" },
-        ]
-    },
-    { label: "显示分页", prop: "hasPagination", type: "boolean" },
-    {
-        label: "新增弹窗",
-        prop: "addDialog",
-        type: "boolean",
-        descriptions: [
-            { label: "表单项", props: "formItems" }
-        ]
-    },
-]
-
 interface INormalTableOptions {
     formItems: any
     tableCols: any
@@ -59,7 +27,7 @@ interface INormalTableOptions {
     updateForm: IComponentConfig
 }
 
-export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, options}) => {
+export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, options}, type) => {
     const {
         formItems,
         tableCols,
@@ -82,6 +50,14 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
     immediate: true
   })`,
     ]
+
+    if (type === IComponentEnum.component) {
+        hooks.unshift(
+            `injectProps({
+    data: Object
+  })`
+        )
+    }
 
     const services: IService[] = [
         {
@@ -126,15 +102,80 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
     }
 }
 
-export const injectParent = () => {
-    const hooks: string[] = []
-
-    const props = [
-        `:data="subTableData"`,
+export const injectParent: IInjectParent = ({ namespace }) => {
+    const hooks: string[] = [
+        `injectData({
+    ${namespace}TableData: {}
+  })`
     ]
+
+    const props = [ `:data="${namespace}TableData"` ]
 
     return {
         hooks,
         props,
     }
 }
+
+export const templateForm: ITemplateForm[] = [
+    {
+        label: "查询表单项",
+        prop: "formItems",
+        type: "array",
+        items: [
+            {
+                label: "类型",
+                prop: "type",
+                type: "select",
+                options: [
+                    { label: "输入框", value: "input" },
+                    { label: "下拉框", value: "select" },
+                ]
+            },
+            {
+                label: "组件属性",
+                prop: "props",
+                type: "array",
+                items: [
+                    { label: "名称", prop: "label", type: "text" },
+                    { label: "字段名", prop: "prop", type: "text" },
+                    { label: "最大长度", prop: "maxlength", type: "number" },
+                ]
+            },
+            {
+                label: "下拉选项",
+                prop: "options",
+                type: "array",
+                items: [
+                    { label: "键", prop: "label", type: "text" },
+                    { label: "值", prop: "value", type: "text" },
+                ]
+            },
+            { label: "下拉api", prop: "api", type: "text" },
+            { label: "组件id", prop: "id", type: "text" },
+            { label: "依赖控件id", prop: "dep", type: "text" },
+        ],
+    },
+    {
+        label: "表格列",
+        prop: "tableCols",
+        type: "array",
+        items: [
+            { label: "名称", prop: "label", type: "text" },
+            { label: "字段名", prop: "prop", type: "text" },
+        ]
+    },
+    { label: "显示分页", prop: "hasPagination", type: "boolean" },
+    {
+        label: "新增弹窗",
+        prop: "addForm",
+        type: "component",
+        templateId: "dialog-form"
+    },
+    {
+        label: "编辑弹窗",
+        prop: "updateForm",
+        type: "component",
+        templateId: "dialog-form"
+    },
+]

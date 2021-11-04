@@ -57,6 +57,7 @@
 <script>
 import pipe from "@/utils/pipe";
 import {
+  injectProps,
   useSearch,
   usePager,
   useSelectOptions
@@ -64,9 +65,12 @@ import {
 import {
   getTableData,
   getClassOptions
-} from "../services/add-form-data-table"
+} from "../services/detail-table"
 
 export default pipe(
+  injectProps({
+    data: Object
+  }),
   useSearch({
     async getTableData() {
       const { status, data, message } = await getTableData()
@@ -89,7 +93,6 @@ export default pipe(
   useSelectOptions({
     namespace: "class",
     options: [],
-    immediate: true,
     async getOptions() {
       const { status, data, message } = await getClassOptions()
       if (status) {
@@ -101,7 +104,7 @@ export default pipe(
     dep: "query.sex"
   })
 )({
-  name: "AddFormDataTable",
+  name: "DetailTable",
 })
 </script>
 

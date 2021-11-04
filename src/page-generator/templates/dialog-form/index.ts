@@ -1,6 +1,6 @@
 import { injectTemplate } from "../../utils"
 import processFormItems from "../utils/process-form-items"
-import {IFormItem, IInjectParent, IProcessTemplate, IService} from "../../@types";
+import {IFormItem, IInjectParent, IProcessTemplate, IService, ITemplateForm} from "../../@types";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -26,10 +26,6 @@ const selectItemTemp = `
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
-
-export const descriptions = [
-
-]
 
 interface IDialogFormOptions {
     formItems: IFormItem<{
@@ -103,7 +99,7 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
 
     const props = [
         `:visible.sync="${config.namespace}Visible"`,
-        `:data="${config.namespace}Form"`,
+        `:data="${config.namespace}Data"`,
         `:title="${config.namespace}Title"`
     ]
 
@@ -112,3 +108,45 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
         props,
     }
 }
+
+export const templateForm: ITemplateForm[] = [
+    { label: "标题", prop: "title", type: "text" },
+    {
+        label: "表单项",
+        prop: "formItems",
+        type: "array",
+        items: [
+            {
+                label: "类型",
+                prop: "type",
+                type: "select",
+                options: [
+                    { label: "输入框", value: "input" },
+                    { label: "下拉框", value: "select" },
+                ]
+            },
+            {
+                label: "组件属性",
+                prop: "props",
+                type: "array",
+                items: [
+                    { label: "名称", prop: "label", type: "text" },
+                    { label: "字段名", prop: "prop", type: "text" },
+                    { label: "最大长度", prop: "maxlength", type: "number" },
+                ]
+            },
+            {
+                label: "下拉选项",
+                prop: "options",
+                type: "array",
+                items: [
+                    { label: "键", prop: "label", type: "text" },
+                    { label: "值", prop: "value", type: "text" },
+                ]
+            },
+            { label: "下拉api", prop: "api", type: "text" },
+            { label: "组件id", prop: "id", type: "text" },
+            { label: "依赖控件id", prop: "dep", type: "text" },
+        ]
+    },
+]

@@ -1,13 +1,14 @@
 import Koa from "koa"
 import KoaRouter from "koa-router"
 import writeFile from "./write-file"
+import {templateForm} from "./templates/dialog-form";
 
 const createServer = () => {
     const app = new Koa()
     const router = new KoaRouter();
 
-    router.get("/:templateId", async (ctx) => {
-        ctx.body = require(`./${ctx.params.templateId}`).descriptions
+    router.get("/getTemplateFormById", async (ctx) => {
+        ctx.body = require(`./templates/${ctx.query.id}`).templateForm
     })
 
     router.get("/", async (ctx) => {
@@ -171,11 +172,59 @@ const createServer = () => {
                 {
                     templateId: "dialog",
                     namespace: "detail",
-                    name: "Detail",
+                    name: "DetailDialog",
                     options: {
                         title: "详情",
                         width: 500,
-                    }
+                    },
+                    components: [
+                        {
+                            templateId: "normal-table",
+                            namespace: "detail",
+                            name: "DetailTable",
+                            options: {
+                                formItems: [
+                                    {
+                                        type: "input",
+                                        props: { label: "用户名", prop: "username", maxlength: 100 }
+                                    },
+                                    {
+                                        type: "input",
+                                        props: { label: "密码", prop: "password", maxlength: 100, }
+                                    },
+                                    {
+                                        type: "input",
+                                        props: { label: "年龄", prop: "age", maxlength: 2 }
+                                    },
+                                    {
+                                        type: "select",
+                                        props: { label: "性别", prop: "sex" },
+                                        options: [
+                                            { value: "1", label: "男" },
+                                            { value: "2", label: "女" },
+                                        ],
+                                        id: "sex"
+                                    },
+                                    {
+                                        type: "select",
+                                        props: {  label: "班级", prop: "class", maxlength: 100, },
+                                        api: "/api/select/getSelectOptions",
+                                        dep: "sex"
+                                    },
+                                ],
+                                tableCols: [
+                                    { label: "用户名", prop: "username" },
+                                    { label: "密码", prop: "password" },
+                                    { label: "年龄", prop: "age" },
+                                    { label: "班级", prop: "class" },
+                                    { label: "备注", prop: "remarks" },
+                                    { label: "备注", prop: "remarks" },
+                                    { label: "备注", prop: "remarks" },
+                                ],
+                                hasPagination: true,
+                            }
+                        }
+                    ]
                 }
             ]
         })

@@ -157,7 +157,9 @@ export const useModal = (modalOptions = {}) => {
   const { onShow } = modalOptions;
   return pipe(
     injectProps({
-      visible: Boolean
+      visible: Boolean,
+      data: Object,
+      title: String
     }),
     injectWatch({
       visible: {
@@ -175,7 +177,7 @@ export const useModal = (modalOptions = {}) => {
 export const useFormCtrl = (formOptions = {}) => {
   const { name } = formOptions;
   return injectData({
-    [makeCamelCase(name, "form")]: {}
+    [makeCamelCase(name, "data")]: {}
   });
 };
 
@@ -186,7 +188,7 @@ export const useModalFormCtrl = ({ name, title, afterHandler } = {}) => {
     injectMethods({
       [makeCamelCase("handle", name)](row, ...args) {
         this[makeCamelCase(name, "visible")] = true
-        this[makeCamelCase(name, "form")] = row.constructor === Object ? row : {}
+        this[makeCamelCase(name, "data")] = row.constructor === Object ? row : {}
         afterHandler?.call(this, row, ...args)
       }
     })
@@ -201,10 +203,6 @@ export const useModalForm = ({ doSubmit, onShow, formRules = {} } = {} ) => {
         this.form = JSON.parse(JSON.stringify(this.data))
         onShow?.()
       }
-    }),
-    injectProps({
-      data: Object,
-      title: String
     }),
     injectData({
       formLoading: false,
