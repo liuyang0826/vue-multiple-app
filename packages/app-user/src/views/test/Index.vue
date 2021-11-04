@@ -25,6 +25,9 @@
           <el-button @click="handleSearch" type="primary">查询</el-button>
         </el-form-item>
       </el-form>
+      <div>
+        <el-button size="small" icon="el-icon-plus" @click="handleAdd" type="primary">添加</el-button>
+      </div>
     </div>
     <el-table size="small" :data="tableData" v-loading="searchLoading">
       <el-table-column label="用户名" prop="username" />
@@ -51,22 +54,32 @@
       @sizeChange="handleSizeChange"
       @currentChange="handleCurrentChange"
     />
+    <add-form :visible.sync="addVisible" :data="addForm" :title="addTitle" />
+    <update-form :visible.sync="updateVisible" :data="updateForm" :title="updateTitle" />
   </div>
 </template>
 
 <script>
-import pipe from "../../utils/pipe";
+import pipe from "@/utils/pipe";
 import {
+  injectComponents,
   useSearch,
   usePager,
-  useSelectOptions
-} from "../../utils"
+  useSelectOptions,
+  useModalFormCtrl
+} from "@/utils"
+import AddForm from "./components/AddForm"
+import UpdateForm from "./components/UpdateForm"
 import {
   getTableData,
   getClassOptions
 } from "./services"
 
 export default pipe(
+  injectComponents({
+    AddForm,
+    UpdateForm
+  }),
   useSearch({
     async getTableData() {
       const { status, data, message } = await getTableData()
@@ -99,7 +112,9 @@ export default pipe(
       }
     },
     dep: "query.sex"
-  })
+  }),
+  useModalFormCtrl({ name: "add", title: "新增用户" }),
+  useModalFormCtrl({ name: "update", title: "编辑用户" })
 )({
   name: "Test",
 })

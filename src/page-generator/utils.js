@@ -19,7 +19,7 @@ const injectTemplate = (template, options, indent = 0) => {
 
 const firstToLowerCase = str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toLowerCase() + $2)
 const firstToUpperCase = str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)
-const componentNameToTagName = str => firstToUpperCase(str).replace(/[A-Z]/g, (a) => `-${a.toLowerCase()}`).slice(1)
+const camelCaseToShortLine = str => firstToUpperCase(str).replace(/[A-Z]/g, (a) => `-${a.toLowerCase()}`).slice(1)
 
 const prettier = template => replace(template, /<%(\w+?)%>/, () => "").replace(/\n\s+\n/g, "\n")
 
@@ -29,7 +29,7 @@ module.exports = {
     injectTemplate,
     firstToLowerCase,
     firstToUpperCase,
-    componentNameToTagName,
+    camelCaseToShortLine,
     replace,
     prettier,
     makeCamelCase,

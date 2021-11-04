@@ -10,6 +10,11 @@
       <el-form-item label="班级：" prop="class" label-width="80px">
         <el-input v-model="form.class" maxlength="100" />
       </el-form-item>
+      <el-form-item label="性别">
+        <el-select clearable v-model="form.sex">
+          <el-option v-for="{ label, value } in sexOptions" :key="value" :label="label" :value="value"  />
+        </el-select>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button size="small" @click="$emit('update:visible', false)">取消</el-button>
@@ -19,13 +24,14 @@
 </template>
 
 <script>
-import pipe from "../../utils/pipe";
+import pipe from "@/utils/pipe";
 import {
-  useModalForm
-} from "../../utils"
+  useModalForm,
+  useSelectOptions
+} from "@/utils"
 import {
   update
-} from "../services"
+} from "../services/update-form"
 
 export default pipe(
   useModalForm({
@@ -35,8 +41,21 @@ export default pipe(
       password: { required: true, message: "请输入密码" }
     },
     async onSubmit() {
-      await update(this.form)
+      const { status, message } = await update(this.form)
+      if (status) {
+        this.$message.error("操作成功")
+        this.$emit("update:visible", false)
+      } else {
+        this.$message.error(message)
+      }
     }
+  }),
+  useSelectOptions({
+    namespace: "sex",
+    options: [
+      { value: "1", label: "男" },
+      { value: "2", label: "女" }
+    ]
   })
 )({
   name: "UpdateForm",

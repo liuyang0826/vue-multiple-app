@@ -1,4 +1,5 @@
-const { injectTemplate } = require("../utils")
+const { injectTemplate } = require("../../utils")
+const processFormItems = require("../utils/process-form-items")
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -13,9 +14,16 @@ const template = `
 </el-dialog>
 `
 
-const formItemTemp = `
+const inputItemTemp = `
 <el-form-item label="<%label%>：" prop="<%prop%>" label-width="<%labelWidth%>px">
   <el-input v-model="form.<%prop%>" maxlength="<%maxlength%>" />
+</el-form-item>`
+
+const selectItemTemp = `
+<el-form-item label="<%label%>">
+  <el-select clearable v-model="form.<%prop%>"<%disabled%>>
+    <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
+  </el-select>
 </el-form-item>`
 
 const descriptions = [
@@ -25,14 +33,21 @@ const descriptions = [
 const process = ({ name, options, parentOptions}) => {
     const { formItems, width = 440 } = options
 
+    const requiredItems = formItems?.filter(d => d.props.required) || []
+
     const pipeMethods = [
         `useModalForm({
     onShow() {},
-    formRules: {
-      ${formItems?.filter(d => d.required).map(d => `${d.prop}: { required: true, message: "请输入${d.label}" }`).join(",\n      ")}
-    },
+    formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.props.prop}: { required: true, message: "请输入${d.props.label}" }`)
+            .join(",\n      ")}\n    ` : ""}},
     async onSubmit() {
-      await ${parentOptions.namespace}(this.form)
+      const { status, message } = await ${parentOptions.namespace}(this.form)
+      if (status) {
+        this.$message.error("操作成功")
+        this.$emit("update:visible", false)
+      } else {
+        this.$message.error(message)
+      }
     }
   })`
     ]
@@ -44,14 +59,26 @@ const process = ({ name, options, parentOptions}) => {
         }
     ]
 
+    processFormItems({formItems, pipeMethods, services })
+
     return {
         options: {
             name,
             template: injectTemplate(template, ({
-                formItems: formItems?.map(d => injectTemplate(formItemTemp, {
-                    labelWidth: 80,
-                    ...d
-                }, 4)).join("\n") || " ",
+                formItems: formItems?.map(item => {
+                    if (item.type === "input") {
+                        return injectTemplate(inputItemTemp, {
+                            labelWidth: 80,
+                            ...item.props
+                        }, 4)
+                    }
+                    if (item.type === "select") {
+                        return injectTemplate(selectItemTemp, {
+                            labelWidth: 80,
+                            ...item.props
+                        }, 4)
+                    }
+                }).join("\n") || " ",
                 width,
             }), 2),
             pipeMethods,

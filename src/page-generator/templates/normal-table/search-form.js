@@ -1,4 +1,4 @@
-const { injectTemplate } = require("../utils")
+const { injectTemplate } = require("../../utils")
 
 const template = `
 <el-form size="small" :model="query" inline>
