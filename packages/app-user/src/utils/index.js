@@ -1,7 +1,7 @@
 export const pipe = (...fns) => x => fns.reduce((x, f) => typeof f === "function" ? f(x) : x, x);
 const makeCamelCase = (first, ...args) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
 
-export const injectLifecycle = (lifecycle, fn) => options => {
+export const useLifecycle = (lifecycle, fn) => options => {
   const originFn = options[lifecycle];
   options[lifecycle] = function () {
     fn.call(this);
@@ -10,48 +10,48 @@ export const injectLifecycle = (lifecycle, fn) => options => {
   return options;
 };
 
-export const injectData = (injectData) => options => {
-  const data = options.data;
+export const useData = (data) => options => {
+  const origin = options.data;
   options.data = () => {
     return {
-      ...injectData,
-      ...data?.(),
+      ...data,
+      ...origin?.(),
     };
   };
   return options;
 };
 
-export const injectMethods = (injectMethods) => options => {
-  const methods = options.methods || {};
-  const newOptions = Object.keys(injectMethods).reduce((options, key) => {
-    const injectFn = injectMethods[key];
-    options[key] = methods[key] ? function (...args) {
+export const useMethods = (methods) => options => {
+  const origin = options.methods || {};
+  const newOptions = Object.keys(useMethods).reduce((options, key) => {
+    const injectFn = methods[key];
+    options[key] = origin[key] ? function (...args) {
       injectFn.call(this, ...args);
-      methods[key].call(this, ...args);
+      origin[key].call(this, ...args);
     } : injectFn;
     return options;
   }, {});
 
   options.methods = {
-    ...methods,
+    ...origin,
     ...newOptions,
   };
   return options;
 };
 
-export const injectProps = (injectProps) => options => {
-  const props = options.props;
+export const useProps = (props) => options => {
+  const origin = options.props;
   options.props = {
-    ...injectProps,
     ...props,
+    ...origin,
   };
   return options;
 };
 
-export const injectWatch = (injectWatch) => pipe(
-  injectLifecycle("created", function () {
-    Object.keys(injectWatch).forEach((key) => {
-      const watch = injectWatch[key]
+export const useWatch = (watch) => pipe(
+  useLifecycle("created", function () {
+    Object.keys(watch).forEach((key) => {
+      const watch = watch[key]
       if (typeof watch === "function") {
         this.$watch(key, watch)
       } else {
@@ -61,24 +61,23 @@ export const injectWatch = (injectWatch) => pipe(
   })
 )
 
-export const injectComponents = (injectComponents) => options => {
-  const components = options.components
+export const useComponents = (components) => options => {
+  const origin = options.components
   options.components = {
-    ...injectComponents,
+    ...origin,
     ...components,
   };
   return options;
 }
 
-export const usePager = ({ name, onChange } = {}) => {
-  console.log(name);
+export const usePager = ({ onChange } = {}) => {
   return pipe(
-    injectData({
+    useData({
       pageSize: 10,
       pageNum: 1,
       total: 0
     }),
-    injectMethods({
+    useMethods({
       handleCurrentChange (val) {
         this.pageNum = val;
         if (typeof onChange === "string") {
@@ -99,14 +98,17 @@ export const usePager = ({ name, onChange } = {}) => {
   )
 };
 
-export const useSearch = ({ getTableData, immediate } = {}) => {
+export const useSearch = ({ getTableData, immediate, selections } = {}) => {
   return pipe(
-    injectData({
+    useData({
       query: {},
       searchLoading: false,
       tableData: []
     }),
-    injectMethods({
+    selections && useData({
+
+    }),
+    useMethods({
       async handleSearch () {
         this.searchLoading = true;
         getTableData.call(this)
@@ -115,7 +117,7 @@ export const useSearch = ({ getTableData, immediate } = {}) => {
         });
       }
     }),
-    immediate && injectLifecycle("created", function () {
+    immediate && useLifecycle("created", function () {
       this.handleSearch();
     })
   );
@@ -124,16 +126,16 @@ export const useSearch = ({ getTableData, immediate } = {}) => {
 export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, dep }) => {
   const methodName = makeCamelCase("get", namespace, "options")
   return pipe(
-    injectData({
+    useData({
       [makeCamelCase(namespace, "options")]: selectOptions
     }),
-    getOptions && injectMethods({
+    getOptions && useMethods({
       [methodName]: getOptions
     }),
-    !dep && getOptions && injectLifecycle("created", function () {
+    !dep && getOptions && useLifecycle("created", function () {
       this[methodName]();
     }),
-    dep && getOptions && injectWatch({
+    dep && getOptions && useWatch({
       [dep]: {
         handler (value) {
           value && this[methodName]();
@@ -146,7 +148,7 @@ export const useSelectOptions = ({ options: selectOptions, getOptions, namespace
 
 export const useModalCtrl = ({ name, title } = {}) => {
   return pipe(
-    injectData({
+    useData({
       [makeCamelCase(name, "visible")]: false,
       [makeCamelCase(name, "title")]: title,
     })
@@ -156,12 +158,12 @@ export const useModalCtrl = ({ name, title } = {}) => {
 export const useModal = (modalOptions = {}) => {
   const { onShow } = modalOptions;
   return pipe(
-    injectProps({
+    useProps({
       visible: Boolean,
       data: Object,
       title: String
     }),
-    injectWatch({
+    useWatch({
       visible: {
         handler(visible) {
           if (visible) {
@@ -176,7 +178,7 @@ export const useModal = (modalOptions = {}) => {
 
 export const useFormCtrl = (formOptions = {}) => {
   const { name } = formOptions;
-  return injectData({
+  return useData({
     [makeCamelCase(name, "data")]: {}
   });
 };
@@ -185,7 +187,7 @@ export const useModalFormCtrl = ({ name, title, afterHandler } = {}) => {
   return pipe(
     useModalCtrl({ name, title }),
     useFormCtrl({ name }),
-    injectMethods({
+    useMethods({
       [makeCamelCase("handle", name)](row, ...args) {
         this[makeCamelCase(name, "visible")] = true
         this[makeCamelCase(name, "data")] = row.constructor === Object ? row : {}
@@ -204,12 +206,12 @@ export const useModalForm = ({ doSubmit, onShow, formRules = {} } = {} ) => {
         onShow?.()
       }
     }),
-    injectData({
+    useData({
       formLoading: false,
       form: {},
       formRules,
     }),
-    injectMethods({
+    useMethods({
       handleSubmit() {
         this.$refs.form.validate((flag) => {
           if (flag) {

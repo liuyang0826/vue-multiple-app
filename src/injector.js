@@ -1,4 +1,4 @@
-const injectLifecycle = (lifecycle, fn) => options => {
+const useLifecycle = (lifecycle, fn) => options => {
   const originFn = options[lifecycle];
   options[lifecycle] = function () {
     fn.call(this);
@@ -7,21 +7,21 @@ const injectLifecycle = (lifecycle, fn) => options => {
   return options;
 };
 
-const injectData = (injectData) => options => {
+const useData = (useData) => options => {
   const data = options.data;
   options.data = () => {
     return {
-      ...injectData,
+      ...useData,
       ...data?.(),
     };
   };
   return options;
 };
 
-const injectMethods = (injectMethods) => options => {
+const useMethods = (useMethods) => options => {
   const methods = options.methods;
-  const newOptions = Object.keys(injectMethods).reduce((options, key) => {
-    const injectFn = injectMethods[key];
+  const newOptions = Object.keys(useMethods).reduce((options, key) => {
+    const injectFn = useMethods[key];
     options[key] = methods[key] ? function (...args) {
       injectFn.call(this, ...args);
       methods[key].call(this, ...args);
@@ -36,20 +36,20 @@ const injectMethods = (injectMethods) => options => {
   return options;
 };
 
-const injectProps = (injectProps) => options => {
+const useProps = (useProps) => options => {
   const props = options.props;
   options.props = {
-    ...injectProps,
+    ...useProps,
     ...props,
   };
   return options;
 };
 
 
-const injectWatch = (injectWatch) => options => {
+const useWatch = (useWatch) => options => {
   const watch = options.watch
   options.watch = {
-    ...injectWatch,
+    ...useWatch,
     ...watch,
   };
   return options;

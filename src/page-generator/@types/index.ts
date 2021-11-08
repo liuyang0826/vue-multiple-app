@@ -48,21 +48,3 @@ export interface IFormItem {
     prop: string
     disabled: string
 }
-
-export interface ITemplateDesc {
-    name: string
-    templateForm: ITemplateForm[]
-}
-
-export interface ITemplateForm {
-    label: string
-    prop: string
-    type: "array" | "select" | "text" | "number" | "boolean" | "component"
-    options?: {
-        label: "输入框" | "下拉框",
-        value: "input" | "select",
-    }[]
-    items?: ITemplateForm[]
-    templateId?: string
-    remarks?: string
-}

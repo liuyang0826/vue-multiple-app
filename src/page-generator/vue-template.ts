@@ -35,7 +35,7 @@ const serviceImportsTemplate =
 
 const componentImportsTemplate = `import <%name%> from "<%componentPath%><%name%>"`
 
-const componentsTemplate = `<<%component%><%props%>/>`
+export const componentsTemplate = `<<%component%><%props%>/>`
 
 const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
     const { components } = config
@@ -61,15 +61,15 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
         .map((item) => require(`./templates/${item.templateId}`)
         .injectParent(item)) as ReturnType<IInjectParent>[]
 
-    injectParents?.forEach(({ hooks: injecthooks }) => {
-        injecthooks.forEach(item => {
+    injectParents?.forEach(({ hooks: injectHooks }) => {
+        injectHooks.forEach(item => {
             hooks.push(item)
         })
     })
 
     const componentNames = Array.from(new Set(mergedComponents.map(d => d.name)))
     if (mergedComponents.length) {
-        hooks.unshift(`injectComponents({
+        hooks.unshift(`useComponents({
     ${componentNames.join(",\n    ")}
   })`)
     }

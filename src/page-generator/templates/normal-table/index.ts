@@ -12,7 +12,9 @@ import {
     IService
 } from "../../@types";
 import inquirer from "inquirer"
-import baseConfigurator from "../../utils/base-configurator";
+import baseConfigure from "../../utils/base-configure";
+import tipsSplit from "../../utils/tips-split";
+import componentsConfigure from "../../utils/components-configure";
 
 const template = `
 <div>
@@ -61,7 +63,7 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
 
     if (type === IComponentEnum.component) {
         hooks.unshift(
-            `injectProps({
+            `useProps({
     data: Object
   })`
         )
@@ -112,7 +114,7 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
 
 export const injectParent: IInjectParent = ({ namespace }) => {
     const hooks: string[] = [
-        `injectData({
+        `useData({
     ${namespace}TableData: {}
   })`
     ]
@@ -126,13 +128,14 @@ export const injectParent: IInjectParent = ({ namespace }) => {
 }
 
 export async function configurator() {
-    const result = await baseConfigurator<INormalTableOptions>({ templateId: "normal-table" })
+    const result = await baseConfigure<INormalTableOptions>({ templateId: "normal-table" })
 
     const { tableCols } = await inquirer.prompt([
         {
             type: "number",
             message: "表格列数:",
-            name: "tableCols"
+            name: "tableCols",
+            default: 1,
         },
     ])
 
@@ -163,7 +166,7 @@ export async function configurator() {
         options.formItems = await promptFormItems({ length: formItems })
     }
 
-    const { hasPagination, hasAddForm } = await inquirer.prompt([
+    const { hasPagination, operations } = await inquirer.prompt([
         {
             type: "confirm",
             message: "是否分页？",
@@ -171,31 +174,30 @@ export async function configurator() {
             default: true
         },
         {
-            type: "confirm",
-            message: "是否添加功能？",
-            name: "hasAddForm",
-            default: false
+            type: "checkbox",
+            message: "功能操作？",
+            name: "operations",
+            default: false,
+            choices: [
+                { name: "新增", checked: true },
+                { name: "编辑" },
+            ]
         },
     ])
 
     options.hasPagination = hasPagination
 
-    if (hasAddForm) {
+    if (operations.includes("新增")) {
+        tipsSplit({ split: `新增弹窗` })
         options.addForm = await require("../dialog-form").configurator()
     }
 
-    const { hasUpdateForm } = await inquirer.prompt([
-        {
-            type: "confirm",
-            message: "是否修改功能？",
-            name: "hasUpdateForm",
-            default: false
-        },
-    ])
-
-    if (hasUpdateForm) {
+    if (operations.includes("编辑")) {
+        tipsSplit({ split: `编辑弹窗` })
         options.updateForm = await require("../dialog-form").configurator()
     }
+
+    result.components = await componentsConfigure()
 
     return result
 }
@@ -204,7 +206,7 @@ async function promptTableCols({ prefix = "表单项", length = 0 }) {
     const result = []
 
     for (let i = 0; i < length; i++) {
-        console.log(`------------${prefix}${i + 1}------------`)
+        tipsSplit({ split: `${prefix}${i + 1}` })
         const item = await inquirer.prompt([
             {
                 type: "input",
@@ -227,7 +229,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0 }) {
     const result = []
 
     for (let i = 0; i < length; i++) {
-        console.log(`------------${prefix}${i + 1}------------`)
+        tipsSplit({ split: `${prefix}${i + 1}` })
         const item = await inquirer.prompt([
             {
                 type: "list",
@@ -269,6 +271,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0 }) {
                 type: "number",
                 message: `固定项个数:`,
                 name: "count",
+                default: 0,
                 when: (answer: any) => answer.type === "select" && answer.source === "固定项"
             },
         ])
@@ -292,7 +295,7 @@ async function promptSelectOptions({ prefix = '', length = 0 }) {
     const result = []
 
     for (let i = 0; i < length; i++) {
-        console.log(`------------${prefix}${i + 1}------------`)
+        tipsSplit({ split: `${prefix}${i + 1}`})
         result[i] = await inquirer.prompt([
             {
                 type: "input",

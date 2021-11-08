@@ -5,11 +5,17 @@ import serviceTemplate from "./service-template"
 import { prettier, firstToLowerCase, camelCaseToShortLine } from "./utils"
 import {IComponentConfig, IComponentEnum} from "./@types";
 
-const writeFile = (config: IComponentConfig) => {
-    const rootDir = path.join(process.cwd(), `./packages/app-user/src/views/${firstToLowerCase(config.name)}`)
-    if (!fs.existsSync(rootDir)) {
-        fs.mkdirSync(rootDir)
+function getRootDir(name: string): string {
+    const rootDir = path.join(process.cwd(), `./packages/app-user/src/views/${name}`)
+    if (fs.existsSync(rootDir)) {
+        return getRootDir(name + "_copy")
     }
+    return rootDir
+}
+
+const writeFile = (config: IComponentConfig) => {
+    const rootDir = getRootDir(firstToLowerCase(config.name))
+    fs.mkdirSync(rootDir)
 
     fs.writeFileSync(path.join(rootDir, "generator-config.json"), JSON.stringify(config, null, 2))
 

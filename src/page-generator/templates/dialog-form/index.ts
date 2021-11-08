@@ -8,7 +8,7 @@ import {
 } from "../../@types";
 import inquirer from "inquirer";
 import {promptFormItems} from "../normal-table";
-import baseConfigurator from "../../utils/base-configurator";
+import baseConfigure from "../../utils/base-configure";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -30,7 +30,7 @@ const inputItemTemp = `
 
 const selectItemTemp = `
 <el-form-item label="<%label%>">
-  <el-select clearable v-model="form.<%prop%>"<%disabled%>>
+  <el-select clearable v-model="form.<%prop%>" label-width="<%labelWidth%>px"<%disabled%>>
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
@@ -118,7 +118,7 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
 }
 
 export async function configurator() {
-    const result = await baseConfigurator<IDialogFormOptions>({
+    const result = await baseConfigure<IDialogFormOptions>({
         templateId: "dialog-form",
     })
 

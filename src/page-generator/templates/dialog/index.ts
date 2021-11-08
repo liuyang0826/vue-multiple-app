@@ -1,5 +1,5 @@
 import { injectTemplate } from "../../utils";
-import { IProcessTemplate, ITemplateDesc } from "../../@types";
+import { IProcessTemplate } from "../../@types";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -32,9 +32,4 @@ export const injectParent = (config: any) => {
         hooks,
         props,
     }
-}
-
-export const description: ITemplateDesc = {
-    name: "普通弹窗",
-    templateForm: []
 }

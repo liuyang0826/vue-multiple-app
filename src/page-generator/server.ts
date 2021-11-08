@@ -3,8 +3,6 @@ import KoaRouter from "koa-router"
 import writeFile from "./write-file"
 import fs from "fs"
 import path from "path"
-import { description } from "./templates/dialog-form";
-import { ITemplateDesc } from "./@types";
 
 const createServer = () => {
     const app = new Koa()
@@ -36,151 +34,48 @@ const createServer = () => {
 
     router.get("/", async (ctx) => {
         writeFile({
-            templateId: "normal-table",
-            name: "Test",
-            options: {
-                formItems: [
-                    { type: "input", label: "用户名", prop: "username", maxlength: 100 },
-                    { type: "input", label: "密码", prop: "password", maxlength: 100 },
-                    { type: "input", label: "年龄", prop: "age", maxlength: 2 },
+            "templateId": "tabs",
+            "name": "Test",
+            "options": {
+                "tabPanes": [
                     {
-                        type: "select",
-                        label: "性别",
-                        prop: "sex",
-                        options: [
-                            { value: "1", label: "男" },
-                            { value: "2", label: "女" },
-                        ],
-                        id: "sex"
-                    },
-                    {
-                        type: "select",
-                        label: "班级", prop: "class", maxlength: 100,
-                        api: "/api/select/getSelectOptions",
-                        dep: "sex"
-                    },
-                ],
-                tableCols: [
-                    { label: "用户名", prop: "username" },
-                    { label: "密码", prop: "password" },
-                    { label: "年龄", prop: "age" },
-                    { label: "班级", prop: "class" },
-                    { label: "备注", prop: "remarks" },
-                    { label: "备注", prop: "remarks" },
-                    { label: "备注", prop: "remarks" },
-                ],
-                hasPagination: true,
-                addForm: {
-                    templateId: "dialog-form",
-                    name: "AddForm",
-                    options: {
-                        title: "新增用户",
-                        formItems: [
-                            { type: "input", label: "用户名", prop: "username", maxlength: 100 },
-                            { type: "input", label: "密码", prop: "password", maxlength: 100 },
-                            { type: "input", label: "年龄", prop: "age", maxlength: 2 },
-                            {
-                                type: "select",
-                                label: "性别",
-                                prop: "sex",
-                                options: [
-                                    { value: "1", label: "男" },
-                                    { value: "2", label: "女" },
-                                ],
-                                id: "sex"
-                            },
-                            {
-                                type: "select",
-                                label: "班级", prop: "class", maxlength: 100,
-                                api: "/api/select/getSelectOptions",
-                                dep: "sex"
-                            },
-                        ],
-                        width: 1000,
-                        api: "/api/add"
-                    },
-                },
-                updateForm: {
-                    templateId: "dialog-form",
-                    name: "UpdateForm",
-                    options: {
-                        title: "编辑用户",
-                        formItems: [
-                            { type: "input", label: "用户名", prop: "username", maxlength: 100 },
-                            { type: "input", label: "密码", prop: "password", maxlength: 100 },
-                            { type: "input", label: "年龄", prop: "age", maxlength: 2 },
-                            {
-                                type: "select",
-                                label: "性别",
-                                prop: "sex",
-                                options: [
-                                    { value: "1", label: "男" },
-                                    { value: "2", label: "女" },
-                                ],
-                                id: "sex"
-                            },
-                            {
-                                type: "select",
-                                label: "班级", prop: "class", maxlength: 100,
-                                api: "/api/select/getSelectOptions",
-                                dep: "sex"
-                            },
-                        ],
-                        api: "/api/update"
-                    }
-                },
-            },
-            components: [
-                {
-                    templateId: "dialog",
-                    namespace: "detail",
-                    name: "DetailDialog",
-                    options: {
-                        title: "详情",
-                        width: 500,
-                    },
-                    components: [
-                        {
-                            templateId: "normal-table",
-                            namespace: "detail",
-                            name: "DetailTable",
-                            options: {
-                                formItems: [
-                                    { type: "input", label: "用户名", prop: "username", maxlength: 100 },
-                                    { type: "input", label: "密码", prop: "password", maxlength: 100 },
-                                    { type: "input", label: "年龄", prop: "age", maxlength: 2 },
+                        "name": "user",
+                        "label": "用户信息",
+                        "component": {
+                            "templateId": "normal-table",
+                            "name": "UserTable",
+                            "options": {
+                                "tableCols": [
                                     {
-                                        type: "select",
-                                        label: "性别",
-                                        prop: "sex",
-                                        options: [
-                                            { value: "1", label: "男" },
-                                            { value: "2", label: "女" },
-                                        ],
-                                        id: "sex"
-                                    },
-                                    {
-                                        type: "select",
-                                        label: "班级", prop: "class", maxlength: 100,
-                                        api: "/api/select/getSelectOptions",
-                                        dep: "sex"
-                                    },
+                                        "label": "用户名",
+                                        "prop": "name"
+                                    }
                                 ],
-                                tableCols: [
-                                    { label: "用户名", prop: "username" },
-                                    { label: "密码", prop: "password" },
-                                    { label: "年龄", prop: "age" },
-                                    { label: "班级", prop: "class" },
-                                    { label: "备注", prop: "remarks" },
-                                    { label: "备注", prop: "remarks" },
-                                    { label: "备注", prop: "remarks" },
-                                ],
-                                hasPagination: true,
-                            }
+                                "hasPagination": true
+                            },
+                            "components": []
                         }
-                    ]
-                }
-            ]
+                    },
+                    {
+                        "name": "car",
+                        "label": "车辆信息",
+                        "component": {
+                            "templateId": "normal-table",
+                            "name": "CarTable",
+                            "options": {
+                                "tableCols": [
+                                    {
+                                        "label": "名称",
+                                        "prop": "name"
+                                    }
+                                ],
+                                "hasPagination": true
+                            },
+                            "components": []
+                        }
+                    }
+                ]
+            }
         })
         ctx.body = "success"
     })
@@ -192,4 +87,4 @@ const createServer = () => {
     })
 }
 
-export default createServer
+createServer()
