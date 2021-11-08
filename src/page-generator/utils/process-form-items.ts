@@ -1,6 +1,6 @@
-import { IFormItem, IService } from "../../@types";
+import { IFormItem, IService } from "../@types";
 
-const { makeCamelCase } = require("../../utils")
+const { makeCamelCase } = require("../utils")
 
 interface IProcessFormItemsProps {
     formItems?: IFormItem[]
@@ -15,20 +15,20 @@ const processFormItems = ({ formItems, hooks, services  }: IProcessFormItemsProp
 
     // 处理下拉框
     formItems.filter(d => d.type === "select").forEach((item) => {
-        const dep = item.dep && `query.${formItems.find(d => d.id === item.dep)?.props?.prop}`
+        const dep = item.dep && `query.${formItems.find(d => d.id === item.dep)?.prop}`
         if (dep) {
-            item.props.disabled = ` :disabled="!${dep}"`
+            item.disabled = ` :disabled="!${dep}"`
         }
         hooks.push(
             `useSelectOptions({
-    namespace: "${item.props.prop}",
+    namespace: "${item.prop}",
     options: [${item.options ? "\n      " : ""}${item.options
                 ?.map(({value, label}) => `{ value: "${value}", label: "${label}" }`)
                 .join(",\n      ") || ""}${item.options ? "\n    " : ""}]${item.api ? `,
     async getOptions() {
-      const { status, data, message } = await ${makeCamelCase("get", item.props.prop, "options")}()
+      const { status, data, message } = await ${makeCamelCase("get", item.prop, "options")}()
       if (status) {
-        this.${item.props.prop}Options = data
+        this.${item.prop}Options = data
       } else {
         this.$message.error(message)
       }
@@ -38,7 +38,7 @@ const processFormItems = ({ formItems, hooks, services  }: IProcessFormItemsProp
         if (item.api) {
             services.push({
                 method: "get",
-                name: makeCamelCase("get", item.props.prop, "options"),
+                name: makeCamelCase("get", item.prop, "options"),
                 api: item.api
             })
         }

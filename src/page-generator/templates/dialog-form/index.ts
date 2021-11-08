@@ -1,6 +1,13 @@
 import { injectTemplate } from "../../utils"
-import processFormItems from "../utils/process-form-items"
-import {IFormItem, IInjectParent, IProcessTemplate, IService, ITemplateForm} from "../../@types";
+import processFormItems from "../../utils/process-form-items"
+import {
+    IFormItem,
+    IInjectParent,
+    IProcessTemplate,
+    IService,
+    ITemplateDesc,
+    ITemplateForm
+} from "../../@types";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -28,9 +35,9 @@ const selectItemTemp = `
 </el-form-item>`
 
 interface IDialogFormOptions {
-    formItems: IFormItem<{
+    formItems: (IFormItem & {
         required: boolean
-    }>[]
+    })[]
     title: string
     width: number
     api: string
@@ -39,12 +46,12 @@ interface IDialogFormOptions {
 export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, options }) => {
     const { formItems, width = 440, api } = options
 
-    const requiredItems = formItems?.filter((d) => d.props.required) || []
+    const requiredItems = formItems?.filter((d) => d.required) || []
 
     const hooks = [
         `useModalForm({
     onShow() {},
-    formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.props.prop}: { required: true, message: "请输入${d.props.label}", trigger: ["change", "blur"] }`)
+    formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.prop}: { required: true, message: "请输入${d.label}", trigger: ["change", "blur"] }`)
             .join(",\n      ")}\n    ` : ""}},
     async onSubmit() {
       const { status, message } = await doSubmit(this.form)
@@ -74,13 +81,13 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
                 if (item.type === "input") {
                     return injectTemplate(inputItemTemp, {
                         labelWidth: 80,
-                        ...item.props
+                        ...item
                     }, 4)
                 }
                 if (item.type === "select") {
                     return injectTemplate(selectItemTemp, {
                         labelWidth: 80,
-                        ...item.props
+                        ...item
                     }, 4)
                 }
             }).join("\n") || " ",
@@ -109,44 +116,47 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
     }
 }
 
-export const templateForm: ITemplateForm[] = [
-    { label: "标题", prop: "title", type: "text" },
-    {
-        label: "表单项",
-        prop: "formItems",
-        type: "array",
-        items: [
-            {
-                label: "类型",
-                prop: "type",
-                type: "select",
-                options: [
-                    { label: "输入框", value: "input" },
-                    { label: "下拉框", value: "select" },
-                ]
-            },
-            {
-                label: "组件属性",
-                prop: "props",
-                type: "array",
-                items: [
-                    { label: "名称", prop: "label", type: "text" },
-                    { label: "字段名", prop: "prop", type: "text" },
-                    { label: "最大长度", prop: "maxlength", type: "number" },
-                ]
-            },
-            {
-                label: "下拉选项",
-                prop: "options",
-                type: "array",
-                items: [
-                    { label: "键", prop: "label", type: "text" },
-                    { label: "值", prop: "value", type: "text" },
-                ]
-            },
-            { label: "下拉api", prop: "api", type: "text" },
-            { label: "组件id", prop: "id", type: "text" },
-            { label: "依赖控件id", prop: "dep", type: "text" },
-        ]
-    },
-]
+export const description: ITemplateDesc = {
+    name: "弹窗表单",
+    templateForm: [
+        { label: "标题", prop: "title", type: "text" },
+        {
+            label: "表单项",
+            prop: "formItems",
+            type: "array",
+            items: [
+                {
+                    label: "类型",
+                    prop: "type",
+                    type: "select",
+                    options: [
+                        { label: "输入框", value: "input" },
+                        { label: "下拉框", value: "select" },
+                    ]
+                },
+                {
+                    label: "组件属性",
+                    prop: "props",
+                    type: "array",
+                    items: [
+                        { label: "名称", prop: "label", type: "text" },
+                        { label: "字段名", prop: "prop", type: "text" },
+                        { label: "最大长度", prop: "maxlength", type: "number" },
+                    ]
+                },
+                {
+                    label: "下拉选项",
+                    prop: "options",
+                    type: "array",
+                    items: [
+                        { label: "键", prop: "label", type: "text" },
+                        { label: "值", prop: "value", type: "text" },
+                    ]
+                },
+                { label: "下拉api", prop: "api", type: "text" },
+                { label: "组件id", prop: "id", type: "text" },
+                { label: "依赖控件id", prop: "dep", type: "text" },
+            ]
+        },
+    ]
+}

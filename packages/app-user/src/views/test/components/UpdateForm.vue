@@ -7,12 +7,17 @@
       <el-form-item label="密码：" prop="password" label-width="80px">
         <el-input v-model="form.password" maxlength="100" />
       </el-form-item>
-      <el-form-item label="班级：" prop="class" label-width="80px">
-        <el-input v-model="form.class" maxlength="100" />
+      <el-form-item label="年龄：" prop="age" label-width="80px">
+        <el-input v-model="form.age" maxlength="2" />
       </el-form-item>
       <el-form-item label="性别">
         <el-select clearable v-model="form.sex">
           <el-option v-for="{ label, value } in sexOptions" :key="value" :label="label" :value="value"  />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="班级">
+        <el-select clearable v-model="form.class" :disabled="!query.sex">
+          <el-option v-for="{ label, value } in classOptions" :key="value" :label="label" :value="value"  />
         </el-select>
       </el-form-item>
     </el-form>
@@ -30,16 +35,14 @@ import {
   useSelectOptions
 } from "@/utils"
 import {
-  doSubmit
+  doSubmit,
+  getClassOptions
 } from "../services/update-form"
 
 export default pipe(
   useModalForm({
     onShow() {},
-    formRules: {
-      username: { required: true, message: "请输入用户名", trigger: ["change", "blur"] },
-      password: { required: true, message: "请输入密码", trigger: ["change", "blur"] }
-    },
+    formRules: {},
     async onSubmit() {
       const { status, message } = await doSubmit(this.form)
       if (status) {
@@ -56,6 +59,19 @@ export default pipe(
       { value: "1", label: "男" },
       { value: "2", label: "女" }
     ]
+  }),
+  useSelectOptions({
+    namespace: "class",
+    options: [],
+    async getOptions() {
+      const { status, data, message } = await getClassOptions()
+      if (status) {
+        this.classOptions = data
+      } else {
+        this.$message.error(message)
+      }
+    },
+    dep: "query.sex"
   })
 )({
   name: "UpdateForm",

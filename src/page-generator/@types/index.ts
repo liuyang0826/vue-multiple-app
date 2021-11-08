@@ -34,25 +34,25 @@ export interface IService {
     api: string // 接口 api 的 url
 }
 
-// 表单相关类型
-export interface IBaseFormItemProp {
-    label: string
-    prop: string
-    disabled: string
-}
-
 export interface IOption {
     value: string
     label: string
 }
 
-export interface IFormItem<T = {}> {
+export interface IFormItem {
     type: "input" | "select" // 表单项类型
-    props: T & IBaseFormItemProp // 表单项配置
     options?: IOption[] // 下拉框选项
     api?: string // 下拉框依赖的数据接口
     id?: string // 表单项id
     dep?: string // 依赖的其他的表单项的id
+    label: string
+    prop: string
+    disabled: string
+}
+
+export interface ITemplateDesc {
+    name: string
+    templateForm: ITemplateForm[]
 }
 
 export interface ITemplateForm {

@@ -7,12 +7,17 @@
       <el-form-item label="密码：" prop="password" label-width="80px">
         <el-input v-model="form.password" maxlength="100" />
       </el-form-item>
-      <el-form-item label="班级：" prop="class" label-width="80px">
-        <el-input v-model="form.class" maxlength="100" />
+      <el-form-item label="年龄：" prop="age" label-width="80px">
+        <el-input v-model="form.age" maxlength="2" />
       </el-form-item>
       <el-form-item label="性别">
         <el-select clearable v-model="form.sex">
           <el-option v-for="{ label, value } in sexOptions" :key="value" :label="label" :value="value"  />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="班级">
+        <el-select clearable v-model="form.class" :disabled="!form.sex">
+          <el-option v-for="{ label, value } in classOptions" :key="value" :label="label" :value="value"  />
         </el-select>
       </el-form-item>
     </el-form>
@@ -20,33 +25,24 @@
       <el-button size="small" @click="$emit('update:visible', false)">取消</el-button>
       <el-button size="small" type="primary" :loading="formLoading" @click="handleSubmit">确定</el-button>
     </template>
-    <data-table :data="subTableData" />
   </el-dialog>
 </template>
 
 <script>
 import pipe from "@/utils/pipe";
 import {
-  injectComponents,
   useModalForm,
-  useSelectOptions,
-  injectData
+  useSelectOptions
 } from "@/utils"
-import DataTable from "./DataTable"
 import {
-  doSubmit
+  doSubmit,
+  getClassOptions
 } from "../services/add-form"
 
 export default pipe(
-  injectComponents({
-    DataTable
-  }),
   useModalForm({
     onShow() {},
-    formRules: {
-      username: { required: true, message: "请输入用户名", trigger: ["change", "blur"] },
-      password: { required: true, message: "请输入密码", trigger: ["change", "blur"] }
-    },
+    formRules: {},
     async onSubmit() {
       const { status, message } = await doSubmit(this.form)
       if (status) {
@@ -64,8 +60,18 @@ export default pipe(
       { value: "2", label: "女" }
     ]
   }),
-  injectData({
-    undefinedTableData: {}
+  useSelectOptions({
+    namespace: "class",
+    options: [],
+    async getOptions() {
+      const { status, data, message } = await getClassOptions()
+      if (status) {
+        this.classOptions = data
+      } else {
+        this.$message.error(message)
+      }
+    },
+    dep: "form.sex"
   })
 )({
   name: "AddForm",

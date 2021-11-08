@@ -24,10 +24,10 @@ const selectItemTemp = `
 export default ({formItems}: any) => injectTemplate(template, {
     formItems: formItems?.map((item: any) => {
         if (item.type === "input") {
-            return injectTemplate(inputItemTemp, item.props, 2)
+            return injectTemplate(inputItemTemp, item, 2)
         }
         if (item.type === "select") {
-            return injectTemplate(selectItemTemp, item.props, 2)
+            return injectTemplate(selectItemTemp, item, 2)
         }
     }).join("\n") || " ",
 }, 4)

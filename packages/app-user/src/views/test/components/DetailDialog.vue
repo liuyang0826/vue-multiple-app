@@ -1,6 +1,6 @@
 <template>
   <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="500px">
-    <detail-table :data="subTableData" />
+    <detail-table :data="detailTableData" />
   </el-dialog>
 </template>
 

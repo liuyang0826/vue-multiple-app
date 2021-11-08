@@ -56,7 +56,6 @@
     />
     <add-form :visible.sync="addVisible" :data="addData" :title="addTitle" />
     <update-form :visible.sync="updateVisible" :data="updateData" :title="updateTitle" />
-    <detail-dialog :visible.sync="detailVisible" :data="detailData" :title="detailTitle" />
   </div>
 </template>
 

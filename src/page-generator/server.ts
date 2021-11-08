@@ -1,14 +1,37 @@
 import Koa from "koa"
 import KoaRouter from "koa-router"
 import writeFile from "./write-file"
-import {templateForm} from "./templates/dialog-form";
+import fs from "fs"
+import path from "path"
+import { description } from "./templates/dialog-form";
+import { ITemplateDesc } from "./@types";
 
 const createServer = () => {
     const app = new Koa()
     const router = new KoaRouter();
 
+    app.use(async (ctx, next) => {
+        ctx.res.setHeader("Access-Control-Allow-Origin", "*")
+        ctx.res.setHeader("Access-Control-Allow-Methods", "*")
+        await next()
+    })
+
+    router.get("/templates", async (ctx) => {
+        const templateDirs = fs.readdirSync(path.join(__dirname, "templates"))
+        ctx.body = templateDirs.map((templateDir) => {
+            return {
+                ...require(path.join(__dirname, "templates", templateDir)).description,
+                id: templateDir
+            }
+        })
+    })
+
     router.get("/getTemplateFormById", async (ctx) => {
-        ctx.body = require(`./templates/${ctx.query.id}`).templateForm
+        ctx.body = require(`./templates/${ctx.query.id}`).description
+    })
+
+    router.post("/submit", async (ctx) => {
+        ctx.body = "success"
     })
 
     router.get("/", async (ctx) => {
@@ -17,21 +40,13 @@ const createServer = () => {
             name: "Test",
             options: {
                 formItems: [
-                    {
-                        type: "input",
-                        props: { label: "用户名", prop: "username", maxlength: 100, }
-                    },
-                    {
-                        type: "input",
-                        props: { label: "密码", prop: "password", maxlength: 100, }
-                    },
-                    {
-                        type: "input",
-                        props: { label: "年龄", prop: "age", maxlength: 2 }
-                    },
+                    { type: "input", label: "用户名", prop: "username", maxlength: 100 },
+                    { type: "input", label: "密码", prop: "password", maxlength: 100 },
+                    { type: "input", label: "年龄", prop: "age", maxlength: 2 },
                     {
                         type: "select",
-                        props: { label: "性别", prop: "sex" },
+                        label: "性别",
+                        prop: "sex",
                         options: [
                             { value: "1", label: "男" },
                             { value: "2", label: "女" },
@@ -40,7 +55,7 @@ const createServer = () => {
                     },
                     {
                         type: "select",
-                        props: {  label: "班级", prop: "class", maxlength: 100, },
+                        label: "班级", prop: "class", maxlength: 100,
                         api: "/api/select/getSelectOptions",
                         dep: "sex"
                     },
@@ -61,79 +76,29 @@ const createServer = () => {
                     options: {
                         title: "新增用户",
                         formItems: [
-                            {
-                                type: "input",
-                                props: { label: "用户名", prop: "username", maxlength: 100, required: true },
-                            },
-                            // { label: "年龄", prop: "age", maxlength: 2, required: true },
-                            {
-                                type: "input",
-                                props: { label: "密码", prop: "password", maxlength: 100, required: true },
-                            },
-                            {
-                                type: "input",
-                                props: { label: "班级", prop: "class", maxlength: 100 },
-                            },
+                            { type: "input", label: "用户名", prop: "username", maxlength: 100 },
+                            { type: "input", label: "密码", prop: "password", maxlength: 100 },
+                            { type: "input", label: "年龄", prop: "age", maxlength: 2 },
                             {
                                 type: "select",
-                                props: { label: "性别", prop: "sex" },
+                                label: "性别",
+                                prop: "sex",
                                 options: [
                                     { value: "1", label: "男" },
                                     { value: "2", label: "女" },
                                 ],
                                 id: "sex"
                             },
+                            {
+                                type: "select",
+                                label: "班级", prop: "class", maxlength: 100,
+                                api: "/api/select/getSelectOptions",
+                                dep: "sex"
+                            },
                         ],
                         width: 1000,
                         api: "/api/add"
                     },
-                    components: [
-                        {
-                            templateId: "normal-table",
-                            name: "DataTable",
-                            options: {
-                                formItems: [
-                                    {
-                                        type: "input",
-                                        props: { label: "用户名", prop: "username", maxlength: 100 }
-                                    },
-                                    {
-                                        type: "input",
-                                        props: { label: "密码", prop: "password", maxlength: 100, }
-                                    },
-                                    {
-                                        type: "input",
-                                        props: { label: "年龄", prop: "age", maxlength: 2 }
-                                    },
-                                    {
-                                        type: "select",
-                                        props: { label: "性别", prop: "sex" },
-                                        options: [
-                                            { value: "1", label: "男" },
-                                            { value: "2", label: "女" },
-                                        ],
-                                        id: "sex"
-                                    },
-                                    {
-                                        type: "select",
-                                        props: {  label: "班级", prop: "class", maxlength: 100, },
-                                        api: "/api/select/getSelectOptions",
-                                        dep: "sex"
-                                    },
-                                ],
-                                tableCols: [
-                                    { label: "用户名", prop: "username" },
-                                    { label: "密码", prop: "password" },
-                                    { label: "年龄", prop: "age" },
-                                    { label: "班级", prop: "class" },
-                                    { label: "备注", prop: "remarks" },
-                                    { label: "备注", prop: "remarks" },
-                                    { label: "备注", prop: "remarks" },
-                                ],
-                                hasPagination: true,
-                            }
-                        }
-                    ]
                 },
                 updateForm: {
                     templateId: "dialog-form",
@@ -141,27 +106,24 @@ const createServer = () => {
                     options: {
                         title: "编辑用户",
                         formItems: [
-                            {
-                                type: "input",
-                                props: { label: "用户名", prop: "username", maxlength: 100, required: true },
-                            },
-                            // { label: "年龄", prop: "age", maxlength: 2, required: true },
-                            {
-                                type: "input",
-                                props: { label: "密码", prop: "password", maxlength: 100, required: true },
-                            },
-                            {
-                                type: "input",
-                                props: { label: "班级", prop: "class", maxlength: 100 },
-                            },
+                            { type: "input", label: "用户名", prop: "username", maxlength: 100 },
+                            { type: "input", label: "密码", prop: "password", maxlength: 100 },
+                            { type: "input", label: "年龄", prop: "age", maxlength: 2 },
                             {
                                 type: "select",
-                                props: { label: "性别", prop: "sex" },
+                                label: "性别",
+                                prop: "sex",
                                 options: [
                                     { value: "1", label: "男" },
                                     { value: "2", label: "女" },
                                 ],
                                 id: "sex"
+                            },
+                            {
+                                type: "select",
+                                label: "班级", prop: "class", maxlength: 100,
+                                api: "/api/select/getSelectOptions",
+                                dep: "sex"
                             },
                         ],
                         api: "/api/update"
@@ -184,21 +146,13 @@ const createServer = () => {
                             name: "DetailTable",
                             options: {
                                 formItems: [
-                                    {
-                                        type: "input",
-                                        props: { label: "用户名", prop: "username", maxlength: 100 }
-                                    },
-                                    {
-                                        type: "input",
-                                        props: { label: "密码", prop: "password", maxlength: 100, }
-                                    },
-                                    {
-                                        type: "input",
-                                        props: { label: "年龄", prop: "age", maxlength: 2 }
-                                    },
+                                    { type: "input", label: "用户名", prop: "username", maxlength: 100 },
+                                    { type: "input", label: "密码", prop: "password", maxlength: 100 },
+                                    { type: "input", label: "年龄", prop: "age", maxlength: 2 },
                                     {
                                         type: "select",
-                                        props: { label: "性别", prop: "sex" },
+                                        label: "性别",
+                                        prop: "sex",
                                         options: [
                                             { value: "1", label: "男" },
                                             { value: "2", label: "女" },
@@ -207,7 +161,7 @@ const createServer = () => {
                                     },
                                     {
                                         type: "select",
-                                        props: {  label: "班级", prop: "class", maxlength: 100, },
+                                        label: "班级", prop: "class", maxlength: 100,
                                         api: "/api/select/getSelectOptions",
                                         dep: "sex"
                                     },
