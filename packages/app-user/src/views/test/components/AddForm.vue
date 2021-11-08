@@ -1,23 +1,20 @@
 <template>
-  <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="1000px">
+  <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="440px">
     <el-form :model="form" size="small" :rules="formRules" ref="form">
       <el-form-item label="用户名：" prop="username" label-width="80px">
-        <el-input v-model="form.username" maxlength="100" />
-      </el-form-item>
-      <el-form-item label="密码：" prop="password" label-width="80px">
-        <el-input v-model="form.password" maxlength="100" />
+        <el-input v-model="form.username" maxlength="" />
       </el-form-item>
       <el-form-item label="年龄：" prop="age" label-width="80px">
-        <el-input v-model="form.age" maxlength="2" />
+        <el-input v-model="form.age" maxlength="" />
       </el-form-item>
       <el-form-item label="性别">
         <el-select clearable v-model="form.sex">
           <el-option v-for="{ label, value } in sexOptions" :key="value" :label="label" :value="value"  />
         </el-select>
       </el-form-item>
-      <el-form-item label="班级">
-        <el-select clearable v-model="form.class" :disabled="!form.sex">
-          <el-option v-for="{ label, value } in classOptions" :key="value" :label="label" :value="value"  />
+      <el-form-item label="尺寸">
+        <el-select clearable v-model="form.size">
+          <el-option v-for="{ label, value } in sizeOptions" :key="value" :label="label" :value="value"  />
         </el-select>
       </el-form-item>
     </el-form>
@@ -36,7 +33,7 @@ import {
 } from "@/utils"
 import {
   doSubmit,
-  getClassOptions
+  getSizeOptions
 } from "../services/add-form"
 
 export default pipe(
@@ -61,17 +58,16 @@ export default pipe(
     ]
   }),
   useSelectOptions({
-    namespace: "class",
+    namespace: "size",
     options: [],
     async getOptions() {
-      const { status, data, message } = await getClassOptions()
+      const { status, data, message } = await getSizeOptions()
       if (status) {
-        this.classOptions = data
+        this.sizeOptions = data
       } else {
         this.$message.error(message)
       }
-    },
-    dep: "form.sex"
+    }
   })
 )({
   name: "AddForm",

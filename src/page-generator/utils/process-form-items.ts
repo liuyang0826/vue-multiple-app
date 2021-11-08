@@ -15,7 +15,7 @@ const processFormItems = ({ formItems, hooks, services  }: IProcessFormItemsProp
 
     // 处理下拉框
     formItems.filter(d => d.type === "select").forEach((item) => {
-        const dep = item.dep && `query.${formItems.find(d => d.id === item.dep)?.prop}`
+        const dep = item.dep && `query.${item.dep}`
         if (dep) {
             item.disabled = ` :disabled="!${dep}"`
         }

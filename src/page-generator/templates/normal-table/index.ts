@@ -9,10 +9,10 @@ import {
     IComponentEnum,
     IInjectParent,
     IProcessTemplate,
-    IService,
-    ITemplateDesc,
-    ITemplateForm
+    IService
 } from "../../@types";
+import inquirer from "inquirer"
+import baseConfigurator from "../../utils/base-configurator";
 
 const template = `
 <div>
@@ -125,61 +125,187 @@ export const injectParent: IInjectParent = ({ namespace }) => {
     }
 }
 
-export const description: ITemplateDesc = {
-    name: "表格",
-    templateForm: [
+export async function configurator() {
+    const result = await baseConfigurator<INormalTableOptions>({ templateId: "normal-table" })
+
+    const { tableCols } = await inquirer.prompt([
         {
-            label: "查询字段",
-            prop: "formItems",
-            type: "array",
-            items: [
-                {
-                    label: "类型",
-                    prop: "type",
-                    type: "select",
-                    options: [
-                        { label: "输入框", value: "input" },
-                        { label: "下拉框", value: "select" },
-                    ]
-                },
-                { label: "名称", prop: "label", type: "text" },
-                { label: "字段名", prop: "prop", type: "text" },
-                { label: "最大长度", prop: "maxlength", type: "number" },
-                {
-                    label: "下拉选项",
-                    prop: "options",
-                    type: "array",
-                    items: [
-                        { label: "键", prop: "label", type: "text" },
-                        { label: "值", prop: "value", type: "text" },
-                    ]
-                },
-                { label: "下拉api", prop: "api", type: "text" },
-                { label: "组件id", prop: "id", type: "text" },
-                { label: "依赖控件id", prop: "dep", type: "text" },
-            ],
+            type: "number",
+            message: "表格列数:",
+            name: "tableCols"
+        },
+    ])
+
+    const options = {} as INormalTableOptions
+
+    result.options = options
+
+    options.tableCols = await promptTableCols({ prefix: "表格列", length: tableCols })
+
+    const { useSearchForm, formItems } = await inquirer.prompt([
+        {
+            type: "confirm",
+            message: "添加查询表单？",
+            name: "useSearchForm",
+            default: false
         },
         {
-            label: "表格列",
-            prop: "tableCols",
-            type: "array",
-            items: [
-                { label: "名称", prop: "label", type: "text" },
-                { label: "字段名", prop: "prop", type: "text" },
-            ]
+            type: "number",
+            message: "个数:",
+            name: "formItems",
+            default: 0,
+            prefix: "表单项",
+            when: (answer) => answer.useSearchForm
         },
-        { label: "显示分页", prop: "hasPagination", type: "boolean" },
+    ])
+
+    if (useSearchForm) {
+        options.formItems = await promptFormItems({ length: formItems })
+    }
+
+    const { hasPagination, hasAddForm } = await inquirer.prompt([
         {
-            label: "新增弹窗",
-            prop: "addForm",
-            type: "component",
-            templateId: "dialog-form"
+            type: "confirm",
+            message: "是否分页？",
+            name: "hasPagination",
+            default: true
         },
         {
-            label: "编辑弹窗",
-            prop: "updateForm",
-            type: "component",
-            templateId: "dialog-form"
+            type: "confirm",
+            message: "是否添加功能？",
+            name: "hasAddForm",
+            default: false
         },
-    ]
+    ])
+
+    options.hasPagination = hasPagination
+
+    if (hasAddForm) {
+        options.addForm = await require("../dialog-form").configurator()
+    }
+
+    const { hasUpdateForm } = await inquirer.prompt([
+        {
+            type: "confirm",
+            message: "是否修改功能？",
+            name: "hasUpdateForm",
+            default: false
+        },
+    ])
+
+    if (hasUpdateForm) {
+        options.updateForm = await require("../dialog-form").configurator()
+    }
+
+    return result
+}
+
+async function promptTableCols({ prefix = "表单项", length = 0 }) {
+    const result = []
+
+    for (let i = 0; i < length; i++) {
+        console.log(`------------${prefix}${i + 1}------------`)
+        const item = await inquirer.prompt([
+            {
+                type: "input",
+                message: `label:`,
+                name: `label`,
+            },
+            {
+                type: "input",
+                message: `prop:`,
+                name: `prop`,
+            },
+        ])
+        result.push(item)
+    }
+
+    return result
+}
+
+export async function promptFormItems({ prefix = "表单项", length = 0 }) {
+    const result = []
+
+    for (let i = 0; i < length; i++) {
+        console.log(`------------${prefix}${i + 1}------------`)
+        const item = await inquirer.prompt([
+            {
+                type: "list",
+                message: `类型:`,
+                name: "type",
+                choices: ["input", "select"],
+            },
+            {
+                type: "input",
+                message: `label:`,
+                name: `label`,
+            },
+            {
+                type: "input",
+                message: `prop:`,
+                name: `prop`,
+            },
+            {
+                type: "list",
+                message: `数据源类型:`,
+                name: "source",
+                choices: ["接口", "固定项"],
+                when: (answer: any) => answer.type === "select"
+            },
+            {
+                type: "input",
+                message: `数据源接口:`,
+                name: "api",
+                when: (answer: any) => answer.type === "select" && answer.source === "接口"
+            },
+            {
+                type: "input",
+                message: `数据源依赖表单项prop:`,
+                name: "dep",
+                default: "无",
+                when: (answer: any) => answer.type === "select" && answer.source === "接口"
+            },
+            {
+                type: "number",
+                message: `固定项个数:`,
+                name: "count",
+                when: (answer: any) => answer.type === "select" && answer.source === "固定项"
+            },
+        ])
+        const length = item.count
+
+        if (length) {
+            item.options = await promptSelectOptions({ length, prefix: `${prefix}${i + 1}选项` })
+        }
+
+        if (!item.dep || item.dep === "无") {
+            delete item.dep
+        }
+
+        result.push(item)
+    }
+
+    return result
+}
+
+async function promptSelectOptions({ prefix = '', length = 0 }) {
+    const result = []
+
+    for (let i = 0; i < length; i++) {
+        console.log(`------------${prefix}${i + 1}------------`)
+        result[i] = await inquirer.prompt([
+            {
+                type: "input",
+                message: `label:`,
+                name: "label",
+            },
+            {
+                type: "input",
+                message: `value:`,
+                name: "value",
+            },
+        ])
+    }
+
+    return result
 }

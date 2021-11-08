@@ -5,9 +5,10 @@ import {
     IInjectParent,
     IProcessTemplate,
     IService,
-    ITemplateDesc,
-    ITemplateForm
 } from "../../@types";
+import inquirer from "inquirer";
+import {promptFormItems} from "../normal-table";
+import baseConfigurator from "../../utils/base-configurator";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -116,47 +117,43 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
     }
 }
 
-export const description: ITemplateDesc = {
-    name: "弹窗表单",
-    templateForm: [
-        { label: "标题", prop: "title", type: "text" },
+export async function configurator() {
+    const result = await baseConfigurator<IDialogFormOptions>({
+        templateId: "dialog-form",
+    })
+
+    const { title, width, formItems } = await inquirer.prompt([
         {
-            label: "表单项",
-            prop: "formItems",
-            type: "array",
-            items: [
-                {
-                    label: "类型",
-                    prop: "type",
-                    type: "select",
-                    options: [
-                        { label: "输入框", value: "input" },
-                        { label: "下拉框", value: "select" },
-                    ]
-                },
-                {
-                    label: "组件属性",
-                    prop: "props",
-                    type: "array",
-                    items: [
-                        { label: "名称", prop: "label", type: "text" },
-                        { label: "字段名", prop: "prop", type: "text" },
-                        { label: "最大长度", prop: "maxlength", type: "number" },
-                    ]
-                },
-                {
-                    label: "下拉选项",
-                    prop: "options",
-                    type: "array",
-                    items: [
-                        { label: "键", prop: "label", type: "text" },
-                        { label: "值", prop: "value", type: "text" },
-                    ]
-                },
-                { label: "下拉api", prop: "api", type: "text" },
-                { label: "组件id", prop: "id", type: "text" },
-                { label: "依赖控件id", prop: "dep", type: "text" },
-            ]
+            type: "input",
+            message: "标题:",
+            name: "title"
         },
-    ]
+        {
+            type: "number",
+            message: "宽度:",
+            name: "width"
+        },
+        {
+            type: "number",
+            message: "表单项数量:",
+            name: "formItems"
+        },
+    ])
+
+    const options = {} as IDialogFormOptions
+
+    result.options = options
+    options.title = title
+    options.width = width
+    options.formItems = await promptFormItems({ length: formItems })
+
+    options.api = (await inquirer.prompt([
+        {
+            type: "input",
+            message: "提交接口:",
+            name: "api"
+        },
+    ])).api
+
+    return result
 }

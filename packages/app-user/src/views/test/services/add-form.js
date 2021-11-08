@@ -2,9 +2,9 @@
 const http = () => {}
 
 export const doSubmit = async (params) => {
-  return await http.post("/api/add", params)
+  return await http.post("/api/addUser", params)
 }
 
-export const getClassOptions = async (params) => {
-  return await http.get("/api/select/getSelectOptions", params)
+export const getSizeOptions = async (params) => {
+  return await http.get("/api/sizes", params)
 }

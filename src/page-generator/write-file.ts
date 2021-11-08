@@ -11,6 +11,8 @@ const writeFile = (config: IComponentConfig) => {
         fs.mkdirSync(rootDir)
     }
 
+    fs.writeFileSync(path.join(rootDir, "generator-config.json"), JSON.stringify(config, null, 2))
+
     const createVue = (config: IComponentConfig, type: IComponentEnum) => {
         const { template, components, services } = vueTemplate(config, type)
         const fileName = type === IComponentEnum.page

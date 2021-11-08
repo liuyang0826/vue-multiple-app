@@ -3,22 +3,19 @@
     <div>
       <el-form size="small" :model="query" inline>
         <el-form-item label="用户名">
-          <el-input clearable v-model="query.username" maxlength="100" @change="handleSearch" />
-        </el-form-item>
-        <el-form-item label="密码">
-          <el-input clearable v-model="query.password" maxlength="100" @change="handleSearch" />
+          <el-input clearable v-model="query.username" maxlength="" @change="handleSearch" />
         </el-form-item>
         <el-form-item label="年龄">
-          <el-input clearable v-model="query.age" maxlength="2" @change="handleSearch" />
+          <el-input clearable v-model="query.age" maxlength="" @change="handleSearch" />
         </el-form-item>
         <el-form-item label="性别">
           <el-select clearable v-model="query.sex"  @change="handleSearch">
             <el-option v-for="{ label, value } in sexOptions" :key="value" :label="label" :value="value"  />
           </el-select>
         </el-form-item>
-        <el-form-item label="班级">
-          <el-select clearable v-model="query.class"  @change="handleSearch" :disabled="!query.sex">
-            <el-option v-for="{ label, value } in classOptions" :key="value" :label="label" :value="value"  />
+        <el-form-item label="尺寸">
+          <el-select clearable v-model="query.size"  @change="handleSearch">
+            <el-option v-for="{ label, value } in sizeOptions" :key="value" :label="label" :value="value"  />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -31,12 +28,9 @@
     </div>
     <el-table size="small" :data="tableData" v-loading="searchLoading">
       <el-table-column label="用户名" prop="username" />
-      <el-table-column label="密码" prop="password" />
       <el-table-column label="年龄" prop="age" />
-      <el-table-column label="班级" prop="class" />
-      <el-table-column label="备注" prop="remarks" />
-      <el-table-column label="备注" prop="remarks" />
-      <el-table-column label="备注" prop="remarks" />
+      <el-table-column label="性别" prop="sex" />
+      <el-table-column label="尺寸" prop="size" />
       <el-table-column label="操作">
         <template slot-scope="{row}">
           <el-button size="small" @click="handleUpdate(row)">编辑</el-button>
@@ -70,17 +64,15 @@ import {
 } from "@/utils"
 import AddForm from "./components/AddForm"
 import UpdateForm from "./components/UpdateForm"
-import DetailDialog from "./components/DetailDialog"
 import {
   getTableData,
-  getClassOptions
+  getSizeOptions
 } from "./services"
 
 export default pipe(
   injectComponents({
     AddForm,
-    UpdateForm,
-    DetailDialog
+    UpdateForm
   }),
   useSearch({
     async getTableData() {
@@ -102,21 +94,19 @@ export default pipe(
     ]
   }),
   useSelectOptions({
-    namespace: "class",
+    namespace: "size",
     options: [],
     async getOptions() {
-      const { status, data, message } = await getClassOptions()
+      const { status, data, message } = await getSizeOptions()
       if (status) {
-        this.classOptions = data
+        this.sizeOptions = data
       } else {
         this.$message.error(message)
       }
-    },
-    dep: "query.sex"
+    }
   }),
-  useModalFormCtrl({ name: "add", title: "新增用户" }),
-  useModalFormCtrl({ name: "update", title: "编辑用户" }),
-  useModalFormCtrl({ name: "detail", title: "详情" })
+  useModalFormCtrl({ name: "add", title: "添加用户" }),
+  useModalFormCtrl({ name: "update", title: "修改用户" })
 )({
   name: "Test",
 })

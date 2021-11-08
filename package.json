@@ -1,20 +1,26 @@
 {
-  "name": "@cisdiliuyang/vue-multiple-app",
-  "version": "0.0.2",
+  "name": "@fast-curd/vue-multiple-app",
+  "author": "liuyang<1161906592@qq.com>",
+  "version": "0.0.1",
   "files": [
     "src",
     "package.json"
   ],
   "scripts": {
-    "dev": "nodemon",
+    "dev": "ts-node src/page-generator/index.ts",
     "build": "npx tsc"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "dependencies": {
+    "inquirer": "^8.2.0",
     "koa": "^2.13.4",
     "koa-router": "^10.1.1",
     "postcss": "^7.0.39"
   },
   "devDependencies": {
+    "@types/inquirer": "^8.1.3",
     "@types/koa": "^2.13.4",
     "@types/koa-router": "^7.4.4",
     "nodemon": "^2.0.14",

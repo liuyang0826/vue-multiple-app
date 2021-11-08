@@ -1,3 +1,10 @@
-import createServer from "./server"
+import { configurator } from "./templates/normal-table"
+import writeFile from "./write-file";
 
-createServer()
+async function main() {
+    const result = await configurator()
+    writeFile(result)
+}
+
+main()
+
