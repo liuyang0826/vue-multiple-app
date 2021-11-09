@@ -14,6 +14,16 @@ const createServer = () => {
         await next()
     })
 
+    router.post("/api/pageList", async (ctx) => {
+      ctx.body = {
+          total: 2,
+          list: [
+              { name: "张三", sex: 1 },
+              { name: "李四", sex: 2 },
+          ]
+      }
+    })
+
     router.get("/templates", async (ctx) => {
         const templateDirs = fs.readdirSync(path.join(__dirname, "templates"))
         ctx.body = templateDirs.map((templateDir) => {

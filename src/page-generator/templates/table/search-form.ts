@@ -1,7 +1,7 @@
 import { injectTemplate } from "../../utils"
 
 const template = `
-<el-form size="small" :model="query" inline>
+<el-form size="small" inline>
   <%formItems%>
   <el-form-item>
     <el-button @click="handleSearch" type="primary">查询</el-button>
@@ -21,7 +21,7 @@ const selectItemTemp = `
   </el-select>
 </el-form-item>`
 
-export default ({formItems}: any) => injectTemplate(template, {
+export default ({formItems}: any) => formItems?.length ? injectTemplate(template, {
     formItems: formItems?.map((item: any) => {
         if (item.type === "input") {
             return injectTemplate(inputItemTemp, item, 2)
@@ -30,4 +30,4 @@ export default ({formItems}: any) => injectTemplate(template, {
             return injectTemplate(selectItemTemp, item, 2)
         }
     }).join("\n") || " ",
-}, 4)
+}, 4) : " "

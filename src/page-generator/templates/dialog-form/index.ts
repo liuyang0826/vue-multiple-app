@@ -8,7 +8,7 @@ import {
 } from "../../@types";
 import inquirer from "inquirer";
 import {promptFormItems} from "../table";
-import baseConfigure from "../../utils/base-configure";
+import basePrompt from "../../utils/base-prompt";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
@@ -50,7 +50,8 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
     const requiredItems = formItems?.filter((d) => d.required) || []
 
     const hooks = [
-        `useModalForm({
+        `useModal({
+    isForm: true,
     onShow() {},
     formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.prop}: { required: true, message: "请输入${d.label}", trigger: ["change", "blur"] }`)
             .join(",\n      ")}\n    ` : ""}},
@@ -102,7 +103,7 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
 
 export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
     const hooks = [
-        `useModalFormCtrl({ name: "${config.namespace}", title: "${config.options.title}" })`
+        `useModalCtrl({ name: "${config.namespace}", title: "${config.options.title}" })`
     ]
 
     const props = [
@@ -118,7 +119,7 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
 }
 
 export async function configurator() {
-    const result = await baseConfigure<IDialogFormOptions>({
+    const result = await basePrompt<IDialogFormOptions>({
         templateId: "dialog-form",
     })
 

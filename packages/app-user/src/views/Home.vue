@@ -19,7 +19,7 @@ import HelloWorld from "@/components/HelloWorld.vue";
 import { Dialog } from "element-ui"
 import DialogForm from "./DialogForm";
 import {
-  pipe, useModalFormCtrl,
+  pipe, useModalCtrl,
   usePager,
   useSearch
 } from "../utils";
@@ -39,13 +39,13 @@ const searchOptions = {
 export default pipe(
     useSearch(searchOptions),
     usePager(),
-    useModalFormCtrl({
+    useModalCtrl({
       name: "add",
       afterHandler() {
         console.log(this, arguments);
       }
     }),
-    useModalFormCtrl({ name: "edit" }),
+    useModalCtrl({ name: "edit" }),
 )({
   name: "Home",
   components: {

@@ -8,9 +8,9 @@
  * @Author: 丿Coder
  * @Date: 2021-10-30 22:11
  */
-import {pipe, useModalForm} from "../utils";
+import {pipe, useModal} from "../utils";
 
-export default pipe(useModalForm({
+export default pipe(useModal({
   onShow() {
     console.log("onShow", this);
   }

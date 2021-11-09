@@ -1,11 +1,12 @@
 import {camelCaseToShortLine, injectTemplate} from "../../utils"
 import {IComponentConfig, IInjectParent, IProcessTemplate} from "../../@types";
-import baseConfigure from "../../utils/base-configure";
+import basePrompt from "../../utils/base-prompt";
 import inquirer from "inquirer";
 import tipsSplit from "../../utils/tips-split";
 import fs from "fs";
 import path from "path";
 import {componentsTemplate} from "../../vue-template";
+import {propValidator, requiredValidator} from "../../utils/validators";
 
 const template = `
 <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -68,7 +69,7 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
 }
 
 export async function configurator() {
-    const result = await baseConfigure<ITabsOptions>({ templateId: "tabs" })
+    const result = await basePrompt<ITabsOptions>({ templateId: "tabs" })
 
     const { count } = await inquirer.prompt([
         {
@@ -90,13 +91,15 @@ export async function configurator() {
         const { name, label, templateId } = await inquirer.prompt([
             {
                 type: "input",
-                message: "name",
+                message: "name(英文)",
                 name: "name",
+                validate: propValidator
             },
             {
                 type: "input",
-                message: "label",
+                message: "label(中文)",
                 name: "label",
+                validate: requiredValidator
             },
             {
                 type: "list",

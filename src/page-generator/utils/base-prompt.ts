@@ -1,7 +1,7 @@
 import {IComponentConfig} from "../@types";
 import inquirer from "inquirer";
 
-async function baseConfigure<T>({ templateId = "" }) {
+async function basePrompt<T>({ templateId = "" }) {
     const config = {
         templateId,
     } as IComponentConfig<T>
@@ -19,4 +19,4 @@ async function baseConfigure<T>({ templateId = "" }) {
     return config
 }
 
-export default baseConfigure
+export default basePrompt

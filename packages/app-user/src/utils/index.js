@@ -146,47 +146,15 @@ export const useSelectOptions = ({ options: selectOptions, getOptions, namespace
   )
 }
 
-export const useModalCtrl = ({ name, title } = {}) => {
+export const useModalCtrl = ({ name, title, afterHandler } = {}) => {
   return pipe(
     useData({
       [makeCamelCase(name, "visible")]: false,
       [makeCamelCase(name, "title")]: title,
-    })
-  );
-};
-
-export const useModal = (modalOptions = {}) => {
-  const { onShow } = modalOptions;
-  return pipe(
-    useProps({
-      visible: Boolean,
-      data: Object,
-      title: String
     }),
-    useWatch({
-      visible: {
-        handler(visible) {
-          if (visible) {
-            onShow?.call(this)
-          }
-        },
-        immediate: true
-      }
-    })
-  );
-};
-
-export const useFormCtrl = (formOptions = {}) => {
-  const { name } = formOptions;
-  return useData({
-    [makeCamelCase(name, "data")]: {}
-  });
-};
-
-export const useModalFormCtrl = ({ name, title, afterHandler } = {}) => {
-  return pipe(
-    useModalCtrl({ name, title }),
-    useFormCtrl({ name }),
+    useData({
+      [makeCamelCase(name, "data")]: {}
+    }),
     useMethods({
       [makeCamelCase("handle", name)](row, ...args) {
         this[makeCamelCase(name, "visible")] = true
@@ -197,32 +165,73 @@ export const useModalFormCtrl = ({ name, title, afterHandler } = {}) => {
   )
 }
 
-export const useModalForm = ({ doSubmit, onShow, formRules = {} } = {} ) => {
+export const useModal = ({ onShow, formRules, doSubmit } = {}) => {
   return pipe(
-    useModal({
-      onShow() {
-        this.formLoading = false
-        this.form = JSON.parse(JSON.stringify(this.data))
-        onShow?.()
+      useProps({
+        visible: Boolean,
+        data: Object,
+        title: String
+      }),
+      useWatch({
+        visible: {
+          handler(visible) {
+            if (!visible) {
+              return
+            }
+            if (formRules) {
+              this.formLoading = false
+              this.form = JSON.parse(JSON.stringify(this.data))
+            }
+            onShow?.call(this)
+          },
+          immediate: true
+        }
+      }),
+      formRules && useData({
+        formLoading: false,
+        form: {},
+        formRules,
+      }),
+      formRules && useMethods({
+        handleSubmit() {
+          this.$refs.form.validate((flag) => {
+            if (flag) {
+              this.formLoading = true
+              doSubmit.call(this)
+                  .finally(() => {
+                    this.formLoading = false
+                  })
+            }
+          })
+        }
+      })
+  );
+};
+
+// 删除 & 批量删除
+export const useDelete = ({ doDelete, doBatchDelete } = {}) => {
+  return pipe(
+    doDelete && useMethods({
+      handleDelete(...args) {
+        this.$confirm("确认删除？", "提示", {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          doDelete.call(this, ...args)
+        })
       }
     }),
-    useData({
-      formLoading: false,
-      form: {},
-      formRules,
-    }),
-    useMethods({
-      handleSubmit() {
-        this.$refs.form.validate((flag) => {
-          if (flag) {
-            this.formLoading = true
-            doSubmit.call(this)
-              .finally(() => {
-                this.formLoading = false
-              })
-          }
+    doBatchDelete && useMethods({
+      handleBatchDelete() {
+        this.$confirm("确认删除？", "提示", {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          doBatchDelete.call(this, this.selections)
         })
       }
     })
   )
-};
+}

@@ -12,9 +12,9 @@ import {
     IService
 } from "../../@types";
 import inquirer from "inquirer"
-import baseConfigure from "../../utils/base-configure";
+import basePrompt from "../../utils/base-prompt";
 import tipsSplit from "../../utils/tips-split";
-import componentsConfigure from "../../utils/components-configure";
+import componentsPrompt from "../../utils/components-prompt";
 import {propValidator, requiredValidator} from "../../utils/validators";
 
 const template = `
@@ -33,8 +33,9 @@ interface INormalTableOptions {
     formItems: any
     api: string
     tableCols: any
-    hasPagination: boolean
-    hasBatchDel: boolean
+    hasPager: boolean
+    deleteApi: string
+    batchDeleteApi: string
     addForm: IComponentConfig
     updateForm: IComponentConfig
 }
@@ -44,8 +45,9 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
         formItems,
         api,
         tableCols,
-        hasPagination,
-        hasBatchDel,
+        hasPager,
+        deleteApi,
+        batchDeleteApi,
         addForm,
         updateForm
     } = options
@@ -53,7 +55,11 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
     const hooks = [
         `useSearch({
     async getTableData() {
-      const { status, data, message } = await getTableData()
+      const { status, data, message } = await getTableData({
+        query: this.query,
+        pageSize: this.pageSize,
+        pageNum: this.pageNum
+      })
       if (status) {
         this.tableData = data
       } else {
@@ -75,12 +81,12 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
     const services: IService[] = [
         {
             name: "getTableData",
-            method: "get",
+            method: "post",
             api
         },
     ]
 
-    if (hasPagination) {
+    if (hasPager) {
         hooks.push(`usePager({ onChange: "handleSearch" })`)
     }
 
@@ -92,6 +98,46 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
         updateForm.namespace = "update"
     }
 
+    if (deleteApi) {
+        services.push({
+            name: "itemDelete",
+            method: "post",
+            api: deleteApi
+        })
+        hooks.push(
+            `useDelete({
+    async doDelete(row) {
+      const { status, message } = await itemDelete(row)
+      if (status) {
+        this.$message.success("删除成功")
+      } else {
+        this.$message.error(message)
+      }
+    }     
+  })`
+        )
+    }
+
+    if (batchDeleteApi) {
+        services.push({
+            name: "batchDelete",
+            method: "post",
+            api: batchDeleteApi
+        })
+        hooks.push(
+            `useDelete({
+    async doBatchDelete(row) {
+      const { status, message } = await batchDelete(row)
+      if (status) {
+        this.$message.success("删除成功")
+      } else {
+        this.$message.error(message)
+      }
+    }     
+  })`
+        )
+    }
+
     processFormItems({ formItems, hooks, services })
 
     return {
@@ -101,11 +147,13 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
                 formItems
             }),
             table: table({
-                tableCols
+                tableCols,
+                hasUpdate: !!updateForm,
+                hasDelete: !!deleteApi
             }),
-            pagination: hasPagination && pagination(),
+            pagination: hasPager && pagination(),
             handleButton: handleButton({
-                hasBatchDel,
+                hasBatchDel: !!batchDeleteApi,
                 addForm: !!addForm
             }),
         }, 2),
@@ -131,7 +179,7 @@ export const injectParent: IInjectParent = ({ namespace }) => {
 }
 
 export async function configurator() {
-    const result = await baseConfigure<INormalTableOptions>({ templateId: "table" })
+    const result = await basePrompt<INormalTableOptions>({ templateId: "table" })
 
     const { tableCols } = await inquirer.prompt([
         {
@@ -187,7 +235,7 @@ export async function configurator() {
         },
     ])
 
-    options.hasPagination = operations.includes("分页")
+    options.hasPager = operations.includes("分页")
 
     if (operations.includes("新增")) {
         tipsSplit({ split: `新增` })
@@ -199,7 +247,33 @@ export async function configurator() {
         options.updateForm = await require("../dialog-form").configurator()
     }
 
-    result.components = await componentsConfigure()
+    if (operations.includes("删除")) {
+        tipsSplit({ split: `删除` })
+        const { deleteApi } = await inquirer.prompt([
+            {
+                type: "input",
+                message: "删除接口:",
+                name: "deleteApi",
+                validate: requiredValidator
+            }
+        ])
+        options.deleteApi = deleteApi
+    }
+
+    if (operations.includes("批量删除")) {
+        tipsSplit({ split: `批量删除` })
+        const { batchDeleteApi } = await inquirer.prompt([
+            {
+                type: "input",
+                message: "批量删除接口:",
+                name: "batchDeleteApi",
+                validate: requiredValidator
+            }
+        ])
+        options.batchDeleteApi = batchDeleteApi
+    }
+
+    result.components = await componentsPrompt()
 
     return result
 }
@@ -262,7 +336,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0 }) {
             },
             {
                 type: "input",
-                message: `数据源接口:`,
+                message: `数据源接口api:`,
                 name: "api",
                 when: (answer: any) => answer.type === "select" && answer.source === "接口",
                 validate: requiredValidator
@@ -278,7 +352,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0 }) {
                 type: "number",
                 message: `固定项个数:`,
                 name: "count",
-                default: 0,
+                default: 2,
                 when: (answer: any) => answer.type === "select" && answer.source === "固定项"
             },
         ])

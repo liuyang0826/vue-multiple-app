@@ -4,12 +4,12 @@ import fs from "fs"
 import path from "path"
 import {IComponentConfig} from "../@types";
 
-async function componentsConfigure() {
+async function componentsPrompt() {
     const components: IComponentConfig[] = []
     const { count } = await inquirer.prompt([
         {
             type: "number",
-            message: "自定义组件数量",
+            message: "自定义组件个数:",
             name: "count",
             default: 0
         },
@@ -32,4 +32,4 @@ async function componentsConfigure() {
     return components
 }
 
-export default componentsConfigure
+export default componentsPrompt

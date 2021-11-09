@@ -19,7 +19,7 @@ export const processTemplate: IProcessTemplate = ({ name, options }) => {
 
 export const injectParent = (config: any) => {
     const hooks = [
-        `useModalFormCtrl({ name: "${config.namespace}", title: "${config.options.title}" })`
+        `useModalCtrl({ name: "${config.namespace}", title: "${config.options.title}" })`
     ]
 
     const props = [
