@@ -16,7 +16,7 @@ const inputItemTemp = `
 
 const selectItemTemp = `
 <el-form-item label="<%label%>">
-  <el-select clearable v-model="query.<%prop%>"  @change="handleSearch"<%disabled%>>
+  <el-select clearable v-model="query.<%prop%>" style="width: 100%;" @change="handleSearch"<%disabled%>>
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`

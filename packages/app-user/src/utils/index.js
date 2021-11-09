@@ -1,5 +1,7 @@
 export const pipe = (...fns) => x => fns.reduce((x, f) => typeof f === "function" ? f(x) : x, x);
 const makeCamelCase = (first, ...args) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
+const get = (obj, prop) => prop.split(",").reduce((obj, key) => obj?.[key], obj)
+
 
 export const useLifecycle = (lifecycle, fn) => options => {
   const originFn = options[lifecycle];
@@ -98,15 +100,15 @@ export const usePager = ({ onChange } = {}) => {
   )
 };
 
-export const useSearch = ({ getTableData, immediate, selections } = {}) => {
+export const useSearch = ({ getTableData, immediate, useSelection } = {}) => {
   return pipe(
     useData({
       query: {},
       searchLoading: false,
       tableData: []
     }),
-    selections && useData({
-
+    useSelection && useData({
+      selectionMap: {}
     }),
     useMethods({
       async handleSearch () {
@@ -123,7 +125,7 @@ export const useSearch = ({ getTableData, immediate, selections } = {}) => {
   );
 };
 
-export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, dep }) => {
+export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, deps }) => {
   const methodName = makeCamelCase("get", namespace, "options")
   return pipe(
     useData({
@@ -132,16 +134,15 @@ export const useSelectOptions = ({ options: selectOptions, getOptions, namespace
     getOptions && useMethods({
       [methodName]: getOptions
     }),
-    !dep && getOptions && useLifecycle("created", function () {
+    !deps && getOptions && useLifecycle("created", function () {
       this[methodName]();
     }),
-    dep && getOptions && useWatch({
-      [dep]: {
-        handler (value) {
-          value && this[methodName]();
-        },
-        immediate: true
-      }
+    deps && getOptions && useLifecycle("created", function () {
+      this.$watch(function () {
+        return deps.every(dep => get(this, dep) !== undefined)
+      }, function (value) {
+        value && this[methodName]();
+      })
     })
   )
 }
@@ -229,7 +230,7 @@ export const useDelete = ({ doDelete, doBatchDelete } = {}) => {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          doBatchDelete.call(this, this.selections)
+          doBatchDelete.call(this, Object.values(this.selectionMap))
         })
       }
     })

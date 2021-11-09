@@ -12,7 +12,7 @@ import basePrompt from "../../utils/base-prompt";
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
-  <el-form :model="form" size="small" :rules="formRules" ref="form">
+  <el-form :model="form" size="small" :rules="formRules" ref="form" label-suffix="：">
      <%formItems%>
   </el-form>
   <template #footer>
@@ -24,13 +24,13 @@ const template = `
 `
 
 const inputItemTemp = `
-<el-form-item label="<%label%>：" prop="<%prop%>" label-width="<%labelWidth%>px">
+<el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px"  >
   <el-input v-model="form.<%prop%>" maxlength="<%maxlength%>" />
 </el-form-item>`
 
 const selectItemTemp = `
-<el-form-item label="<%label%>">
-  <el-select clearable v-model="form.<%prop%>" label-width="<%labelWidth%>px"<%disabled%>>
+<el-form-item label="<%label%>" label-width="<%labelWidth%>px">
+  <el-select clearable v-model="form.<%prop%>" style="width: 100%;" label-width="<%labelWidth%>px">
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
@@ -51,7 +51,6 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
 
     const hooks = [
         `useModal({
-    isForm: true,
     onShow() {},
     formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.prop}: { required: true, message: "请输入${d.label}", trigger: ["change", "blur"] }`)
             .join(",\n      ")}\n    ` : ""}},
@@ -74,7 +73,7 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
         }
     ]
 
-    processFormItems({formItems, hooks, services })
+    processFormItems({ formItems, hooks, services, depForm: "form" })
 
     return {
         name,
@@ -146,7 +145,7 @@ export async function configurator() {
     result.options = options
     options.title = title
     options.width = width
-    options.formItems = await promptFormItems({ length: formItems })
+    options.formItems = await promptFormItems({ length: formItems, required: true })
 
     options.api = (await inquirer.prompt([
         {

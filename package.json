@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "dev": "ts-node src/page-generator/index.ts",
+    "start": "ts-node src/page-generator/server.ts",
     "build": "npx tsc"
   },
   "publishConfig": {

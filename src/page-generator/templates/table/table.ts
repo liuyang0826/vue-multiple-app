@@ -2,6 +2,7 @@ import { injectTemplate } from "../../utils"
 
 const template = `
 <el-table size="small" :data="tableData" v-loading="searchLoading">
+  <%selection%>
   <%tableCols%>
   <%operationCol%>
 </el-table>
@@ -11,18 +12,27 @@ const tableColTemp = `
 <el-table-column label="<%label%>" prop="<%prop%>" />`
 
 const operationColTemp = `
-<el-table-column label="操作">
+<el-table-column label="操作" width="<%width%>">
   <template slot-scope="{row}">
-    <%update%>
-    <%delete%>
+    <%operations%>
   </template>
 </el-table-column>
 `
 
-export default ({ tableCols, hasUpdate, hasDelete }: any) => injectTemplate(template, {
-    tableCols: tableCols?.map((item: any) => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
-    operationCol: hasUpdate || hasDelete ? injectTemplate(operationColTemp, {
-        update: hasUpdate ? `<el-button size="small" @click="handleUpdate(row)">编辑</el-button>` : " ",
-        delete: hasDelete ? `<el-button size="small" @click="handleDelete(row)" type="danger">删除</el-button>` : " "
-    }, 2) : " "
-}, 2)
+export default ({ tableCols, hasUpdate, hasDelete, hasToggleEnable, hasMove, hasSelection }: any) => {
+    const operations = [
+        hasUpdate && `<el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>`,
+        hasDelete && `<el-button size="small" type="text" @click="handleDelete(row)">删除</el-button>`,
+        hasToggleEnable && `<el-button size="small" type="text" @click="handleToggleEnable(row)">{{ row.enable ? "禁用" : "启用" }}</el-button>`,
+        hasMove && `<el-button size="small" type="text" @click="handleMove(row, 1)">上移</el-button>`,
+        hasMove && `<el-button size="small" type="text" @click="handleMove(row, 0)">下移</el-button>`,
+    ].filter(Boolean)
+    return injectTemplate(template, {
+        tableCols: tableCols?.map((item: any) => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
+        selection: hasSelection ? `<el-table-column type="selection" width="55" />` : " ",
+        operationCol: operations.length ? injectTemplate(operationColTemp, {
+            operations: operations.join(`\n    <el-divider direction="vertical"/>\n    `),
+            width: operations.length * 40
+        }, 2) : " "
+    }, 2)
+}

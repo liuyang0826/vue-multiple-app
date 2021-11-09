@@ -6,21 +6,20 @@ interface IProcessFormItemsProps {
     formItems?: IFormItem[]
     hooks: string[]
     services: IService[]
+    depForm: string
 }
 
-const processFormItems = ({ formItems, hooks, services  }: IProcessFormItemsProps) => {
+const processFormItems = ({ formItems, hooks, services, depForm }: IProcessFormItemsProps) => {
     if (!formItems) {
         return
     }
 
     // 处理下拉框
     formItems.filter(d => d.type === "select").forEach((item) => {
-        const dep = item.dep && `query.${item.dep}`
-        if (dep) {
-            item.disabled = ` :disabled="!${dep}"`
-        }
+        const deps = item.deps?.map(d => `"${depForm}.${item.deps}"`)
         hooks.push(
             `useSelectOptions({
+    // ${item.label}选项
     namespace: "${item.prop}",
     options: [${item.options ? "\n      " : ""}${item.options
                 ?.map(({value, label}) => `{ value: "${value}", label: "${label}" }`)
@@ -32,7 +31,7 @@ const processFormItems = ({ formItems, hooks, services  }: IProcessFormItemsProp
       } else {
         this.$message.error(message)
       }
-    }` : ""}${dep ? `,\n    dep: "${dep}"` : ""}
+    }` : ""}${deps ? `,\n    deps: ${deps}` : ""}
   })`
         )
         if (item.api) {

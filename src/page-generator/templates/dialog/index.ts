@@ -33,3 +33,5 @@ export const injectParent = (config: any) => {
         props,
     }
 }
+
+export const componentOnly = true
