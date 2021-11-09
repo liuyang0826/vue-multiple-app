@@ -15,6 +15,7 @@ import inquirer from "inquirer"
 import baseConfigure from "../../utils/base-configure";
 import tipsSplit from "../../utils/tips-split";
 import componentsConfigure from "../../utils/components-configure";
+import {propValidator, requiredValidator} from "../../utils/validators";
 
 const template = `
 <div>
@@ -30,6 +31,7 @@ const template = `
 
 interface INormalTableOptions {
     formItems: any
+    api: string
     tableCols: any
     hasPagination: boolean
     hasBatchDel: boolean
@@ -40,6 +42,7 @@ interface INormalTableOptions {
 export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, options}, type) => {
     const {
         formItems,
+        api,
         tableCols,
         hasPagination,
         hasBatchDel,
@@ -73,7 +76,7 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
         {
             name: "getTableData",
             method: "get",
-            api: "/api/list"
+            api
         },
     ]
 
@@ -139,46 +142,41 @@ export async function configurator() {
         },
     ])
 
-    const options = {} as INormalTableOptions
+    const options = {
+        tableCols: (await promptTableCols({ prefix: "表格列", length: tableCols }))
+    } as INormalTableOptions
 
     result.options = options
 
-    options.tableCols = await promptTableCols({ prefix: "表格列", length: tableCols })
-
-    const { useSearchForm, formItems } = await inquirer.prompt([
+    const { api, formItems } = await inquirer.prompt([
         {
-            type: "confirm",
-            message: "添加查询表单？",
-            name: "useSearchForm",
-            default: false
+            type: "input",
+            message: "数据接口:",
+            name: "api",
+            validate: requiredValidator
         },
         {
             type: "number",
-            message: "个数:",
+            message: "查询表单项数量:",
             name: "formItems",
-            default: 0,
-            prefix: "表单项",
+            default: 1,
             when: (answer) => answer.useSearchForm
         },
     ])
 
-    if (useSearchForm) {
+    options.api = api
+
+    if (formItems) {
         options.formItems = await promptFormItems({ length: formItems })
     }
 
-    const { hasPagination, operations } = await inquirer.prompt([
-        {
-            type: "confirm",
-            message: "是否分页？",
-            name: "hasPagination",
-            default: true
-        },
+    const { operations } = await inquirer.prompt([
         {
             type: "checkbox",
             message: "功能操作？",
             name: "operations",
-            default: false,
             choices: [
+                { name: "分页", checked: true },
                 { name: "新增", checked: true },
                 { name: "编辑", checked: true },
                 { name: "删除" },
@@ -189,15 +187,15 @@ export async function configurator() {
         },
     ])
 
-    options.hasPagination = hasPagination
+    options.hasPagination = operations.includes("分页")
 
     if (operations.includes("新增")) {
-        tipsSplit({ split: `新增弹窗` })
+        tipsSplit({ split: `新增` })
         options.addForm = await require("../dialog-form").configurator()
     }
 
     if (operations.includes("编辑")) {
-        tipsSplit({ split: `编辑弹窗` })
+        tipsSplit({ split: `编辑` })
         options.updateForm = await require("../dialog-form").configurator()
     }
 
@@ -214,13 +212,15 @@ async function promptTableCols({ prefix = "表单项", length = 0 }) {
         const item = await inquirer.prompt([
             {
                 type: "input",
-                message: `label:`,
+                message: `label(中文):`,
                 name: `label`,
+                validate: requiredValidator
             },
             {
                 type: "input",
-                message: `prop:`,
+                message: `prop(英文):`,
                 name: `prop`,
+                validate: propValidator
             },
         ])
         result.push(item)
@@ -243,13 +243,15 @@ export async function promptFormItems({ prefix = "表单项", length = 0 }) {
             },
             {
                 type: "input",
-                message: `label:`,
+                message: `label(中文):`,
                 name: `label`,
+                validate: requiredValidator,
             },
             {
                 type: "input",
-                message: `prop:`,
+                message: `prop(英文):`,
                 name: `prop`,
+                validate: propValidator,
             },
             {
                 type: "list",
@@ -262,7 +264,8 @@ export async function promptFormItems({ prefix = "表单项", length = 0 }) {
                 type: "input",
                 message: `数据源接口:`,
                 name: "api",
-                when: (answer: any) => answer.type === "select" && answer.source === "接口"
+                when: (answer: any) => answer.type === "select" && answer.source === "接口",
+                validate: requiredValidator
             },
             {
                 type: "input",
@@ -303,13 +306,15 @@ async function promptSelectOptions({ prefix = '', length = 0 }) {
         result[i] = await inquirer.prompt([
             {
                 type: "input",
-                message: `label:`,
+                message: `label(中文):`,
                 name: "label",
+                validate: requiredValidator,
             },
             {
                 type: "input",
-                message: `value:`,
+                message: `value(英文):`,
                 name: "value",
+                validate: propValidator,
             },
         ])
     }

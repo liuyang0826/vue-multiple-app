@@ -23,7 +23,7 @@ export const useData = (data) => options => {
 
 export const useMethods = (methods) => options => {
   const origin = options.methods || {};
-  const newOptions = Object.keys(useMethods).reduce((options, key) => {
+  const newOptions = Object.keys(methods).reduce((options, key) => {
     const injectFn = methods[key];
     options[key] = origin[key] ? function (...args) {
       injectFn.call(this, ...args);

@@ -1,4 +1,4 @@
-import { configurator } from "./templates/tabs"
+import { configurator } from "./templates/table"
 import writeFile from "./write-file";
 
 async function main() {
