@@ -42,7 +42,7 @@ const createServer = () => {
                         "name": "user",
                         "label": "用户信息",
                         "component": {
-                            "templateId": "normal-table",
+                            "templateId": "table",
                             "name": "UserTable",
                             "options": {
                                 "tableCols": [
@@ -60,7 +60,7 @@ const createServer = () => {
                         "name": "car",
                         "label": "车辆信息",
                         "component": {
-                            "templateId": "normal-table",
+                            "templateId": "table",
                             "name": "CarTable",
                             "options": {
                                 "tableCols": [

@@ -1,7 +1,7 @@
 import searchForm from "./search-form"
 import table from "./table"
 import pagination from "./pagination"
-import handleButton from "./handle-button"
+import handleButton from "./operations"
 import {injectTemplate} from "../../utils"
 import processFormItems from "../../utils/process-form-items"
 import {
@@ -128,7 +128,7 @@ export const injectParent: IInjectParent = ({ namespace }) => {
 }
 
 export async function configurator() {
-    const result = await baseConfigure<INormalTableOptions>({ templateId: "normal-table" })
+    const result = await baseConfigure<INormalTableOptions>({ templateId: "table" })
 
     const { tableCols } = await inquirer.prompt([
         {
@@ -180,7 +180,11 @@ export async function configurator() {
             default: false,
             choices: [
                 { name: "新增", checked: true },
-                { name: "编辑" },
+                { name: "编辑", checked: true },
+                { name: "删除" },
+                { name: "批量删除" },
+                { name: "启用禁用" },
+                { name: "上移下移" },
             ]
         },
     ])

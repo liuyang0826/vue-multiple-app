@@ -7,7 +7,7 @@
     "package.json"
   ],
   "scripts": {
-    "dev": "ts-node src/page-generator/server.ts",
+    "dev": "ts-node src/page-generator/index.ts",
     "build": "npx tsc"
   },
   "publishConfig": {

@@ -7,7 +7,7 @@ import {
     IService,
 } from "../../@types";
 import inquirer from "inquirer";
-import {promptFormItems} from "../normal-table";
+import {promptFormItems} from "../table";
 import baseConfigure from "../../utils/base-configure";
 
 const template = `
