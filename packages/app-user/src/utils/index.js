@@ -1,7 +1,6 @@
 export const pipe = (...fns) => x => fns.reduce((x, f) => typeof f === "function" ? f(x) : x, x);
 const makeCamelCase = (first, ...args) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
-const get = (obj, prop) => prop.split(",").reduce((obj, key) => obj?.[key], obj)
-
+const get = (obj, prop) => prop.split(".").reduce((obj, key) => obj?.[key], obj)
 
 export const useLifecycle = (lifecycle, fn) => options => {
   const originFn = options[lifecycle];
@@ -50,10 +49,10 @@ export const useProps = (props) => options => {
   return options;
 };
 
-export const useWatch = (watch) => pipe(
+export const useWatch = (watchers) => pipe(
   useLifecycle("created", function () {
-    Object.keys(watch).forEach((key) => {
-      const watch = watch[key]
+    Object.keys(watchers).forEach((key) => {
+      const watch = watchers[key]
       if (typeof watch === "function") {
         this.$watch(key, watch)
       } else {
@@ -138,10 +137,12 @@ export const useSelectOptions = ({ options: selectOptions, getOptions, namespace
       this[methodName]();
     }),
     deps && getOptions && useLifecycle("created", function () {
-      this.$watch(function () {
-        return deps.every(dep => get(this, dep) !== undefined)
-      }, function (value) {
-        value && this[methodName]();
+      let prevDeps = []
+      this.$watch(() => deps.map(dep => get(this, dep)), (val) => {
+        if (prevDeps.length !== val.length || prevDeps.some((d, i) => val[i] !== d)) {
+          this[methodName]();
+        }
+        prevDeps = val
       })
     })
   )

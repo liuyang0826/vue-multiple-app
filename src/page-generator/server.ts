@@ -76,7 +76,7 @@ const createServer = () => {
                         "prop": "size",
                         "source": "接口",
                         "api": "/api/sizes",
-                        "dep": "sex"
+                        "deps": ["sex"]
                     },
                     {
                         "type": "input",
@@ -139,7 +139,7 @@ const createServer = () => {
                                 "prop": "size",
                                 "source": "接口",
                                 "api": "/api/sizes",
-                                "dep": "sex"
+                                "deps": ["sex"]
                             },
                             {
                                 "type": "input",
@@ -190,7 +190,7 @@ const createServer = () => {
                                 "prop": "szie",
                                 "source": "接口",
                                 "api": "/api/sizes",
-                                "dep": "sex"
+                                "deps": ["sex"]
                             }
                         ],
                         "api": "/api/updateUser"

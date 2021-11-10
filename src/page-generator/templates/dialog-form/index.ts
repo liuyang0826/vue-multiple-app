@@ -54,7 +54,7 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
     onShow() {},
     formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.prop}: { required: true, message: "请输入${d.label}", trigger: ["change", "blur"] }`)
             .join(",\n      ")}\n    ` : ""}},
-    async onSubmit() {
+    async doSubmit() {
       const { status, message } = await doSubmit(this.form)
       if (status) {
         this.$message.error("操作成功")

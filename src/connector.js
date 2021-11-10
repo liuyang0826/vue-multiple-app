@@ -40,3 +40,10 @@ const connector = (options) => {
 };
 
 export default connector;
+
+
+function sortNodeClass(attr, length) {
+  const nodes = [...document.body.querySelectorAll("*")]
+
+  return nodes.filter(d => d[attr].length > length).sort((a, b) => a[attr].length - b[attr].length)
+}

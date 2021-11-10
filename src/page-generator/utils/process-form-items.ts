@@ -16,7 +16,7 @@ const processFormItems = ({ formItems, hooks, services, depForm }: IProcessFormI
 
     // 处理下拉框
     formItems.filter(d => d.type === "select").forEach((item) => {
-        const deps = item.deps?.map(d => `"${depForm}.${item.deps}"`)
+        const deps = item.deps?.map(d => `"${depForm}.${item.deps}"`).join(", ")
         hooks.push(
             `useSelectOptions({
     // ${item.label}选项
@@ -31,7 +31,7 @@ const processFormItems = ({ formItems, hooks, services, depForm }: IProcessFormI
       } else {
         this.$message.error(message)
       }
-    }` : ""}${deps ? `,\n    deps: ${deps}` : ""}
+    }` : ""}${deps ? `,\n    deps: [${deps}]` : ""}
   })`
         )
         if (item.api) {
