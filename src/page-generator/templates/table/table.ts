@@ -32,7 +32,7 @@ export default ({ tableCols, hasUpdate, hasDelete, hasToggleEnable, hasMove, has
         selection: hasSelection ? `<el-table-column type="selection" width="55" />` : " ",
         operationCol: operations.length ? injectTemplate(operationColTemp, {
             operations: operations.join(`\n    <el-divider direction="vertical"/>\n    `),
-            width: operations.length * 40
+            width: operations.length * 44
         }, 2) : " "
     }, 2)
 }
