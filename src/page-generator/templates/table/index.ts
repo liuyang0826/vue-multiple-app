@@ -6,7 +6,7 @@ import {injectTemplate} from "../../utils"
 import processFormItems from "../../utils/process-form-items"
 import {
     IComponentConfig,
-    IComponentEnum,
+    IComponentTypeEnum, IConfigurator,
     IInjectParent,
     IProcessTemplate,
     IService
@@ -16,6 +16,9 @@ import basePrompt from "../../utils/base-prompt";
 import tipsSplit from "../../utils/tips-split";
 import componentsPrompt from "../../utils/components-prompt";
 import { propValidator, requiredValidator } from "../../utils/validators";
+import {getTemplateById} from "../../index";
+
+export const templateId = "table"
 
 const template = `
 <div>
@@ -78,7 +81,7 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
   })`,
     ]
 
-    if (type === IComponentEnum.component) {
+    if (type === IComponentTypeEnum.component) {
         hooks.unshift(
             `useProps({
     data: Object
@@ -300,12 +303,12 @@ export async function configurator() {
 
     if (operations.includes("新增")) {
         tipsSplit({ split: `新增` })
-        options.addForm = await require("../dialog-form").configurator()
+        options.addForm = await getTemplateById("dialog-form")!.configurator()
     }
 
     if (operations.includes("编辑")) {
         tipsSplit({ split: `编辑` })
-        options.updateForm = await require("../dialog-form").configurator()
+        options.updateForm = await getTemplateById("dialog-form")!.configurator()
     }
 
     if (operations.includes("删除")) {
