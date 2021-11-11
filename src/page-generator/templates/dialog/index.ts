@@ -1,13 +1,17 @@
 import { injectTemplate } from "../../utils";
 import { IProcessTemplate } from "../../@types";
 
+export const templateId = "dialog"
+
+export const componentOnly = true
+
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
   <%components%>
 </el-dialog>
 `
 
-export const processTemplate: IProcessTemplate = ({ name, options }) => {
+export const processTemplate: IProcessTemplate<{}> = ({ name, options }) => {
     return {
         name,
         template: injectTemplate(template, options, 2),
@@ -33,5 +37,3 @@ export const injectParent = (config: any) => {
         props,
     }
 }
-
-export const componentOnly = true

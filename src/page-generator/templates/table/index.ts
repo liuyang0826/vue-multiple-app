@@ -6,7 +6,7 @@ import {injectTemplate} from "../../utils"
 import processFormItems from "../../utils/process-form-items"
 import {
     IComponentConfig,
-    IComponentEnum,
+    IComponentTypeEnum, IConfigurator,
     IInjectParent,
     IProcessTemplate,
     IService
@@ -16,6 +16,9 @@ import basePrompt from "../../utils/base-prompt";
 import tipsSplit from "../../utils/tips-split";
 import componentsPrompt from "../../utils/components-prompt";
 import { propValidator, requiredValidator } from "../../utils/validators";
+import {getTemplateById} from "../../index";
+
+export const templateId = "table"
 
 const template = `
 <div>
@@ -29,7 +32,7 @@ const template = `
 </div>
 `
 
-interface INormalTableOptions {
+interface ITableOptions {
     formItems: any
     api: string
     tableCols: any
@@ -44,7 +47,7 @@ interface INormalTableOptions {
     updateForm: IComponentConfig
 }
 
-export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, options}, type) => {
+export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options}, type) => {
     const {
         formItems,
         api,
@@ -78,7 +81,7 @@ export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, o
   })`,
     ]
 
-    if (type === IComponentEnum.component) {
+    if (type === IComponentTypeEnum.component) {
         hooks.unshift(
             `useProps({
     data: Object
@@ -238,8 +241,8 @@ export const injectParent: IInjectParent = ({ namespace }) => {
     }
 }
 
-export async function configurator() {
-    const result = await basePrompt<INormalTableOptions>({ templateId: "table" })
+export const configurator: IConfigurator<ITableOptions> = async () => {
+    const result = await basePrompt<ITableOptions>({ templateId: "table" })
 
     const { tableCols } = await inquirer.prompt([
         {
@@ -252,7 +255,7 @@ export async function configurator() {
 
     const options = {
         tableCols: (await promptTableCols({ prefix: "表格列", length: tableCols }))
-    } as INormalTableOptions
+    } as ITableOptions
 
     result.options = options
 
@@ -300,12 +303,12 @@ export async function configurator() {
 
     if (operations.includes("新增")) {
         tipsSplit({ split: `新增` })
-        options.addForm = await require("../dialog-form").configurator()
+        options.addForm = await getTemplateById("dialog-form")!.configurator()
     }
 
     if (operations.includes("编辑")) {
         tipsSplit({ split: `编辑` })
-        options.updateForm = await require("../dialog-form").configurator()
+        options.updateForm = await getTemplateById("dialog-form")!.configurator()
     }
 
     if (operations.includes("删除")) {
