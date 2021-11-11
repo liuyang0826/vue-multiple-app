@@ -7,11 +7,14 @@ import {
     IService,
 } from "../../@types";
 import inquirer from "inquirer";
-import {promptFormItems} from "../table";
 import basePrompt from "../../utils/base-prompt";
+import tipsSplit from "../../utils/tips-split";
+import { propValidator, requiredValidator } from "../../utils/validators";
+import { promptSelectOptions } from "../table";
+import { judgeType } from "../../utils";
 
 const template = `
-<el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px">
+<el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px" append-to-body :close-on-click-modal="false">
   <el-form :model="form" size="small" :rules="formRules" ref="form" label-suffix="：">
      <%formItems%>
   </el-form>
@@ -29,11 +32,19 @@ const inputItemTemp = `
 </el-form-item>`
 
 const selectItemTemp = `
-<el-form-item label="<%label%>" label-width="<%labelWidth%>px">
-  <el-select clearable v-model="form.<%prop%>" style="width: 100%;" label-width="<%labelWidth%>px">
+<el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
+  <el-select clearable v-model="form.<%prop%>" style="width: 100%;">
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
+
+const radioItemTemp = `
+<el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
+    <el-radio-group v-model="form.<%prop%>">
+        <el-radio v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-radio>
+    </el-radio-group>
+</el-form-item>
+`
 
 interface IDialogFormOptions {
     formItems: (IFormItem & {
@@ -81,13 +92,19 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
             formItems: formItems?.map((item) => {
                 if (item.type === "input") {
                     return injectTemplate(inputItemTemp, {
-                        labelWidth: 80,
+                        labelWidth: 120,
                         ...item
                     }, 4)
                 }
                 if (item.type === "select") {
                     return injectTemplate(selectItemTemp, {
-                        labelWidth: 80,
+                        labelWidth: 120,
+                        ...item
+                    }, 4)
+                }
+                if (item.type == "radio") {
+                    return injectTemplate(radioItemTemp, {
+                        labelWidth: 120,
                         ...item
                     }, 4)
                 }
@@ -154,6 +171,82 @@ export async function configurator() {
             name: "api"
         },
     ])).api
+
+    return result
+}
+
+export async function promptFormItems({ prefix = "表单项", length = 0, required = false }) {
+    const result = []
+
+    for (let i = 0; i < length; i++) {
+        tipsSplit({ split: `${prefix}${i + 1}` })
+        const item: any = await inquirer.prompt([
+            {
+                type: "list",
+                message: `类型:`,
+                name: "type",
+                choices: ["input", "select", "radio"],
+            },
+            {
+                type: "input",
+                message: `label(中文):`,
+                name: `label`,
+                validate: requiredValidator,
+            },
+            {
+                type: "input",
+                message: `prop(英文):`,
+                name: `prop`,
+                validate: propValidator,
+            },
+            {
+                type: "confirm",
+                message: `是否必填:`,
+                name: `required`,
+                default: true,
+                when: () => required
+            },
+            {
+                type: "list",
+                message: `数据源类型:`,
+                name: "source",
+                choices: ["接口", "固定项"],
+                when: (answer: any) => judgeType(answer.type)
+            },
+            {
+                type: "input",
+                message: `数据源接口api:`,
+                name: "api",
+                when: (answer: any) => judgeType(answer.type) && answer.source === "接口",
+                validate: requiredValidator
+            },
+            {
+                type: "checkbox",
+                message: `数据源依赖表单项prop:`,
+                name: "deps",
+                when: (answer: any) => judgeType(answer.type) && answer.source === "接口",
+                choices: result.map(d => d.prop)
+            },
+            {
+                type: "number",
+                message: `固定项个数:`,
+                name: "count",
+                default: 2,
+                when: (answer: any) => judgeType(answer.type) && answer.source === "固定项"
+            },
+        ])
+        const length = item.count
+
+        if (length) {
+            item.options = await promptSelectOptions({ length, prefix: `${prefix}${i + 1}选项` })
+        }
+
+        if (!item.deps?.length) {
+            delete item.deps
+        }
+
+        result.push(item)
+    }
 
     return result
 }
