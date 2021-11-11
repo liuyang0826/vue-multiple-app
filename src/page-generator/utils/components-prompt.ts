@@ -1,9 +1,7 @@
 import inquirer from "inquirer";
 import tipsSplit from "./tips-split";
-import fs from "fs"
-import path from "path"
 import {IComponentConfig} from "../@types";
-import {templateMap} from "../index";
+import {getTemplateById, getTemplates} from "../index";
 
 async function componentsPrompt() {
     const components: IComponentConfig[] = []
@@ -23,11 +21,11 @@ async function componentsPrompt() {
                 type: "list",
                 message: "组件模板",
                 name: "templateId",
-                choices: fs.readdirSync(path.join(__dirname, "../templates"))
+                choices: getTemplates().filter(d => !d.componentOnly).map(d => d.templateId)
             },
         ])
         components.push(
-            await templateMap.get(templateId)!.configurator()
+            await getTemplateById(templateId)!.configurator()
         )
     }
     return components

@@ -4,7 +4,15 @@ import fs from "fs"
 import path from "path";
 import {ITemplate} from "./@types";
 
-export const templateMap = new Map<string, ITemplate>()
+const templateMap = new Map<string, ITemplate>()
+
+export function getTemplates() {
+    return Array.from(templateMap.values())
+}
+
+export function getTemplateById(templateId: string) {
+    return templateMap.get(templateId)
+}
 
 function init() {
     fs.readdirSync(path.join(__dirname, "./templates")).forEach((templateId) => {
@@ -25,11 +33,11 @@ async function main() {
             type: "list",
             message: `选择页面模板:`,
             name: "templateId",
-            choices: Array.from(templateMap.values()).filter(d => !d.componentOnly).map(d => d.templateId)
+            choices: getTemplates().filter(d => !d.componentOnly).map(d => d.templateId)
         }
     ])
 
-    writeFile(await templateMap.get(templateId)!.configurator())
+    writeFile(await getTemplateById(templateId)!.configurator())
 }
 
 main()

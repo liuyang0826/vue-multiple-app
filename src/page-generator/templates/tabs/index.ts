@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import {componentsTemplate} from "../../vue-template";
 import {propValidator, requiredValidator} from "../../utils/validators";
-import {templateMap} from "../../index";
+import {getTemplateById, getTemplates} from "../../index";
 
 export const templateId = "tabs"
 
@@ -49,7 +49,7 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
     })
 
     const injectParents = tabPanes
-        .map((item) => templateMap.get(item.component.templateId)!.injectParent(item.component))
+        .map((item) => getTemplateById(item.component.templateId)!.injectParent(item.component))
 
     return {
         name,
@@ -107,14 +107,14 @@ export const configurator: IConfigurator<ITabsOptions> = async () => {
                 type: "list",
                 message: "组件模板",
                 name: "templateId",
-                choices: fs.readdirSync(path.join(__dirname, "../"))
+                choices: getTemplates().filter(d => !d.componentOnly).map(d => d.templateId)
             },
         ])
 
         options.tabPanes.push({
             name,
             label,
-            component: await templateMap.get(templateId)!.configurator()
+            component: await getTemplateById(templateId)!.configurator()
         })
     }
 

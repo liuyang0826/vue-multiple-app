@@ -1,5 +1,5 @@
-import {IComponentConfig, IComponentTypeEnum, IInjectParent} from "./@types";
-import {templateMap} from "./index";
+import {IComponentConfig, IComponentTypeEnum} from "./@types";
+import {getTemplateById} from "./index";
 
 import { injectTemplate, camelCaseToShortLine, firstToUpperCase } from "./utils"
 
@@ -46,20 +46,14 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
         hooks = [],
         components: privateComponents,
         services
-    } = templateMap.get(config.templateId)!.processTemplate(config, type)
+    } = getTemplateById(config.templateId)!.processTemplate(config, type)
 
     const realName = firstToUpperCase(name)
 
     const mergedComponents = [...(privateComponents || []), ...(components || [])]
-    // if (type !== IComponentTypeEnum.page) {
-    //     // 给组件内的组件添加命名空间
-    //     mergedComponents.forEach((item) => {
-    //         item.name = `${realName}${firstToUpperCase(item.name)}`
-    //     })
-    // }
 
     const injectParents = mergedComponents
-        .map((item) => templateMap.get(item.templateId)!.injectParent(item))
+        .map((item) => getTemplateById(item.templateId)!.injectParent(item))
 
     injectParents?.forEach(({ hooks: injectHooks }) => {
         injectHooks.forEach(item => {
@@ -93,6 +87,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
             }) : " ",
             hooks: hooks?.join(",\n  ") || " ",
         }), {
+            // 模板私有的组件需要自己处理注入到template的逻辑，公共处理逻辑只处理拓展组件
             components: components?.map((item, index) => {
                 const props = injectParents[index].props || []
                 return injectTemplate(componentsTemplate, {

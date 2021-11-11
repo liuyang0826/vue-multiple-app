@@ -16,7 +16,7 @@ import basePrompt from "../../utils/base-prompt";
 import tipsSplit from "../../utils/tips-split";
 import componentsPrompt from "../../utils/components-prompt";
 import { propValidator, requiredValidator } from "../../utils/validators";
-import {templateMap} from "../../index";
+import {getTemplateById} from "../../index";
 
 export const templateId = "table"
 
@@ -303,12 +303,12 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
 
     if (operations.includes("新增")) {
         tipsSplit({ split: `新增` })
-        options.addForm = await templateMap.get("dialog-form")!.configurator()
+        options.addForm = await getTemplateById("dialog-form")!.configurator()
     }
 
     if (operations.includes("编辑")) {
         tipsSplit({ split: `编辑` })
-        options.updateForm = await templateMap.get("dialog-form")!.configurator()
+        options.updateForm = await getTemplateById("dialog-form")!.configurator()
     }
 
     if (operations.includes("删除")) {
