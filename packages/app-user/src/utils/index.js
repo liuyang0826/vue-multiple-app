@@ -13,12 +13,12 @@ export const useLifecycle = (lifecycle, fn) => options => {
 
 export const useData = (data) => options => {
   const origin = options.data;
-  options.data = () => {
+  options.data = function () {
     return {
-      ...data,
-      ...origin?.(),
+      ...data?.call(this),
+      ...origin?.call(this),
     };
-  };
+  }
   return options;
 };
 
@@ -73,10 +73,12 @@ export const useComponents = (components) => options => {
 
 export const usePager = ({ onChange } = {}) => {
   return pipe(
-    useData({
-      pageSize: 10,
-      pageNum: 1,
-      total: 0
+    useData(function () {
+      return {
+        pageSize: 10,
+        pageNum: 1,
+        total: 0
+      }
     }),
     useMethods({
       handleCurrentChange (val) {
@@ -101,13 +103,17 @@ export const usePager = ({ onChange } = {}) => {
 
 export const useSearch = ({ getTableData, immediate, useSelection } = {}) => {
   return pipe(
-    useData({
-      query: {},
-      searchLoading: false,
-      tableData: []
+    useData(function () {
+      return {
+        query: {},
+        searchLoading: false,
+        tableData: []
+      }
     }),
-    useSelection && useData({
-      selectionMap: {}
+    useSelection && useData(function () {
+      return {
+        selectionMap: {}
+      }
     }),
     useMethods({
       async handleSearch () {
@@ -127,8 +133,10 @@ export const useSearch = ({ getTableData, immediate, useSelection } = {}) => {
 export const useSelectOptions = ({ options: selectOptions, getOptions, namespace, deps }) => {
   const methodName = makeCamelCase("get", namespace, "options")
   return pipe(
-    useData({
-      [makeCamelCase(namespace, "options")]: selectOptions
+    useData(function () {
+      return {
+        [makeCamelCase(namespace, "options")]: selectOptions
+      }
     }),
     getOptions && useMethods({
       [methodName]: getOptions
@@ -148,19 +156,27 @@ export const useSelectOptions = ({ options: selectOptions, getOptions, namespace
   )
 }
 
-export const useModalCtrl = ({ name, title, afterHandler } = {}) => {
+export const useModalCtrl = ({ name, title, afterHandler, data } = {}) => {
+  data = data || function () {
+    return {}
+  }
+
   return pipe(
-    useData({
-      [makeCamelCase(name, "visible")]: false,
-      [makeCamelCase(name, "title")]: title,
+    useData(function () {
+      return {
+        [makeCamelCase(name, "visible")]: false,
+        [makeCamelCase(name, "title")]: title,
+      }
     }),
-    useData({
-      [makeCamelCase(name, "data")]: {}
+    useData(function () {
+      return {
+        [makeCamelCase(name, "data")]: data.call(this)
+      }
     }),
     useMethods({
       [makeCamelCase("handle", name)](row, ...args) {
         this[makeCamelCase(name, "visible")] = true
-        this[makeCamelCase(name, "data")] = row.constructor === Object ? row : {}
+        this[makeCamelCase(name, "data")] = row.constructor === Object ? row : data.call(this)
         afterHandler?.call(this, row, ...args)
       }
     })
@@ -189,10 +205,12 @@ export const useModal = ({ onShow, formRules, doSubmit } = {}) => {
           immediate: true
         }
       }),
-      formRules && useData({
-        formLoading: false,
-        form: {},
-        formRules,
+      formRules && useData(function () {
+        return {
+          formLoading: false,
+          form: {},
+          formRules,
+        }
       }),
       formRules && useMethods({
         handleSubmit() {
