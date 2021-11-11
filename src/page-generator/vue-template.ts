@@ -1,6 +1,7 @@
-import {IComponentConfig, IComponentEnum, IInjectParent, IProcessTemplate} from "./@types";
+import {IComponentConfig, IComponentEnum, IInjectParent} from "./@types";
+import {templateMap} from "./index";
 
-const { injectTemplate, camelCaseToShortLine, firstToUpperCase } = require("./utils")
+import { injectTemplate, camelCaseToShortLine, firstToUpperCase } from "./utils"
 
 const baseTemplate =
 `<template>
@@ -45,7 +46,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
         hooks = [],
         components: privateComponents,
         services
-    } = require(`./templates/${config.templateId}`).processTemplate(config, type) as ReturnType<IProcessTemplate>
+    } = templateMap.get(config.templateId)!.processTemplate(config, type)
 
     const realName = firstToUpperCase(name)
 
@@ -58,8 +59,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
     // }
 
     const injectParents = mergedComponents
-        .map((item) => require(`./templates/${item.templateId}`)
-        .injectParent(item)) as ReturnType<IInjectParent>[]
+        .map((item) => templateMap.get(item.templateId)!.injectParent(item))
 
     injectParents?.forEach(({ hooks: injectHooks }) => {
         injectHooks.forEach(item => {

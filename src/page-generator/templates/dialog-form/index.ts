@@ -1,6 +1,7 @@
 import { injectTemplate } from "../../utils"
 import processFormItems from "../../utils/process-form-items"
 import {
+    IConfigurator,
     IFormItem,
     IInjectParent,
     IProcessTemplate,
@@ -12,6 +13,10 @@ import tipsSplit from "../../utils/tips-split";
 import { propValidator, requiredValidator } from "../../utils/validators";
 import { promptSelectOptions } from "../table";
 import { judgeType } from "../../utils";
+
+export const templateId = "dialog-form"
+
+export const componentOnly = true
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px" append-to-body :close-on-click-modal="false">
@@ -134,7 +139,7 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
     }
 }
 
-export async function configurator() {
+export const configurator: IConfigurator<IDialogFormOptions> = async () => {
     const result = await basePrompt<IDialogFormOptions>({
         templateId: "dialog-form",
     })
