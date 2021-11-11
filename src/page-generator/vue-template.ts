@@ -36,7 +36,19 @@ const serviceImportsTemplate =
 
 const componentImportsTemplate = `import <%name%> from "<%componentPath%><%name%>"`
 
-export const componentsTemplate = `<<%component%><%props%>/>`
+const componentsTemplate = `<<%component%><%props%>/>`
+
+interface IInjectComponentParams {
+    name: string
+    props: string[]
+}
+
+export const makeComponentCode = ({ name, props}: IInjectComponentParams, indent = 4 ) => {
+  return injectTemplate(componentsTemplate, {
+      component: camelCaseToShortLine(name),
+      props: props.length ?` ${props?.join(" ")} ` : " "
+  }, indent)
+}
 
 const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
     const { components } = config
@@ -89,11 +101,10 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
         }), {
             // 模板私有的组件需要自己处理注入到template的逻辑，公共处理逻辑只处理拓展组件
             components: components?.map((item, index) => {
-                const props = injectParents[index].props || []
-                return injectTemplate(componentsTemplate, {
-                    component: camelCaseToShortLine(item.name),
-                    props: props.length ?` ${injectParents[index].props?.join(" ")} ` : " "
-                }, 4)
+                return makeComponentCode({
+                    name: item.name,
+                    props: injectParents[index].props || []
+                })
             }) .join("\n    ")|| " "
         }),
         components: mergedComponents,
