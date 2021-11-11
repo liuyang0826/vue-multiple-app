@@ -1,4 +1,4 @@
-export enum IComponentEnum {
+export enum IComponentTypeEnum {
     page = "page",
     component = "component"
 }
@@ -13,7 +13,7 @@ export interface IComponentConfig<T extends {} = {}> {
 }
 
 // 模板处理函数
-export type IProcessTemplate<T> = (config: IComponentConfig<T>, type: IComponentEnum) => {
+export type IProcessTemplate<T> = (config: IComponentConfig<T>, type: IComponentTypeEnum) => {
     name: string // 组件名称
     template: string // 处理完成的组件模板内容
     hooks?: string[] // 依赖的hook方法
@@ -27,14 +27,16 @@ export type IInjectParent<T = {}> = (config: IComponentConfig<T>) => {
     props: string[]
 }
 
+// 模板实现自己的配置项表单
 export type IConfigurator<T> = () => Promise<IComponentConfig<T>>
 
+// 单模板
 export interface ITemplate<T = {}> {
-    templateId: string
-    processTemplate: IProcessTemplate<T>
-    injectParent: IInjectParent
-    componentOnly: boolean
-    configurator: IConfigurator<T>
+    templateId: string // 模板id
+    componentOnly: boolean // 模板是否只能作为子组件
+    processTemplate: IProcessTemplate<T> // 处理模板的方法
+    injectParent: IInjectParent // 当模板被作为自组件调用时主动向父组件注入的方法
+    configurator: IConfigurator<T> // 模板的配置表单
 }
 
 // service 接口函数类型

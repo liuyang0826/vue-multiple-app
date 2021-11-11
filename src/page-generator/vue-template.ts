@@ -1,4 +1,4 @@
-import {IComponentConfig, IComponentEnum, IInjectParent} from "./@types";
+import {IComponentConfig, IComponentTypeEnum, IInjectParent} from "./@types";
 import {templateMap} from "./index";
 
 import { injectTemplate, camelCaseToShortLine, firstToUpperCase } from "./utils"
@@ -38,7 +38,7 @@ const componentImportsTemplate = `import <%name%> from "<%componentPath%><%name%
 
 export const componentsTemplate = `<<%component%><%props%>/>`
 
-const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
+const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
     const { components } = config
     const {
         name,
@@ -51,7 +51,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
     const realName = firstToUpperCase(name)
 
     const mergedComponents = [...(privateComponents || []), ...(components || [])]
-    // if (type !== IComponentEnum.page) {
+    // if (type !== IComponentTypeEnum.page) {
     //     // 给组件内的组件添加命名空间
     //     mergedComponents.forEach((item) => {
     //         item.name = `${realName}${firstToUpperCase(item.name)}`
@@ -85,15 +85,15 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
             }) : " ",
             componentImports: componentNames.map(name => injectTemplate(componentImportsTemplate, {
                 name,
-                componentPath: type === IComponentEnum.page ? "./components/" : "./"
+                componentPath: type === IComponentTypeEnum.page ? "./components/" : "./"
             })).join("\n") || " ",
             serviceImports: services?.length ? injectTemplate(serviceImportsTemplate, {
                 imports: services.map((d: any) => d.name).join(",\n  "),
-                servicePath: type === IComponentEnum.page ? "./services" : `../services/${camelCaseToShortLine(realName)}`,
+                servicePath: type === IComponentTypeEnum.page ? "./services" : `../services/${camelCaseToShortLine(realName)}`,
             }) : " ",
             hooks: hooks?.join(",\n  ") || " ",
         }), {
-            components: mergedComponents.map((item, index) => {
+            components: components?.map((item, index) => {
                 const props = injectParents[index].props || []
                 return injectTemplate(componentsTemplate, {
                     component: camelCaseToShortLine(item.name),

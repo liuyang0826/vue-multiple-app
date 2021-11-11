@@ -6,7 +6,7 @@ import {injectTemplate} from "../../utils"
 import processFormItems from "../../utils/process-form-items"
 import {
     IComponentConfig,
-    IComponentEnum, IConfigurator,
+    IComponentTypeEnum, IConfigurator,
     IInjectParent,
     IProcessTemplate,
     IService
@@ -81,7 +81,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
   })`,
     ]
 
-    if (type === IComponentEnum.component) {
+    if (type === IComponentTypeEnum.component) {
         hooks.unshift(
             `useProps({
     data: Object
