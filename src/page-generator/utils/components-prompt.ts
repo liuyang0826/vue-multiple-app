@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import tipsSplit from "./tips-split";
 import {IComponentConfig} from "../@types";
-import {getTemplateById, getTemplates} from "../index";
+import {getTemplateById, getTemplates} from "../scanner";
 
 async function componentsPrompt() {
     const components: IComponentConfig[] = []
