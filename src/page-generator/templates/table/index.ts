@@ -17,6 +17,7 @@ import tipsSplit from "../../utils/tips-split";
 import componentsPrompt from "../../utils/components-prompt";
 import { propValidator, requiredValidator } from "../../utils/validators";
 import {getTemplateById} from "../../index";
+import {makeComponentCode} from "../../vue-template";
 
 export const templateId = "table"
 
@@ -28,6 +29,8 @@ const template = `
   </div>
   <%table%>
   <%pagination%>
+  <%addForm%>
+  <%updateForm%>
   <%components%>
 </div>
 `
@@ -101,12 +104,32 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
         hooks.push(`usePager({ onChange: "handleSearch" })`)
     }
 
+    let addFormCode = " "
     if (addForm) {
         addForm.namespace = "add"
+        const {
+            hooks: addFormHooks,
+            props: addFormProps
+        } = getTemplateById(addForm.templateId)!.injectParent(addForm)
+        hooks.push(...addFormHooks)
+        addFormCode = makeComponentCode({
+            name: addForm.name,
+            props: addFormProps
+        })
     }
 
+    let updateFormCode = " "
     if (updateForm) {
         updateForm.namespace = "update"
+        const {
+            hooks: updateFormHooks,
+            props: updateFormProps
+        } = getTemplateById(updateForm.templateId)!.injectParent(updateForm)
+        hooks.push(...updateFormHooks)
+        updateFormCode = makeComponentCode({
+            name: updateForm.name,
+            props: updateFormProps
+        })
     }
 
     if (deleteApi) {
@@ -219,6 +242,8 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
                 hasBatchDel: !!batchDeleteApi,
                 addForm: !!addForm
             }),
+            addForm: addFormCode,
+            updateForm: updateFormCode
         }, 2),
         hooks,
         components: [addForm, updateForm].filter(Boolean),

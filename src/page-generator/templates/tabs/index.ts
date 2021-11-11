@@ -3,9 +3,7 @@ import {IComponentConfig, IConfigurator, IInjectParent, IProcessTemplate} from "
 import basePrompt from "../../utils/base-prompt";
 import inquirer from "inquirer";
 import tipsSplit from "../../utils/tips-split";
-import fs from "fs";
-import path from "path";
-import {componentsTemplate} from "../../vue-template";
+import {makeComponentCode} from "../../vue-template";
 import {propValidator, requiredValidator} from "../../utils/validators";
 import {getTemplateById, getTemplates} from "../../index";
 
@@ -58,11 +56,12 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
                 const props = injectParents[index].props || []
                 return injectTemplate(tabPaneTemplate, {
                     ...item,
-                    component: injectTemplate(componentsTemplate, {
-                        component: camelCaseToShortLine(item.component.name),
-                        props: props.length ?` ${injectParents[index].props?.join(" ")} ` : " "
-                    })
-                }, 2)
+                    component: makeComponentCode({
+                        name: item.component.name,
+                        props: injectParents[index].props,
+
+                    }, 2)
+                })
             }).join("\n  ")
         }, 2),
         hooks,
