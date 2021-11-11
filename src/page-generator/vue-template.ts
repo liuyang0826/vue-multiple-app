@@ -1,6 +1,7 @@
-import {IComponentConfig, IComponentEnum, IInjectParent, IProcessTemplate} from "./@types";
+import {IComponentConfig, IComponentTypeEnum} from "./@types";
+import {getTemplateById} from "./index";
 
-const { injectTemplate, camelCaseToShortLine, firstToUpperCase } = require("./utils")
+import { injectTemplate, camelCaseToShortLine, firstToUpperCase } from "./utils"
 
 const baseTemplate =
 `<template>
@@ -37,7 +38,7 @@ const componentImportsTemplate = `import <%name%> from "<%componentPath%><%name%
 
 export const componentsTemplate = `<<%component%><%props%>/>`
 
-const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
+const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
     const { components } = config
     const {
         name,
@@ -45,21 +46,14 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
         hooks = [],
         components: privateComponents,
         services
-    } = require(`./templates/${config.templateId}`).processTemplate(config, type) as ReturnType<IProcessTemplate>
+    } = getTemplateById(config.templateId)!.processTemplate(config, type)
 
     const realName = firstToUpperCase(name)
 
     const mergedComponents = [...(privateComponents || []), ...(components || [])]
-    // if (type !== IComponentEnum.page) {
-    //     // 给组件内的组件添加命名空间
-    //     mergedComponents.forEach((item) => {
-    //         item.name = `${realName}${firstToUpperCase(item.name)}`
-    //     })
-    // }
 
     const injectParents = mergedComponents
-        .map((item) => require(`./templates/${item.templateId}`)
-        .injectParent(item)) as ReturnType<IInjectParent>[]
+        .map((item) => getTemplateById(item.templateId)!.injectParent(item))
 
     injectParents?.forEach(({ hooks: injectHooks }) => {
         injectHooks.forEach(item => {
@@ -85,15 +79,16 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentEnum) => {
             }) : " ",
             componentImports: componentNames.map(name => injectTemplate(componentImportsTemplate, {
                 name,
-                componentPath: type === IComponentEnum.page ? "./components/" : "./"
+                componentPath: type === IComponentTypeEnum.page ? "./components/" : "./"
             })).join("\n") || " ",
             serviceImports: services?.length ? injectTemplate(serviceImportsTemplate, {
                 imports: services.map((d: any) => d.name).join(",\n  "),
-                servicePath: type === IComponentEnum.page ? "./services" : `../services/${camelCaseToShortLine(realName)}`,
+                servicePath: type === IComponentTypeEnum.page ? "./services" : `../services/${camelCaseToShortLine(realName)}`,
             }) : " ",
             hooks: hooks?.join(",\n  ") || " ",
         }), {
-            components: mergedComponents.map((item, index) => {
+            // 模板私有的组件需要自己处理注入到template的逻辑，公共处理逻辑只处理拓展组件
+            components: components?.map((item, index) => {
                 const props = injectParents[index].props || []
                 return injectTemplate(componentsTemplate, {
                     component: camelCaseToShortLine(item.name),
