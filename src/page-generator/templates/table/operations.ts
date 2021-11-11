@@ -1,7 +1,7 @@
 import { injectTemplate } from "../../utils"
 
 const template = `
-<div>
+<div class="table-tool">
   <%batchDelButton%>
   <%addButton%>
 </div>

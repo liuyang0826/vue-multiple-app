@@ -28,3 +28,6 @@ export const camelCaseToShortLine = (str: string) => firstToUpperCase(str).repla
 export const prettier = (template: string) => replace(template, /<%(\w+?)%>/, () => "").replace(/\n\s+\n/g, "\n")
 
 export const makeCamelCase = (first: string, ...args: string[]) => `${first}${args.map(str => str.replace(/\b(\w)(\w*)/, ($0, $1, $2) => $1.toUpperCase() + $2)).join("")}`
+
+// 判断表单项是否有option选项
+export const judgeType = (type: string) => ["select", "radio"].includes(type);

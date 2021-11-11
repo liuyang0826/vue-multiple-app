@@ -59,3 +59,14 @@ export default {
   }
 }
 </script>
+
+<style>
+html, body, div, p, ol, ul, li {
+  margin: 0;
+  padding: 0;
+}
+body {
+  padding: 20px;
+  background: #f0f0f0;
+}
+</style>

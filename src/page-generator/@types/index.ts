@@ -52,7 +52,7 @@ export interface IOption {
 }
 
 export interface IFormItem {
-    type: "input" | "select" // 表单项类型
+    type: "input" | "select" | "radio" // 表单项类型
     options?: IOption[] // 下拉框选项
     api?: string // 下拉框依赖的数据接口
     deps?: string[] // 依赖的其他的表单项的id

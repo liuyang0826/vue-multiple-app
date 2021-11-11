@@ -435,13 +435,6 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 validate: propValidator,
             },
             {
-                type: "confirm",
-                message: `是否必填:`,
-                name: `required`,
-                default: true,
-                when: () => required
-            },
-            {
                 type: "list",
                 message: `数据源类型:`,
                 name: "source",
@@ -486,7 +479,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
     return result
 }
 
-async function promptSelectOptions({ prefix = '', length = 0 }) {
+export async function promptSelectOptions({ prefix = '', length = 0 }) {
     const result = []
 
     for (let i = 0; i < length; i++) {

@@ -1,4 +1,5 @@
 import { IFormItem, IService } from "../@types";
+import { judgeType } from "../utils";
 
 import { makeCamelCase } from "../utils"
 
@@ -15,7 +16,7 @@ const processFormItems = ({ formItems, hooks, services, depForm }: IProcessFormI
     }
 
     // 处理下拉框
-    formItems.filter(d => d.type === "select").forEach((item) => {
+    formItems.filter(d => judgeType(d.type)).forEach((item) => {
         const deps = item.deps?.map(d => `"${depForm}.${item.deps}"`).join(", ")
         hooks.push(
             `useSelectOptions({
