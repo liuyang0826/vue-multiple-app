@@ -74,7 +74,8 @@ writeFile({
                     {
                         "type": "input",
                         "label": "用户名",
-                        "prop": "name"
+                        "prop": "name",
+                        "required": true
                     },
                     {
                         "type": "radio",

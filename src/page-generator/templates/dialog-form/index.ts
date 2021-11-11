@@ -126,7 +126,7 @@ export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
     const checkBoxes = config.options.formItems.filter(d => d.type === "radio")
     const hooks = [
         `useModalCtrl({
-    name: "${config.namespace}",
+    namespace: "${config.namespace}",
     title: "${config.options.title}"${checkBoxes.length ? `,\n    data() {
       return {
         ${checkBoxes.map(d => `${d.prop}: []`).join("\n      ")}

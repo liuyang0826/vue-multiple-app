@@ -4,9 +4,10 @@ import vueTemplate from "./vue-template"
 import serviceTemplate from "./service-template"
 import { prettier, firstToLowerCase, camelCaseToShortLine } from "./utils"
 import {IComponentConfig, IComponentTypeEnum} from "./@types";
+import {getContext} from "./scanner";
 
 function getRootDir(name: string): string {
-    const rootDir = path.join(process.cwd(), `./packages/app-user/src/views/${name}`)
+    const rootDir = path.join(getContext().root, "views", `${name}`)
     if (fs.existsSync(rootDir)) {
         return getRootDir(name + "_copy")
     }
