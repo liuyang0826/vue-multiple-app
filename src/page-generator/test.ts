@@ -7,162 +7,98 @@ writeFile({
     "templateId": "table",
     "name": "Test",
     "options": {
+        "tableCols": [
+            {
+                "label": "name",
+                "prop": "name"
+            }
+        ],
+        "api": "/da",
         "formItems": [
             {
                 "type": "input",
-                "label": "用户名",
-                "prop": "name"
-            },
-            {
-                "type": "select",
-                "label": "性别",
-                "prop": "sex",
-                "source": "固定项",
-                "count": 2,
-                "options": [
-                    {
-                        "label": "男",
-                        "value": "1"
-                    },
-                    {
-                        "label": "女",
-                        "value": "2"
-                    }
-                ]
-            },
-            {
-                "type": "select",
-                "label": "尺寸",
-                "prop": "size",
-                "source": "接口",
-                "api": "/api/sizes",
-                "deps": ["sex"]
-            },
-            {
-                "type": "input",
-                "label": "年龄",
-                "prop": "age"
+                "label": "21",
+                "prop": "eq"
             }
         ],
-        "tableCols": [
-            {
-                "label": "用户名",
-                "prop": "name"
-            },
-            {
-                "label": "性别",
-                "prop": "sex"
-            },
-            {
-                "label": "年龄",
-                "prop": "age"
-            },
-            {
-                "label": "尺寸",
-                "prop": "size"
-            }
-        ],
-        "api": "/api/pageList",
         "hasPager": true,
         "addForm": {
             "templateId": "dialog-form",
-            "name": "AddForm",
+            "name": "Add",
             "options": {
-                "title": "新增用户",
-                "width": 440,
+                "title": "sa",
                 "formItems": [
                     {
                         "type": "input",
-                        "label": "用户名",
-                        "prop": "name",
-                        "required": true
-                    },
-                    {
-                        "type": "radio",
-                        "label": "性别",
-                        "prop": "sex",
-                        "source": "固定项",
-                        "count": 2,
-                        "options": [
-                            {
-                                "label": "男",
-                                "value": "1"
-                            },
-                            {
-                                "label": "女",
-                                "value": "2"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "select",
-                        "label": "尺寸",
-                        "prop": "size",
-                        "source": "接口",
-                        "api": "/api/sizes",
-                        "deps": ["sex"]
+                        "label": "321",
+                        "prop": "a",
+                        "required": true,
+                        "width": 90
                     },
                     {
                         "type": "input",
-                        "label": "年龄",
-                        "prop": "age"
+                        "label": "ewq",
+                        "prop": "ewq",
+                        "required": false,
+                        "width": 90
+                    },
+                    {
+                        "type": "input",
+                        "label": "ewq",
+                        "prop": "eqw",
+                        "required": false,
+                        "width": 90
+                    },
+                    {
+                        "type": "input",
+                        "label": "eqw",
+                        "prop": "eqw",
+                        "required": false,
+                        "width": 90
+                    },
+                    {
+                        "type": "input",
+                        "label": "eqw",
+                        "prop": "eqw",
+                        "required": false,
+                        "width": 90
+                    },
+                    {
+                        "type": "input",
+                        "label": "ewq",
+                        "prop": "eq",
+                        "required": false,
+                        "width": 90
+                    },
+                    {
+                        "type": "input",
+                        "label": "wq",
+                        "prop": "ewq",
+                        "required": false,
+                        "width": 90
+                    },
+                    {
+                        "type": "input",
+                        "label": "q",
+                        "prop": "ewq",
+                        "required": false,
+                        "width": 90
                     }
                 ],
-                "api": "/api/addUser"
-            }
+                "api": "ewq"
+            },
+            "components": []
         },
         "updateForm": {
             "templateId": "dialog-form",
-            "name": "UpdateForm",
+            "name": "Eq",
             "options": {
-                "title": "编辑用户",
-                "width": 440,
-                "formItems": [
-                    {
-                        "type": "input",
-                        "label": "用户名",
-                        "prop": "name"
-                    },
-                    {
-                        "type": "select",
-                        "label": "性别",
-                        "prop": "sex",
-                        "source": "固定项",
-                        "count": 2,
-                        "options": [
-                            {
-                                "label": "男",
-                                "value": "1"
-                            },
-                            {
-                                "label": "女",
-                                "value": "2"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "input",
-                        "label": "年龄",
-                        "prop": "age"
-                    },
-                    {
-                        "type": "select",
-                        "label": "尺寸",
-                        "prop": "szie",
-                        "source": "接口",
-                        "api": "/api/sizes",
-                        "deps": ["sex"]
-                    }
-                ],
-                "api": "/api/updateUser"
-            }
-        },
-        "deleteApi": "/api/delete",
-        "batchDeleteApi": "/api/batchDelete",
-        "toggleEnableApi": "/api/toggleEnable",
-        "moveApi": "/api/move",
-        "exportApi": "/api/export",
-        "hasSelection": true
+                "title": "ewq",
+                "formItems": [],
+                "api": "eqw"
+            },
+            "components": []
+        }
     },
     "components": []
 })

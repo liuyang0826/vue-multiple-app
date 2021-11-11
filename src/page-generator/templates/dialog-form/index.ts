@@ -13,6 +13,7 @@ import tipsSplit from "../../utils/tips-split";
 import { propValidator, requiredValidator } from "../../utils/validators";
 import { promptSelectOptions } from "../table";
 import { judgeType } from "../../utils";
+import componentsPrompt from "../../utils/components-prompt";
 
 export const templateId = "dialog-form"
 
@@ -20,7 +21,7 @@ export const componentOnly = true
 
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px" append-to-body :close-on-click-modal="false">
-  <el-form :model="form" size="small" :rules="formRules" ref="form" label-suffix="：">
+  <el-form :model="form" size="small" inline :rules="formRules" ref="form" label-suffix="：">
      <%formItems%>
   </el-form>
   <template #footer>
@@ -33,12 +34,12 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px"  >
-  <el-input v-model="form.<%prop%>" maxlength="<%maxlength%>" />
+  <el-input v-model="form.<%prop%>" maxlength="<%maxlength%>" style="width: 240px;" />
 </el-form-item>`
 
 const selectItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-  <el-select clearable v-model="form.<%prop%>" style="width: 100%;">
+  <el-select clearable v-model="form.<%prop%>" style="width: 240px;">
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
@@ -152,7 +153,7 @@ export const configurator: IConfigurator<IDialogFormOptions> = async () => {
         templateId: "dialog-form",
     })
 
-    const { title, width, formItems } = await inquirer.prompt([
+    const { title, formItemCount } = await inquirer.prompt([
         {
             type: "input",
             message: "标题:",
@@ -160,13 +161,8 @@ export const configurator: IConfigurator<IDialogFormOptions> = async () => {
         },
         {
             type: "number",
-            message: "宽度:",
-            name: "width"
-        },
-        {
-            type: "number",
             message: "表单项数量:",
-            name: "formItems"
+            name: "formItemCount"
         },
     ])
 
@@ -174,8 +170,43 @@ export const configurator: IConfigurator<IDialogFormOptions> = async () => {
 
     result.options = options
     options.title = title
-    options.width = width
-    options.formItems = await promptFormItems({ length: formItems, required: true })
+    const formItems = await promptFormItems({ length: formItemCount, required: true })
+    options.formItems = formItems
+
+    const components = await componentsPrompt()
+
+    result.components = components
+
+
+    if (components.length) {
+        const { width } = await inquirer.prompt([
+            {
+                type: "number",
+                message: "表单列数:",
+                name: "width",
+                validate: requiredValidator
+            },
+        ])
+        options.width = width
+    } else {
+        // 自动计算弹窗宽度
+        const cols = Math.ceil(formItemCount / 6)
+        const labelWidths = Array.from({ length: cols }).map((_, index) => {
+            let maxLabel = 0
+            for (let i = index; i < formItemCount; i += cols) {
+                const curWidth = formItems[i].label.length * 18 + 14 + (formItems[i].required ? 12 : 0)
+                if (curWidth > maxLabel) {
+                    maxLabel = curWidth
+                }
+            }
+            return maxLabel
+        })
+
+        formItems.forEach((item, index) => {
+          item.labelWidth = labelWidths[index % cols]
+        })
+        options.width = labelWidths.reduce((a, b) => a + b) + 240 * cols + 60
+    }
 
     options.api = (await inquirer.prompt([
         {
