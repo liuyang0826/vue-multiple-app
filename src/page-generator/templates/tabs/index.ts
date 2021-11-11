@@ -1,5 +1,5 @@
 import {camelCaseToShortLine, injectTemplate} from "../../utils"
-import {IComponentConfig, IConfigurator, IInjectParent, IProcessTemplate} from "../../@types";
+import {IComponentConfig, IInjectParent, IProcessTemplate} from "../../@types";
 import basePrompt from "../../utils/base-prompt";
 import inquirer from "inquirer";
 import tipsSplit from "../../utils/tips-split";
@@ -7,9 +7,6 @@ import fs from "fs";
 import path from "path";
 import {componentsTemplate} from "../../vue-template";
 import {propValidator, requiredValidator} from "../../utils/validators";
-import {templateMap} from "../../index";
-
-export const templateId = "tabs"
 
 const template = `
 <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -49,7 +46,8 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
     })
 
     const injectParents = tabPanes
-        .map((item) => templateMap.get(item.component.templateId)!.injectParent(item.component))
+        .map((item) => require(`../${item.component.templateId}`)
+            .injectParent(item.component)) as ReturnType<IInjectParent>[]
 
     return {
         name,
@@ -70,7 +68,7 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
     }
 }
 
-export const configurator: IConfigurator<ITabsOptions> = async () => {
+export async function configurator() {
     const result = await basePrompt<ITabsOptions>({ templateId: "tabs" })
 
     const { count } = await inquirer.prompt([
@@ -114,7 +112,7 @@ export const configurator: IConfigurator<ITabsOptions> = async () => {
         options.tabPanes.push({
             name,
             label,
-            component: await templateMap.get(templateId)!.configurator()
+            component: await require(path.join(__dirname, "../", templateId)).configurator()
         })
     }
 

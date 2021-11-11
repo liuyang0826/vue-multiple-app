@@ -6,7 +6,7 @@ import {injectTemplate} from "../../utils"
 import processFormItems from "../../utils/process-form-items"
 import {
     IComponentConfig,
-    IComponentEnum, IConfigurator,
+    IComponentEnum,
     IInjectParent,
     IProcessTemplate,
     IService
@@ -16,9 +16,6 @@ import basePrompt from "../../utils/base-prompt";
 import tipsSplit from "../../utils/tips-split";
 import componentsPrompt from "../../utils/components-prompt";
 import { propValidator, requiredValidator } from "../../utils/validators";
-import {templateMap} from "../../index";
-
-export const templateId = "table"
 
 const template = `
 <div>
@@ -32,7 +29,7 @@ const template = `
 </div>
 `
 
-interface ITableOptions {
+interface INormalTableOptions {
     formItems: any
     api: string
     tableCols: any
@@ -47,7 +44,7 @@ interface ITableOptions {
     updateForm: IComponentConfig
 }
 
-export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options}, type) => {
+export const processTemplate: IProcessTemplate<INormalTableOptions> = ({ name, options}, type) => {
     const {
         formItems,
         api,
@@ -241,8 +238,8 @@ export const injectParent: IInjectParent = ({ namespace }) => {
     }
 }
 
-export const configurator: IConfigurator<ITableOptions> = async () => {
-    const result = await basePrompt<ITableOptions>({ templateId: "table" })
+export async function configurator() {
+    const result = await basePrompt<INormalTableOptions>({ templateId: "table" })
 
     const { tableCols } = await inquirer.prompt([
         {
@@ -255,7 +252,7 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
 
     const options = {
         tableCols: (await promptTableCols({ prefix: "表格列", length: tableCols }))
-    } as ITableOptions
+    } as INormalTableOptions
 
     result.options = options
 
@@ -303,12 +300,12 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
 
     if (operations.includes("新增")) {
         tipsSplit({ split: `新增` })
-        options.addForm = await templateMap.get("dialog-form")!.configurator()
+        options.addForm = await require("../dialog-form").configurator()
     }
 
     if (operations.includes("编辑")) {
         tipsSplit({ split: `编辑` })
-        options.updateForm = await templateMap.get("dialog-form")!.configurator()
+        options.updateForm = await require("../dialog-form").configurator()
     }
 
     if (operations.includes("删除")) {

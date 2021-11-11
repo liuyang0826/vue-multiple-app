@@ -3,7 +3,6 @@ import tipsSplit from "./tips-split";
 import fs from "fs"
 import path from "path"
 import {IComponentConfig} from "../@types";
-import {templateMap} from "../index";
 
 async function componentsPrompt() {
     const components: IComponentConfig[] = []
@@ -27,7 +26,7 @@ async function componentsPrompt() {
             },
         ])
         components.push(
-            await templateMap.get(templateId)!.configurator()
+            await require(path.join(__dirname, "../templates", templateId)).configurator()
         )
     }
     return components

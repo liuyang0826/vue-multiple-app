@@ -1,7 +1,7 @@
 import { IFormItem, IService } from "../@types";
 import { judgeType } from "../utils";
 
-import { makeCamelCase } from "../utils"
+const { makeCamelCase } = require("../utils")
 
 interface IProcessFormItemsProps {
     formItems?: IFormItem[]

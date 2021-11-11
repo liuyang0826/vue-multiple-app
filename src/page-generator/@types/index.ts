@@ -13,7 +13,7 @@ export interface IComponentConfig<T extends {} = {}> {
 }
 
 // 模板处理函数
-export type IProcessTemplate<T> = (config: IComponentConfig<T>, type: IComponentEnum) => {
+export type IProcessTemplate<T = {}> = (config: IComponentConfig<T>, type: IComponentEnum) => {
     name: string // 组件名称
     template: string // 处理完成的组件模板内容
     hooks?: string[] // 依赖的hook方法
@@ -25,16 +25,6 @@ export type IProcessTemplate<T> = (config: IComponentConfig<T>, type: IComponent
 export type IInjectParent<T = {}> = (config: IComponentConfig<T>) => {
     hooks: string[]
     props: string[]
-}
-
-export type IConfigurator<T> = () => Promise<IComponentConfig<T>>
-
-export interface ITemplate<T = {}> {
-    templateId: string
-    processTemplate: IProcessTemplate<T>
-    injectParent: IInjectParent
-    componentOnly: boolean
-    configurator: IConfigurator<T>
 }
 
 // service 接口函数类型
