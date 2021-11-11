@@ -3,7 +3,7 @@ import path from "path"
 import vueTemplate from "./vue-template"
 import serviceTemplate from "./service-template"
 import { prettier, firstToLowerCase, camelCaseToShortLine } from "./utils"
-import {IComponentConfig, IComponentEnum} from "./@types";
+import {IComponentConfig, IComponentTypeEnum} from "./@types";
 
 function getRootDir(name: string): string {
     const rootDir = path.join(process.cwd(), `./packages/app-user/src/views/${name}`)
@@ -19,12 +19,12 @@ const writeFile = (config: IComponentConfig) => {
 
     fs.writeFileSync(path.join(rootDir, "generator-config.json"), JSON.stringify(config, null, 2))
 
-    const createVue = (config: IComponentConfig, type: IComponentEnum) => {
+    const createVue = (config: IComponentConfig, type: IComponentTypeEnum) => {
         const { template, components, services } = vueTemplate(config, type)
-        const fileName = type === IComponentEnum.page
+        const fileName = type === IComponentTypeEnum.page
             ? `Index.vue`
             : `components/${config.name}.vue`
-        if (type !== IComponentEnum.page) {
+        if (type !== IComponentTypeEnum.page) {
             const componentsDir = path.join(rootDir, "components")
             if (!fs.existsSync(componentsDir)) {
                 fs.mkdirSync(componentsDir)
@@ -32,11 +32,11 @@ const writeFile = (config: IComponentConfig) => {
         }
         fs.writeFileSync(path.join(rootDir, fileName), prettier(template))
         components.forEach((config) => {
-            createVue(config, IComponentEnum.component)
+            createVue(config, IComponentTypeEnum.component)
         })
 
         if (services?.length) {
-            const serviceFileName = type === IComponentEnum.page ? "index" : camelCaseToShortLine(config.name)
+            const serviceFileName = type === IComponentTypeEnum.page ? "index" : camelCaseToShortLine(config.name)
             const servicesDir = path.join(rootDir, "services")
             if (!fs.existsSync(servicesDir)) {
                 fs.mkdirSync(servicesDir)
@@ -45,7 +45,7 @@ const writeFile = (config: IComponentConfig) => {
         }
     }
 
-    createVue(config, IComponentEnum.page)
+    createVue(config, IComponentTypeEnum.page)
 }
 
 export default writeFile
