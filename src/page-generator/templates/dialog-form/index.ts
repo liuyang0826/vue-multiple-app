@@ -135,7 +135,7 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
 }
 
 export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
-    const checkBoxes = config.options.formItems.filter(d => d.type === "radio")
+    const checkBoxes = config.options.formItems.filter(d => d.type === "checkbox")
     const hooks = [
         `useModalCtrl({
     name: "${config.namespace}",
@@ -235,9 +235,9 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 type: "list",
                 message: `类型:`,
                 name: `inputType`,
-                choices: ["text", "textarea", "number", "password", "email", "tel"],
+                choices: ["text", "textarea", "number", "password"],
                 default: "text",
-                when: (answer: any) => answer.type === "text"
+                when: (answer: any) => answer.type === "input"
             },
             {
                 type: "list",
