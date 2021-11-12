@@ -33,7 +33,7 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px"  >
-  <el-input v-model="form.<%prop%>" maxlength="<%maxlength%>" />
+  <el-input type="<%inputType%>" v-model="form.<%prop%>" maxlength="<%maxlength%>" />
 </el-form-item>`
 
 const selectItemTemp = `
@@ -48,8 +48,14 @@ const radioItemTemp = `
     <el-radio-group v-model="form.<%prop%>">
         <el-radio v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-radio>
     </el-radio-group>
-</el-form-item>
-`
+</el-form-item>`
+
+const checkboxItemTemp = `
+<el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
+    <el-checkbox-group v-model="form.<%prop%>">
+        <el-checkbox v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-checkbox>
+    </el-checkbox-group>
+</el-form-item>`
 
 interface IDialogFormOptions {
     formItems: (IFormItem & {
@@ -109,6 +115,12 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
                 }
                 if (item.type == "radio") {
                     return injectTemplate(radioItemTemp, {
+                        labelWidth: 120,
+                        ...item
+                    }, 4)
+                }
+                if (item.type == "checkbox") {
+                    return injectTemplate(checkboxItemTemp, {
                         labelWidth: 120,
                         ...item
                     }, 4)
@@ -190,7 +202,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 type: "list",
                 message: `类型:`,
                 name: "type",
-                choices: ["input", "select", "radio"],
+                choices: ["input", "select", "radio", "checkbox"],
             },
             {
                 type: "input",
@@ -210,6 +222,14 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 name: `required`,
                 default: true,
                 when: () => required
+            },
+            {
+                type: "list",
+                message: `类型:`,
+                name: `inputType`,
+                choices: ["text", "textarea", "number", "password", "email", "tel"],
+                default: "text",
+                when: (answer: any) => answer.type === "text"
             },
             {
                 type: "list",
