@@ -40,12 +40,12 @@ export default pipe(
     useSearch(searchOptions),
     usePager(),
     useModalCtrl({
-      name: "add",
+      namespace: "add",
       afterHandler() {
         console.log(this, arguments);
       }
     }),
-    useModalCtrl({ name: "edit" }),
+    useModalCtrl({ namespace: "edit" }),
 )({
   name: "Home",
   components: {
