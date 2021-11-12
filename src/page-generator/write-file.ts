@@ -32,7 +32,7 @@ const writeFile = (config: IComponentConfig) => {
             }
         }
         fs.writeFileSync(path.join(rootDir, fileName), prettier(template))
-        components.forEach((config) => {
+        components?.forEach((config) => {
             createVue(config, IComponentTypeEnum.component)
         })
 

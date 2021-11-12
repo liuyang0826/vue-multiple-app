@@ -13,89 +13,80 @@ writeFile({
                 "prop": "name"
             }
         ],
-        "api": "/da",
+        "api": "sass",
         "formItems": [
             {
                 "type": "input",
-                "label": "21",
-                "prop": "eq"
+                "label": "name",
+                "prop": "name"
             }
         ],
         "hasPager": true,
         "addForm": {
             "templateId": "dialog-form",
-            "name": "Add",
+            "name": "AddForm",
             "options": {
-                "title": "sa",
+                "title": "新增用户",
                 "formItems": [
                     {
                         "type": "input",
-                        "label": "321",
-                        "prop": "a",
+                        "label": "用户名",
+                        "prop": "name",
                         "required": true,
-                        "width": 90
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "ewq",
-                        "prop": "ewq",
-                        "required": false,
-                        "width": 90
+                        "label": "年龄",
+                        "prop": "age",
+                        "required": true,
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "ewq",
-                        "prop": "eqw",
-                        "required": false,
-                        "width": 90
+                        "label": "性别",
+                        "prop": "sex",
+                        "required": true,
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "eqw",
-                        "prop": "eqw",
-                        "required": false,
-                        "width": 90
+                        "label": "身份证号",
+                        "prop": "code",
+                        "required": true,
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "eqw",
-                        "prop": "eqw",
-                        "required": false,
-                        "width": 90
+                        "label": "电话号码",
+                        "prop": "phone",
+                        "required": true,
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "ewq",
-                        "prop": "eq",
-                        "required": false,
-                        "width": 90
+                        "label": "地址",
+                        "prop": "address",
+                        "required": true,
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "wq",
-                        "prop": "ewq",
-                        "required": false,
-                        "width": 90
+                        "label": "职务",
+                        "prop": "job",
+                        "required": true,
+                        "labelWidth": 96
                     },
                     {
                         "type": "input",
-                        "label": "q",
-                        "prop": "ewq",
-                        "required": false,
-                        "width": 90
+                        "label": "尺寸",
+                        "prop": "size",
+                        "required": true,
+                        "labelWidth": 96
                     }
                 ],
-                "api": "ewq"
-            },
-            "components": []
-        },
-        "updateForm": {
-            "templateId": "dialog-form",
-            "name": "Eq",
-            "options": {
-                "title": "ewq",
-                "formItems": [],
-                "api": "eqw"
+                "width": 732,
+                "api": ""
             },
             "components": []
         }
