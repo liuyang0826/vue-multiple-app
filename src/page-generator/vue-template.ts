@@ -64,8 +64,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
 
     const mergedComponents = [...(privateComponents || []), ...(components || [])]
 
-    const injectParents = mergedComponents
-        .map((item) => getTemplateById(item.templateId)!.injectParent(item))
+    const injectParents = components?.map((item) => getTemplateById(item.templateId)!.injectParent(item))
 
     injectParents?.forEach(({ hooks: injectHooks }) => {
         injectHooks.forEach(item => {
@@ -74,7 +73,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
     })
 
     const componentNames = Array.from(new Set(mergedComponents.map(d => d.name)))
-    if (mergedComponents.length) {
+    if (componentNames.length) {
         hooks.unshift(`useComponents({
     ${componentNames.join(",\n    ")}
   })`)
@@ -103,7 +102,7 @@ const vueTemplate =  (config: IComponentConfig, type: IComponentTypeEnum) => {
             components: components?.map((item, index) => {
                 return makeComponentCode({
                     name: item.name,
-                    props: injectParents[index].props || []
+                    props: injectParents![index].props || []
                 })
             }) .join("\n    ")|| " "
         }),

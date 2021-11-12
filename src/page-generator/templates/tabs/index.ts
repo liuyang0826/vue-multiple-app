@@ -50,18 +50,19 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
 
     const injectParents = tabPanes
         .map((item) => getTemplateById(item.component.templateId)!.injectParent(item.component))
+    injectParents.forEach(({ hooks: injectHooks }) => {
+        hooks.push(...injectHooks)
+    })
 
     return {
         name,
         template: injectTemplate(template, {
             tabPanes: tabPanes.map((item, index) => {
-                const props = injectParents[index].props || []
                 return injectTemplate(tabPaneTemplate, {
                     ...item,
                     component: makeComponentCode({
                         name: item.component.name,
                         props: injectParents[index].props,
-
                     }, 2)
                 })
             }).join("\n  ")

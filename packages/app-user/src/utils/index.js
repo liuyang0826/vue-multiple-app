@@ -101,7 +101,8 @@ export const usePager = ({ onChange } = {}) => {
   )
 };
 
-export const useSearch = ({ getTableData, immediate, useSelection } = {}) => {
+export const useSearch = ({ getTableData, immediate, useSelection, onSelectionChange } = {}) => {
+  console.log(onSelectionChange);
   return pipe(
     useData(function () {
       return {
