@@ -1,5 +1,5 @@
 import {IComponentConfig, IComponentTypeEnum} from "./@types";
-import {getTemplateById} from "./index";
+import {getTemplateById} from "./scanner";
 
 import { injectTemplate, camelCaseToShortLine, firstToUpperCase } from "./utils"
 

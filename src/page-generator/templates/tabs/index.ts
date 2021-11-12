@@ -5,7 +5,7 @@ import inquirer from "inquirer";
 import tipsSplit from "../../utils/tips-split";
 import {makeComponentCode} from "../../vue-template";
 import {propValidator, requiredValidator} from "../../utils/validators";
-import {getTemplateById, getTemplates} from "../../index";
+import {getTemplateById, getTemplates} from "../../scanner";
 
 export const templateId = "tabs"
 

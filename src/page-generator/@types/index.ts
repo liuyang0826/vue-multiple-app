@@ -39,6 +39,11 @@ export interface ITemplate<T = {}> {
     configurator: IConfigurator<T> // 模板的配置表单
 }
 
+export interface IGeneratorConfig {
+    templates?: ITemplate[]
+    root?: string
+}
+
 // service 接口函数类型
 export interface IService {
     name: string // 函数名

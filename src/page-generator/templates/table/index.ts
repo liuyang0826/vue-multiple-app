@@ -16,7 +16,7 @@ import basePrompt from "../../utils/base-prompt";
 import tipsSplit from "../../utils/tips-split";
 import componentsPrompt from "../../utils/components-prompt";
 import { propValidator, requiredValidator } from "../../utils/validators";
-import {getTemplateById} from "../../index";
+import {getTemplateById} from "../../scanner";
 import {makeComponentCode} from "../../vue-template";
 
 export const templateId = "table"

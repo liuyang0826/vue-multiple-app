@@ -156,7 +156,7 @@ export const useSelectOptions = ({ options: selectOptions, getOptions, namespace
   )
 }
 
-export const useModalCtrl = ({ name, title, afterHandler, data } = {}) => {
+export const useModalCtrl = ({ namespace, title, afterHandler, data } = {}) => {
   data = data || function () {
     return {}
   }
@@ -164,19 +164,19 @@ export const useModalCtrl = ({ name, title, afterHandler, data } = {}) => {
   return pipe(
     useData(function () {
       return {
-        [makeCamelCase(name, "visible")]: false,
-        [makeCamelCase(name, "title")]: title,
+        [makeCamelCase(namespace, "visible")]: false,
+        [makeCamelCase(namespace, "title")]: title,
       }
     }),
     useData(function () {
       return {
-        [makeCamelCase(name, "data")]: data.call(this)
+        [makeCamelCase(namespace, "data")]: data.call(this)
       }
     }),
     useMethods({
-      [makeCamelCase("handle", name)](row, ...args) {
-        this[makeCamelCase(name, "visible")] = true
-        this[makeCamelCase(name, "data")] = row.constructor === Object ? row : data.call(this)
+      [makeCamelCase("handle", namespace)](row, ...args) {
+        this[makeCamelCase(namespace, "visible")] = true
+        this[makeCamelCase(namespace, "data")] = row.constructor === Object ? row : data.call(this)
         afterHandler?.call(this, row, ...args)
       }
     })
@@ -199,6 +199,7 @@ export const useModal = ({ onShow, formRules, doSubmit } = {}) => {
             if (formRules) {
               this.formLoading = false
               this.form = JSON.parse(JSON.stringify(this.data))
+              this.$refs.form?.clearValidate()
             }
             onShow?.call(this)
           },
