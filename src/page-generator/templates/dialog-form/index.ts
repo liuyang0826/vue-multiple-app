@@ -34,7 +34,7 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px"  >
-  <el-input v-model="form.<%prop%>" maxlength="<%maxlength%>" style="width: 240px;" />
+  <el-input v-model="form.<%prop%>"<%maxlength%>style="width: 240px;" />
 </el-form-item>`
 
 const selectItemTemp = `
@@ -55,11 +55,14 @@ const radioItemTemp = `
 interface IDialogFormOptions {
     formItems: (IFormItem & {
         required: boolean
+        maxlength: number
     })[]
     title: string
     width: number
     api: string
 }
+
+export const makeMaxlength = (maxlength: number) => maxlength ? ` maxlength="${maxlength}" ` : " "
 
 export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, options }) => {
     const { formItems, width = 440, api } = options
@@ -99,7 +102,8 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
                 if (item.type === "input") {
                     return injectTemplate(inputItemTemp, {
                         labelWidth: 120,
-                        ...item
+                        ...item,
+                        maxlength: makeMaxlength(item.maxlength)
                     }, 4)
                 }
                 if (item.type === "select") {
