@@ -32,9 +32,11 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
     const { tabPanes } = options
 
     const hooks: string[] = [
-        `useData({
-    activeName: "${tabPanes[0].name}"
-  })`,
+        `useData(function() {
+      return {
+        activeName: "${tabPanes[0].name}"
+      }
+    })`,
         `useMethods({
     handleClick() {
     

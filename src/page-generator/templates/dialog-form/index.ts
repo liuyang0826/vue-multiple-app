@@ -135,8 +135,16 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
 }
 
 export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
+    const checkBoxes = config.options.formItems.filter(d => d.type === "radio")
     const hooks = [
-        `useModalCtrl({ name: "${config.namespace}", title: "${config.options.title}" })`
+        `useModalCtrl({
+    name: "${config.namespace}",
+    title: "${config.options.title}"${checkBoxes.length ? `,\n    data() {
+      return {
+        ${checkBoxes.map(d => `${d.prop}: []`).join("\n      ")}
+      }
+    }` : ""}
+  })`
     ]
 
     const props = [

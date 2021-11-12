@@ -253,8 +253,10 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
 
 export const injectParent: IInjectParent = ({ namespace }) => {
     const hooks: string[] = [
-        `useData({
-    ${namespace}TableData: {}
+        `useData(function() {
+    return {
+      ${namespace}TableData: {}
+    }
   })`
     ]
 
