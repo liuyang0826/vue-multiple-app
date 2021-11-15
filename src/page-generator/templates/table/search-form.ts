@@ -11,7 +11,7 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>">
-  <el-input clearable v-model="query.<%prop%>"<%maxlength%>@change="handleSearch" />
+  <el-input clearable v-model="query.<%prop%>"<%maxlength%> @change="handleSearch" />
 </el-form-item>`
 
 const selectItemTemp = `

@@ -3,6 +3,7 @@ import { injectTemplate } from "../../utils"
 const template = `
 <el-table size="small" :data="tableData" v-loading="searchLoading">
   <%selection%>
+  <%orderIndex%>
   <%tableCols%>
   <%operationCol%>
 </el-table>
@@ -19,7 +20,7 @@ const operationColTemp = `
 </el-table-column>
 `
 
-export default ({ tableCols, hasUpdate, hasDelete, hasToggleEnable, hasMove, hasSelection }: any) => {
+export default ({ tableCols, hasIndex, hasUpdate, hasDelete, hasToggleEnable, hasMove, hasSelection }: any) => {
     const operations = [
         hasUpdate && `<el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>`,
         hasDelete && `<el-button size="small" type="text" @click="handleDelete(row)">删除</el-button>`,
@@ -29,6 +30,7 @@ export default ({ tableCols, hasUpdate, hasDelete, hasToggleEnable, hasMove, has
     ].filter(Boolean)
     return injectTemplate(template, {
         tableCols: tableCols?.map((item: any) => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
+        orderIndex: hasIndex ? `<el-table-column type="index" label="序号" width="55" />` : " ",
         selection: hasSelection ? `<el-table-column type="selection" width="55" />` : " ",
         operationCol: operations.length ? injectTemplate(operationColTemp, {
             operations: operations.join(`\n    <el-divider direction="vertical"/>\n    `),

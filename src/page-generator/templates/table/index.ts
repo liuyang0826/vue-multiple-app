@@ -111,6 +111,7 @@ useMethods({
 interface ITableOptions {
     formItems: any
     api: string
+    hasIndex: boolean
     tableCols: any
     hasPager: boolean
     deleteApi: string
@@ -127,6 +128,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
     const {
         formItems,
         api,
+        hasIndex,
         tableCols,
         hasPager,
         deleteApi,
@@ -239,11 +241,12 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             }),
             table: table({
                 tableCols,
+                hasIndex: hasIndex,
                 hasUpdate: updateForm,
                 hasDelete: deleteApi,
                 hasToggleEnable: toggleEnableApi,
                 hasMove: moveApi,
-                hasSelection: moveApi,
+                hasSelection: hasSelection,
             }),
             pagination: hasPager && pagination(),
             handleButton: handleButton({
@@ -285,7 +288,7 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             message: "表格列数:",
             name: "tableCols",
             default: 1,
-        },
+        }
     ])
 
     const options = {
@@ -321,6 +324,7 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             message: "功能操作？",
             name: "operations",
             choices: [
+                { name: "序号", checked: true },
                 { name: "分页", checked: true },
                 { name: "新增", checked: true },
                 { name: "编辑", checked: true },
@@ -333,6 +337,8 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             ]
         },
     ])
+
+    options.hasIndex = operations.includes("序号")
 
     options.hasPager = operations.includes("分页")
 
