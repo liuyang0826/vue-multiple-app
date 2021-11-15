@@ -70,26 +70,35 @@ interface IDialogFormOptions {
 
 export const makeMaxlength = (maxlength: number) => maxlength ? ` :maxlength="${maxlength}" ` : " "
 
+const modalHookTemplate = `
+useModal({
+  onShow() {},
+  formRules: {<%formRules%>},
+  async doSubmit() {
+    const { status, message } = await doSubmit(this.form)
+    if (status) {
+      this.$message.error("操作成功")
+      this.$emit("update:visible", false)
+    } else {
+      this.$message.error(message)
+    }
+  }
+})`
+
+const requireRuleTemplate = `<%prop%>: { required: true, message: "请输入<%label%>", trigger: ["change", "blur"] }`
+
 export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, options }) => {
     const { formItems, width = 440, api } = options
 
     const requiredItems = formItems?.filter((d) => d.required) || []
 
     const hooks = [
-        `useModal({
-    onShow() {},
-    formRules: {${requiredItems.length ? `\n      ${requiredItems.map(d => `${d.prop}: { required: true, message: "请输入${d.label}", trigger: ["change", "blur"] }`)
-            .join(",\n      ")}\n    ` : ""}},
-    async doSubmit() {
-      const { status, message } = await doSubmit(this.form)
-      if (status) {
-        this.$message.error("操作成功")
-        this.$emit("update:visible", false)
-      } else {
-        this.$message.error(message)
-      }
-    }
-  })`
+        injectTemplate(modalHookTemplate, {
+            formRules: requiredItems.length
+                ? `\n    ${requiredItems.map(d => injectTemplate(requireRuleTemplate, d))
+                .join(",\n    ")}\n  `
+                : ""
+        }, 2)
     ]
     const services: IService[] = [
         {
@@ -139,17 +148,29 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
     }
 }
 
+const modalCtrlHookTemplate = `
+useModalCtrl({
+  namespace: "<%namespace%>",
+  title: "<%title%>"<%data%>
+})`
+
+const modalDataTemplate = `
+data() {
+  return {
+    <%props%>
+  }
+}`
+
 export const injectParent: IInjectParent<IDialogFormOptions> = (config) => {
     const checkBoxes = config.options.formItems.filter(d => d.type === "checkbox")
     const hooks = [
-        `useModalCtrl({
-    namespace: "${config.namespace}",
-    title: "${config.options.title}"${checkBoxes.length ? `,\n    data() {
-      return {
-        ${checkBoxes.map(d => `${d.prop}: []`).join("\n      ")}
-      }
-    }` : ""}
-  })`
+        injectTemplate(modalCtrlHookTemplate, {
+            namespace: config.namespace,
+            title: config.options.title,
+            data: checkBoxes.length ? `,${injectTemplate(modalDataTemplate, {
+                props: checkBoxes.map(d => `${d.prop}: []`).join("\n      ")
+            }, 2)}` : "",
+        }, 2),
     ]
 
     const props = [
@@ -228,7 +249,8 @@ export const configurator: IConfigurator<IDialogFormOptions> = async () => {
         {
             type: "input",
             message: "提交接口:",
-            name: "api"
+            name: "api",
+            validate: requiredValidator
         },
     ])).api
 

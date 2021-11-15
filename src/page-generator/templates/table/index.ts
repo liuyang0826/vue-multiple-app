@@ -35,6 +35,79 @@ const template = `
 </div>
 `
 
+const searchHookTemplate = `
+useSearch({
+  async getTableData() {
+    const { status, data, message } = await getTableData({
+      query: this.query,
+      pageSize: this.pageSize,
+      pageNum: this.pageNum
+    })
+    if (status) {
+      this.tableData = data
+    } else {
+      this.$message.error(message)
+    }
+  },
+  immediate: true<%hasSelection%>
+})`
+const deleteHookTemplate = `
+useDelete({
+  // 单个删除
+  async doDelete(row) {
+    const { status, message } = await itemDelete(row)
+    if (status) {
+      this.$message.success("删除成功")
+    } else {
+      this.$message.error(message)
+    }
+  }     
+})`
+
+const batchDeleteHookTemplate =`
+useDelete({
+  // 批量删除
+  async doBatchDelete(rows) {
+    const { status, message } = await batchDelete(rows)
+    if (status) {
+      this.$message.success("删除成功")
+    } else {
+      this.$message.error(message)
+    }
+  }     
+})`
+
+const toggleEnableHookTemplate = `
+useMethods({
+  // 启用禁用
+  async handleToggleEnable(row) {
+    const { status, message } = await toggleEnable({
+      id: row.id
+    })
+    if (status) {
+      this.$message.success("操作成功")
+    } else {
+      this.$message.error(message)
+    }
+  }     
+})`
+
+const moveHookTemplate = `
+useMethods({
+  // 上移下移
+  async handleMove(row, direction) {
+    const { status, message } = await move({
+      id: row.id,
+      direction
+    })
+    if (status) {
+      this.$message.success("操作成功")
+    } else {
+      this.$message.error(message)
+    }
+  }     
+})`
+
 interface ITableOptions {
     formItems: any
     api: string
@@ -69,21 +142,9 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
     } = options
 
     const hooks = [
-        `useSearch({
-    async getTableData() {
-      const { status, data, message } = await getTableData({
-        query: this.query,
-        pageSize: this.pageSize,
-        pageNum: this.pageNum
-      })
-      if (status) {
-        this.tableData = data
-      } else {
-        this.$message.error(message)
-      }
-    },
-    immediate: true${hasSelection || batchDeleteApi || exportApi ? `,\n    hasSelection: true` : ""}
-  })`,
+        injectTemplate(searchHookTemplate, {
+            hasSelection: hasSelection || batchDeleteApi || exportApi ? `,\n  hasSelection: true` : ""
+        }, 2),
     ]
 
     if (type === IComponentTypeEnum.component) {
@@ -140,19 +201,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: deleteApi
         })
-        hooks.push(
-            `useDelete({
-    // 单个删除
-    async doDelete(row) {
-      const { status, message } = await itemDelete(row)
-      if (status) {
-        this.$message.success("删除成功")
-      } else {
-        this.$message.error(message)
-      }
-    }     
-  })`
-        )
+        hooks.push(injectTemplate(deleteHookTemplate, {}, 2))
     }
 
     if (batchDeleteApi) {
@@ -161,19 +210,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: batchDeleteApi
         })
-        hooks.push(
-            `useDelete({
-    // 批量删除
-    async doBatchDelete(rows) {
-      const { status, message } = await batchDelete(rows)
-      if (status) {
-        this.$message.success("删除成功")
-      } else {
-        this.$message.error(message)
-      }
-    }     
-  })`
-        )
+        hooks.push(injectTemplate(batchDeleteHookTemplate, {}, 2))
     }
 
     if (toggleEnableApi) {
@@ -182,21 +219,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: toggleEnableApi
         })
-        hooks.push(
-            `useMethods({
-    // 启用禁用
-    async handleToggleEnable(row) {
-      const { status, message } = await toggleEnable({
-        id: row.id
-      })
-      if (status) {
-        this.$message.success("操作成功")
-      } else {
-        this.$message.error(message)
-      }
-    }     
-  })`
-        )
+        hooks.push(injectTemplate(toggleEnableHookTemplate, {}, 2))
     }
 
     if (moveApi) {
@@ -205,22 +228,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: moveApi
         })
-        hooks.push(
-            `useMethods({
-    // 上移下移
-    async handleMove(row, direction) {
-      const { status, message } = await move({
-        id: row.id,
-        direction
-      })
-      if (status) {
-        this.$message.success("操作成功")
-      } else {
-        this.$message.error(message)
-      }
-    }     
-  })`
-        )
+        hooks.push(injectTemplate(moveHookTemplate, {}, 2))
     }
 
     processFormItems({ formItems, hooks, services, depForm: "query" })
