@@ -22,7 +22,7 @@ export const componentOnly = true
 const template = `
 <el-dialog :visible.sync="visible" :title="title" @close="$emit('update:visible', false)" width="<%width%>px" append-to-body :close-on-click-modal="false">
   <el-form :model="form" size="small" inline :rules="formRules" ref="form" label-suffix="：">
-     <%formItems%>
+    <%formItems%>
   </el-form>
   <template #footer>
     <el-button size="small" @click="$emit('update:visible', false)">取消</el-button>
@@ -34,7 +34,7 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-  <el-input type="<%inputType%>" v-model="form.<%prop%>"<%maxlength%>style="width: 240px;" />
+  <el-input type="<%inputType%>" v-model="form.<%prop%>" <%maxlength%> style="width: 240px;" />
 </el-form-item>`
 
 const selectItemTemp = `
@@ -46,16 +46,16 @@ const selectItemTemp = `
 
 const radioItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-    <el-radio-group v-model="form.<%prop%>">
-        <el-radio v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-radio>
-    </el-radio-group>
+  <el-radio-group v-model="form.<%prop%>">
+    <el-radio v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-radio>
+  </el-radio-group>
 </el-form-item>`
 
 const checkboxItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-    <el-checkbox-group v-model="form.<%prop%>">
-        <el-checkbox v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-checkbox>
-    </el-checkbox-group>
+  <el-checkbox-group v-model="form.<%prop%>">
+    <el-checkbox v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-checkbox>
+  </el-checkbox-group>
 </el-form-item>`
 
 interface IDialogFormOptions {
@@ -68,7 +68,7 @@ interface IDialogFormOptions {
     api: string
 }
 
-export const makeMaxlength = (maxlength: number) => maxlength ? ` maxlength="${maxlength}" ` : " "
+export const makeMaxlength = (maxlength: number) => maxlength ? ` :maxlength="${maxlength}" ` : " "
 
 export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, options }) => {
     const { formItems, width = 440, api } = options
@@ -268,11 +268,18 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
             },
             {
                 type: "list",
-                message: `类型:`,
+                message: `input类型:`,
                 name: `inputType`,
                 choices: ["text", "textarea", "number", "password"],
                 default: "text",
                 when: (answer: any) => answer.type === "input"
+            },
+            {
+                type: "input",
+                message: `input最大长度:`,
+                name: `maxlength`,
+                default: 100,
+                when: (answer: any) => answer.type === "input" || answer.type === "textarea"
             },
             {
                 type: "list",
