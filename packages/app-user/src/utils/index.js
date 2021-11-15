@@ -71,38 +71,10 @@ export const useComponents = (components) => options => {
   return options;
 }
 
-export const usePager = ({ onChange } = {}) => {
-  return pipe(
-    useData(function () {
-      return {
-        pageSize: 10,
-        pageNum: 1,
-        total: 0
-      }
-    }),
-    useMethods({
-      handleCurrentChange (val) {
-        this.pageNum = val;
-        if (typeof onChange === "string") {
-          this[onChange]()
-        } else {
-          onChange.call(this, val)
-        }
-      },
-      handleSizeChange (val) {
-        this.pageSize = val;
-        if (typeof onChange === "string") {
-          this[onChange]()
-        } else {
-          onChange.call(this, val)
-        }
-      }
-    })
-  )
-};
+export const useTableCrud = ({ doSearch, immediate, hasPager, hasSelection, rowKey = "id", onSelectionChange, doDelete, doBatchDelete, doToggleEnable } = {}) => {
+  let selectionLen = 0
+  let selectionMap = {}
 
-export const useSearch = ({ getTableData, immediate, useSelection, onSelectionChange } = {}) => {
-  console.log(onSelectionChange);
   return pipe(
     useData(function () {
       return {
@@ -111,22 +83,107 @@ export const useSearch = ({ getTableData, immediate, useSelection, onSelectionCh
         tableData: []
       }
     }),
-    useSelection && useData(function () {
-      return {
-        selectionMap: {}
-      }
-    }),
     useMethods({
-      async handleSearch () {
+      handleSearch () {
+        this.updateTable()
+      },
+      async updateTable() {
         this.searchLoading = true;
-        getTableData.call(this)
-        .finally(() => {
+        try {
+          await doSearch.call(this)
+        } finally {
           this.searchLoading = false;
-        });
+          hasSelection && this.$nextTick(() => {
+            this.tableData.forEach((row) => {
+              this.$refs.table.toggleRowSelection(row, !!selectionMap[row[rowKey]])
+            })
+            selectionLen = this.tableData.filter(row => !!selectionMap[row[rowKey]]).length
+          })
+        }
       }
     }),
     immediate && useLifecycle("created", function () {
       this.handleSearch();
+    }),
+    hasPager && useData(function () {
+      return {
+        pageSize: 10,
+        pageNum: 1,
+        total: 0
+      }
+    }),
+    hasPager && useMethods({
+      handleSearch () {
+        this.pageNum = 1
+      },
+      handleCurrentChange (val) {
+        this.pageNum = val;
+        this.updateTable()
+      },
+      handleSizeChange (val) {
+        this.pageSize = val;
+        this.updateTable()
+      }
+    }),
+    hasSelection && useLifecycle("created", function () {
+      selectionMap = {}
+      selectionLen = 0
+    }),
+    hasSelection && useMethods({
+      resetSelection(selectedRows) {
+        selectionMap = selectedRows ? selectedRows.reduce((map, row) => ({...map, [row[rowKey]]: row}), {}) : {}
+        selectionLen = this.tableData.filter(row => !!selectionMap[row[rowKey]]).length
+        onSelectionChange(selectionMap)
+      },
+      handleSelect(selection, row) {
+        if (selectionLen < selection.length) {
+          selectionMap[row[rowKey]] = row;
+        } else {
+          delete selectionMap[row[rowKey]];
+        }
+        onSelectionChange(selectionMap)
+        selectionLen = selection.length;
+      },
+      handleSelectAll(selection) {
+        if (selection.length) {
+          selection.forEach(row => {
+            selectionMap[row[rowKey]] = row;
+          });
+        } else {
+          this.tableData.forEach(row => {
+            delete selectionMap[row[rowKey]];
+          });
+        }
+        onSelectionChange(selectionMap)
+        selectionLen = selection.length;
+      }
+    }),
+    doDelete && useMethods({
+      handleDelete(...args) {
+        this.$confirm("确认删除？", "提示", {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          doDelete.call(this, ...args)
+        })
+      }
+    }),
+    doBatchDelete && useMethods({
+      handleBatchDelete() {
+        this.$confirm("确认删除？", "提示", {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          doBatchDelete.call(this, Object.values(selectionMap))
+        })
+      }
+    }),
+    doToggleEnable && useMethods({
+      handleToggleEnable() {
+        doToggleEnable.call(this)
+      }
     })
   );
 };
@@ -229,31 +286,3 @@ export const useModal = ({ onShow, formRules, doSubmit } = {}) => {
       })
   );
 };
-
-// 删除 & 批量删除
-export const useDelete = ({ doDelete, doBatchDelete } = {}) => {
-  return pipe(
-    doDelete && useMethods({
-      handleDelete(...args) {
-        this.$confirm("确认删除？", "提示", {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          doDelete.call(this, ...args)
-        })
-      }
-    }),
-    doBatchDelete && useMethods({
-      handleBatchDelete() {
-        this.$confirm("确认删除？", "提示", {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          doBatchDelete.call(this, Object.values(this.selectionMap))
-        })
-      }
-    })
-  )
-}
