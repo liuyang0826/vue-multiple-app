@@ -30,7 +30,7 @@ export default ({ tableCols, hasIndex, hasUpdate, hasDelete, hasToggleEnable, ha
     ].filter(Boolean)
     return injectTemplate(template, {
         tableCols: tableCols?.map((item: any) => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
-        orderIndex: hasIndex ? `<el-table-column type="index" label="序号" width="55" />` : " ",
+        orderIndex: hasIndex ? `<el-table-column type="index" label="序号" width="55" :index="indexMethod" />` : " ",
         selection: hasSelection ? `<el-table-column type="selection" width="55" />` : " ",
         operationCol: operations.length ? injectTemplate(operationColTemp, {
             operations: operations.join(`\n    <el-divider direction="vertical"/>\n    `),

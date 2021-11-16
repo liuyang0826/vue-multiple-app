@@ -71,6 +71,20 @@ export const useComponents = (components) => options => {
   return options;
 }
 
+export const useIndex = ({ flag }) => {
+  return pipe(
+    useMethods({
+      indexMethod (index) {
+        if (flag > 0) {
+          return this.pageSize * (this.pageNum -1) + index + 1;
+        } else {
+          index + 1;
+        }
+      }
+    })
+  )
+}
+
 export const usePager = ({ onChange } = {}) => {
   return pipe(
     useData(function () {

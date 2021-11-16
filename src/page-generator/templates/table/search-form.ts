@@ -21,13 +21,21 @@ const selectItemTemp = `
   </el-select>
 </el-form-item>`
 
+const dateItemTemp = `
+<el-form-item label="<%label%>">
+  <el-date-picker type="<%dateType%>" v-model="query.<%prop%>" :editable="false"></el-date-picker>
+</el-form-item>`
+
 export default ({formItems}: any) => formItems?.length ? injectTemplate(template, {
     formItems: formItems?.map((item: any) => {
         if (item.type === "input") {
-            return injectTemplate(inputItemTemp, item, 2)
+          return injectTemplate(inputItemTemp, item, 2)
         }
         if (item.type === "select") {
-            return injectTemplate(selectItemTemp, item, 2)
+          return injectTemplate(selectItemTemp, item, 2)
+        }
+        if (item.type === "date") {
+          return injectTemplate(dateItemTemp, item, 2)
         }
     }).join("\n") || " ",
 }, 4) : " "

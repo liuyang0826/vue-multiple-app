@@ -167,6 +167,14 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
         hooks.push(`usePager({ onChange: "handleSearch" })`)
     }
 
+    if (hasIndex) {
+        if (hasPager) {
+            hooks.push(`useIndex({ flag: 1 })`)
+        } else {
+            hooks.push(`useIndex({ flag: 0 })`)
+        }
+    }
+
     let addFormCode = " "
     if (addForm) {
         addForm.namespace = "add"
@@ -461,7 +469,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 type: "list",
                 message: `类型:`,
                 name: "type",
-                choices: ["input", "select"],
+                choices: ["input", "select", "date"],
             },
             {
                 type: "input",
@@ -474,6 +482,13 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 message: `prop(英文):`,
                 name: `prop`,
                 validate: propValidator,
+            },
+            {   type: "list",
+                message: `date类型:`,
+                name: `dateType`,
+                choices: ["date", "datetime", "year", "month", "daterange", "datetimerange"],
+                default: "date",
+                when: (answer: any) => answer.type === "date"
             },
             {
                 type: "list",
