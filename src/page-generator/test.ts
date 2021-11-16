@@ -22,6 +22,7 @@ writeFile({
             },
         ],
         "hasPager": true,
+        "hasIndex": true,
         "deleteApi": "xxx",
         "batchDeleteApi": "xxx",
         "toggleEnableApi": "xxx",

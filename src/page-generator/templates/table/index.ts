@@ -49,7 +49,7 @@ useTableCrud({
       this.$message.error(message)
     }
   },
-  immediate: true<%hasPager%><%hasSelection%><%doDelete%><%doBatchDelete%><%toggleEnable%><%move%>
+  immediate: true<%hasPager%><%hasSelection%><%doDelete%><%doBatchDelete%><%doToggleEnable%><%doMove%>
 })`
 const doDeleteTemplate = `
 // 单个删除
@@ -83,12 +83,13 @@ async doToggleEnable(row) {
   })
   if (status) {
     this.$message.success("操作成功")
+    this.updateTable()
   } else {
     this.$message.error(message)
   }
 }`
 
-const moveTemplate = `
+const doMoveTemplate = `
 // 上移下移
 async handleMove(row, direction) {
   const { status, message } = await move({
@@ -97,6 +98,7 @@ async handleMove(row, direction) {
   })
   if (status) {
     this.$message.success("操作成功")
+    this.updateTable()
   } else {
     this.$message.error(message)
   }
@@ -141,8 +143,8 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             hasPager: hasPager ? `,\n  hasPager: true` : "",
             doDelete: deleteApi ? `,\n${injectTemplate(doDeleteTemplate, {}, 2)}` : "",
             doBatchDelete: batchDeleteApi ? `,\n${injectTemplate(doBatchDeleteTemplate, {}, 2)}` : "",
-            toggleEnable: toggleEnableApi ? `,\n${injectTemplate(doToggleEnableTemplate, {}, 2)}` : "",
-            move: moveApi ? `,\n${injectTemplate(moveTemplate, {}, 2)}` : "",
+            doToggleEnable: toggleEnableApi ? `,\n${injectTemplate(doToggleEnableTemplate, {}, 2)}` : "",
+            doMove: moveApi ? `,\n${injectTemplate(doMoveTemplate, {}, 2)}` : "",
         }, 2),
     ]
 

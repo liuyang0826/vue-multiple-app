@@ -71,7 +71,7 @@ export const useComponents = (components) => options => {
   return options;
 }
 
-export const useTableCrud = ({ doSearch, immediate, hasPager, hasSelection, rowKey = "id", onSelectionChange, doDelete, doBatchDelete, doToggleEnable } = {}) => {
+export const useTableCrud = ({ doSearch, immediate, hasPager, hasSelection, rowKey = "id", onSelectionChange, doDelete, doBatchDelete, doToggleEnable, doMove } = {}) => {
   let selectionLen = 0
   let selectionMap = {}
 
@@ -183,6 +183,11 @@ export const useTableCrud = ({ doSearch, immediate, hasPager, hasSelection, rowK
     doToggleEnable && useMethods({
       handleToggleEnable() {
         doToggleEnable.call(this)
+      }
+    }),
+    doMove && useMethods({
+      handleMove() {
+        doMove.call(this)
       }
     })
   );
