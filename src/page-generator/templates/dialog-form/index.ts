@@ -34,7 +34,7 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-  <el-input type="<%inputType%>" v-model="form.<%prop%>" <%maxlength%> style="width: 240px;" />
+  <el-input type="<%inputType%>" v-model="form.<%prop%>"<%maxlength%>style="width: 240px;" />
 </el-form-item>`
 
 const selectItemTemp = `
@@ -213,7 +213,6 @@ export const configurator: IConfigurator<IDialogFormOptions> = async () => {
     const components = await componentsPrompt()
 
     result.components = components
-
 
     if (components.length) {
         const { width } = await inquirer.prompt([

@@ -19,9 +19,13 @@ writeFile({
                 "type": "input",
                 "label": "name",
                 "prop": "name"
-            }
+            },
         ],
         "hasPager": true,
+        "deleteApi": "xxx",
+        "batchDeleteApi": "xxx",
+        "toggleEnableApi": "xxx",
+        "moveApi": "xxx",
         "addForm": {
             "templateId": "dialog-form",
             "name": "AddForm",
