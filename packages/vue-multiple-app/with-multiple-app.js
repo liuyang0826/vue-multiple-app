@@ -112,7 +112,7 @@ function withMultipleApp(options) {
             chainWebpack(config, { name })
         }
 
-        vueConfig.transpileDependencies = [...(vueConfig.transpileDependencies || []), /node_modules\/@cisdiliuyang\/.*/]
+        vueConfig.transpileDependencies = [...(vueConfig.transpileDependencies || []), /(node_modules\/)?@cisdiliuyang\/.*/]
 
         // 添加css命名空间
         vueConfig.css = {
