@@ -1,7 +1,7 @@
 import { injectTemplate } from "../../utils"
 
 const template = `
-<el-table size="small" :data="tableData" v-loading="searchLoading">
+<el-table size="small" :data="tableData" v-loading="searchLoading"<%selectEvents%>>
   <%selection%>
   <%orderIndex%>
   <%tableCols%>
@@ -20,7 +20,7 @@ const operationColTemp = `
 </el-table-column>
 `
 
-export default ({ tableCols, hasIndex, hasUpdate, hasDelete, hasToggleEnable, hasMove, hasSelection }: any) => {
+export default ({ tableCols, hasPager, hasUpdate, hasDelete, hasToggleEnable, hasMove, hasSelection }: any) => {
     const operations = [
         hasUpdate && `<el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>`,
         hasDelete && `<el-button size="small" type="text" @click="handleDelete(row)">删除</el-button>`,
@@ -30,8 +30,9 @@ export default ({ tableCols, hasIndex, hasUpdate, hasDelete, hasToggleEnable, ha
     ].filter(Boolean)
     return injectTemplate(template, {
         tableCols: tableCols?.map((item: any) => injectTemplate(tableColTemp, item, 2)).join("\n") || " ",
-        orderIndex: hasIndex ? `<el-table-column type="index" label="序号" width="55" :index="indexMethod" />` : " ",
-        selection: hasSelection ? `<el-table-column type="selection" width="55" />` : " ",
+        orderIndex: hasPager ? `<el-table-column type="index" label="序号" width="55" :index="indexMethod" />` : " ",
+        selection: hasSelection ? `<el-table-column type="selection" width="55" align="center" />` : " ",
+        selectEvents: hasSelection ? ` ref="table" @select="handleSelect" @select-all="handleSelectAll"` : "",
         operationCol: operations.length ? injectTemplate(operationColTemp, {
             operations: operations.join(`\n    <el-divider direction="vertical"/>\n    `),
             width: operations.length * 44

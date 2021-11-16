@@ -36,8 +36,8 @@ const template = `
 `
 
 const searchHookTemplate = `
-useSearch({
-  async getTableData() {
+useTableCrud({
+  async doSearch() {
     const { status, data, message } = await getTableData({
       query: this.query,
       pageSize: this.pageSize,
@@ -49,69 +49,62 @@ useSearch({
       this.$message.error(message)
     }
   },
-  immediate: true<%hasSelection%>
+  immediate: true<%hasPager%><%hasSelection%><%doDelete%><%doBatchDelete%><%toggleEnable%><%move%>
 })`
-const deleteHookTemplate = `
-useDelete({
-  // 单个删除
-  async doDelete(row) {
-    const { status, message } = await itemDelete(row)
-    if (status) {
-      this.$message.success("删除成功")
-    } else {
-      this.$message.error(message)
-    }
-  }     
-})`
+const doDeleteTemplate = `
+// 单个删除
+async doDelete(row) {
+  const { status, message } = await itemDelete(row)
+  if (status) {
+    this.$message.success("删除成功")
+    this.updateTable()
+  } else {
+    this.$message.error(message)
+  }
+}`
 
-const batchDeleteHookTemplate =`
-useDelete({
-  // 批量删除
-  async doBatchDelete(rows) {
-    const { status, message } = await batchDelete(rows)
-    if (status) {
-      this.$message.success("删除成功")
-    } else {
-      this.$message.error(message)
-    }
-  }     
-})`
+const doBatchDeleteTemplate =`
+// 批量删除
+async doBatchDelete(rows) {
+  const { status, message } = await batchDelete(rows)
+  if (status) {
+    this.$message.success("删除成功")
+    this.updateTable()
+  } else {
+    this.$message.error(message)
+  }
+}`
 
-const toggleEnableHookTemplate = `
-useMethods({
-  // 启用禁用
-  async handleToggleEnable(row) {
-    const { status, message } = await toggleEnable({
-      id: row.id
-    })
-    if (status) {
-      this.$message.success("操作成功")
-    } else {
-      this.$message.error(message)
-    }
-  }     
-})`
+const doToggleEnableTemplate = `
+// 启用禁用
+async doToggleEnable(row) {
+  const { status, message } = await toggleEnable({
+    id: row.id
+  })
+  if (status) {
+    this.$message.success("操作成功")
+  } else {
+    this.$message.error(message)
+  }
+}`
 
-const moveHookTemplate = `
-useMethods({
-  // 上移下移
-  async handleMove(row, direction) {
-    const { status, message } = await move({
-      id: row.id,
-      direction
-    })
-    if (status) {
-      this.$message.success("操作成功")
-    } else {
-      this.$message.error(message)
-    }
-  }     
-})`
+const moveTemplate = `
+// 上移下移
+async handleMove(row, direction) {
+  const { status, message } = await move({
+    id: row.id,
+    direction
+  })
+  if (status) {
+    this.$message.success("操作成功")
+  } else {
+    this.$message.error(message)
+  }
+}`
 
 interface ITableOptions {
     formItems: any
     api: string
-    hasIndex: boolean
     tableCols: any
     hasPager: boolean
     deleteApi: string
@@ -128,7 +121,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
     const {
         formItems,
         api,
-        hasIndex,
         tableCols,
         hasPager,
         deleteApi,
@@ -143,15 +135,20 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
 
     const hooks = [
         injectTemplate(searchHookTemplate, {
-            hasSelection: hasSelection || batchDeleteApi || exportApi ? `,\n  hasSelection: true` : ""
+            hasSelection: hasSelection || batchDeleteApi || exportApi ? `,\n  hasSelection: true` : "",
+            hasPager: hasPager ? `,\n  hasPager: true` : "",
+            doDelete: deleteApi ? `,\n${injectTemplate(doDeleteTemplate, {}, 2)}` : "",
+            doBatchDelete: batchDeleteApi ? `,\n${injectTemplate(doBatchDeleteTemplate, {}, 2)}` : "",
+            toggleEnable: toggleEnableApi ? `,\n${injectTemplate(doToggleEnableTemplate, {}, 2)}` : "",
+            move: moveApi ? `,\n${injectTemplate(moveTemplate, {}, 2)}` : "",
         }, 2),
     ]
 
     if (type === IComponentTypeEnum.component) {
         hooks.unshift(
             `useProps({
-    data: Object
-  })`
+                data: Object
+            })`
         )
     }
 
@@ -162,18 +159,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             api
         },
     ]
-
-    if (hasPager) {
-        hooks.push(`usePager({ onChange: "handleSearch" })`)
-    }
-
-    if (hasIndex) {
-        if (hasPager) {
-            hooks.push(`useIndex({ flag: 1 })`)
-        } else {
-            hooks.push(`useIndex({ flag: 0 })`)
-        }
-    }
 
     let addFormCode = " "
     if (addForm) {
@@ -209,7 +194,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: deleteApi
         })
-        hooks.push(injectTemplate(deleteHookTemplate, {}, 2))
     }
 
     if (batchDeleteApi) {
@@ -218,7 +202,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: batchDeleteApi
         })
-        hooks.push(injectTemplate(batchDeleteHookTemplate, {}, 2))
     }
 
     if (toggleEnableApi) {
@@ -227,7 +210,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: toggleEnableApi
         })
-        hooks.push(injectTemplate(toggleEnableHookTemplate, {}, 2))
     }
 
     if (moveApi) {
@@ -236,7 +218,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             method: "post",
             api: moveApi
         })
-        hooks.push(injectTemplate(moveHookTemplate, {}, 2))
     }
 
     processFormItems({ formItems, hooks, services, depForm: "query" })
@@ -249,12 +230,12 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             }),
             table: table({
                 tableCols,
-                hasIndex: hasIndex,
+                hasPager: hasPager,
                 hasUpdate: updateForm,
                 hasDelete: deleteApi,
                 hasToggleEnable: toggleEnableApi,
                 hasMove: moveApi,
-                hasSelection: hasSelection,
+                hasSelection: hasSelection || batchDeleteApi || exportApi,
             }),
             pagination: hasPager && pagination(),
             handleButton: handleButton({
@@ -332,7 +313,6 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             message: "功能操作？",
             name: "operations",
             choices: [
-                { name: "序号", checked: true },
                 { name: "分页", checked: true },
                 { name: "新增", checked: true },
                 { name: "编辑", checked: true },
@@ -345,8 +325,6 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             ]
         },
     ])
-
-    options.hasIndex = operations.includes("序号")
 
     options.hasPager = operations.includes("分页")
 

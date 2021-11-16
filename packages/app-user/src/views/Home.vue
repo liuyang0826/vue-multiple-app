@@ -20,8 +20,7 @@ import { Dialog } from "element-ui"
 import DialogForm from "./DialogForm";
 import {
   pipe, useModalCtrl,
-  usePager,
-  useSearch
+  useTableCrud
 } from "../utils";
 
 const searchOptions = {
@@ -33,12 +32,12 @@ const searchOptions = {
       }, 1000);
     });
   },
+  hasPager: true,
   immediate: true
 };
 
 export default pipe(
-    useSearch(searchOptions),
-    usePager(),
+    useTableCrud(searchOptions),
     useModalCtrl({
       namespace: "add",
       afterHandler() {

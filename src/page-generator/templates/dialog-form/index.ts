@@ -236,7 +236,6 @@ export const configurator: IConfigurator<IDialogFormOptions> = async () => {
 
     result.components = components
 
-
     if (components.length) {
         const { width } = await inquirer.prompt([
             {
