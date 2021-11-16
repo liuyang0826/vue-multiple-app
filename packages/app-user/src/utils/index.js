@@ -123,6 +123,9 @@ export const useTableCrud = ({ doSearch, immediate, hasPager, hasSelection, rowK
       handleSizeChange (val) {
         this.pageSize = val;
         this.updateTable()
+      },
+      indexMethod (index) {
+        return this.pageSize * (this.pageNum -1) + index + 1;
       }
     }),
     hasSelection && useLifecycle("created", function () {

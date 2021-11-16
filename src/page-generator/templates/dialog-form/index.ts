@@ -34,12 +34,12 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-  <el-input type="<%inputType%>" v-model="form.<%prop%>"<%maxlength%>style="width: 240px;" />
+  <el-input type="<%inputType%>" v-model="form.<%prop%>" <%maxlength%> style="width: 240px;" placeholder="请输入" :rows="4" />
 </el-form-item>`
 
 const selectItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-  <el-select clearable v-model="form.<%prop%>" style="width: 240px;">
+  <el-select clearable v-model="form.<%prop%>" style="width: 240px;" placeholder="请选择">
     <el-option v-for="{ label, value } in <%prop%>Options" :key="value" :label="label" :value="value"  />
   </el-select>
 </el-form-item>`
@@ -56,6 +56,16 @@ const checkboxItemTemp = `
   <el-checkbox-group v-model="form.<%prop%>">
     <el-checkbox v-for="{ label, value } in <%prop%>Options" :key="value" :label="value">{{label}}</el-checkbox>
   </el-checkbox-group>
+</el-form-item>`
+
+const switchItemTemp = `
+<el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
+  <el-switch v-model="form.<%prop%>" :active-value="true" :inactive-value="false"></el-switch>
+</el-form-item>`
+
+const dateItemTemp = `
+<el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
+  <el-date-picker type="<%dateType%>" v-model="form.<%prop%>" style="width: 240px;" placeholder="请选择" :editable="false"></el-date-picker>
 </el-form-item>`
 
 interface IDialogFormOptions {
@@ -138,6 +148,18 @@ export const processTemplate: IProcessTemplate<IDialogFormOptions> = ({ name, op
                         labelWidth: 120,
                         ...item
                     }, 4)
+                }
+                if (item.type === "switch") {
+                    return injectTemplate(switchItemTemp, {
+                        labelWidth: 120,
+                        ...item
+                    })
+                }
+                if (item.type === "date") {
+                    return injectTemplate(dateItemTemp, {
+                        labelWidth: 120,
+                        ...item
+                    })
                 }
             }).join("\n") || " ",
             width,
@@ -266,7 +288,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 type: "list",
                 message: `类型:`,
                 name: "type",
-                choices: ["input", "select", "radio", "checkbox"],
+                choices: ["input", "select", "radio", "checkbox", "switch", "date"],
             },
             {
                 type: "input",
@@ -301,6 +323,13 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 name: `maxlength`,
                 default: 100,
                 when: (answer: any) => answer.type === "input" || answer.type === "textarea"
+            },
+            {   type: "list",
+                message: `date类型:`,
+                name: `dateType`,
+                choices: ["date", "datetime", "year", "month", "daterange", "datetimerange"],
+                default: "date",
+                when: (answer: any) => answer.type === "date"
             },
             {
                 type: "list",

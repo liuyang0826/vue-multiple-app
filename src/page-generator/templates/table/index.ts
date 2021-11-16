@@ -107,7 +107,6 @@ async handleMove(row, direction) {
 interface ITableOptions {
     formItems: any
     api: string
-    hasIndex: boolean
     tableCols: any
     hasPager: boolean
     deleteApi: string
@@ -124,7 +123,6 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
     const {
         formItems,
         api,
-        hasIndex,
         tableCols,
         hasPager,
         deleteApi,
@@ -151,8 +149,8 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
     if (type === IComponentTypeEnum.component) {
         hooks.unshift(
             `useProps({
-    data: Object
-  })`
+                data: Object
+            })`
         )
     }
 
@@ -234,7 +232,7 @@ export const processTemplate: IProcessTemplate<ITableOptions> = ({ name, options
             }),
             table: table({
                 tableCols,
-                hasIndex: hasIndex,
+                hasPager: hasPager,
                 hasUpdate: updateForm,
                 hasDelete: deleteApi,
                 hasToggleEnable: toggleEnableApi,
@@ -317,7 +315,6 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             message: "功能操作？",
             name: "operations",
             choices: [
-                { name: "序号", checked: true },
                 { name: "分页", checked: true },
                 { name: "新增", checked: true },
                 { name: "编辑", checked: true },
@@ -330,8 +327,6 @@ export const configurator: IConfigurator<ITableOptions> = async () => {
             ]
         },
     ])
-
-    options.hasIndex = operations.includes("序号")
 
     options.hasPager = operations.includes("分页")
 
@@ -454,7 +449,7 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 type: "list",
                 message: `类型:`,
                 name: "type",
-                choices: ["input", "select"],
+                choices: ["input", "select", "date"],
             },
             {
                 type: "input",
@@ -467,6 +462,13 @@ export async function promptFormItems({ prefix = "表单项", length = 0, requir
                 message: `prop(英文):`,
                 name: `prop`,
                 validate: propValidator,
+            },
+            {   type: "list",
+                message: `date类型:`,
+                name: `dateType`,
+                choices: ["date", "datetime", "year", "month", "daterange", "datetimerange"],
+                default: "date",
+                when: (answer: any) => answer.type === "date"
             },
             {
                 type: "list",
