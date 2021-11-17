@@ -4,5 +4,8 @@
   "version": "0.0.1",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {
+    "postcss": "^7.0.39"
   }
 }
