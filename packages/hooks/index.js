@@ -134,11 +134,17 @@ export const useTableCurd = ({ doSearch, immediate, hasPager, hasSelection, rowK
       selectionMap = {}
       selectionLen = 0
     }),
+    hasSelection && useData(function () {
+      return {
+        selections: []
+      }
+    }),
     hasSelection && useMethods({
       resetSelection(selectedRows) {
         selectionMap = selectedRows ? selectedRows.reduce((map, row) => ({...map, [row[rowKey]]: row}), {}) : {}
         selectionLen = this.tableData.filter(row => !!selectionMap[row[rowKey]]).length
-        onSelectionChange(selectionMap)
+        this.selections = Object.values(selectionMap)
+        onSelectionChange.call(this, selectionMap)
       },
       handleSelect(selection, row) {
         if (selectionLen < selection.length) {
@@ -146,7 +152,8 @@ export const useTableCurd = ({ doSearch, immediate, hasPager, hasSelection, rowK
         } else {
           delete selectionMap[row[rowKey]];
         }
-        onSelectionChange(selectionMap)
+        this.selections = Object.values(selectionMap)
+        onSelectionChange.call(this, selectionMap)
         selectionLen = selection.length;
       },
       handleSelectAll(selection) {
@@ -159,7 +166,8 @@ export const useTableCurd = ({ doSearch, immediate, hasPager, hasSelection, rowK
             delete selectionMap[row[rowKey]];
           });
         }
-        onSelectionChange(selectionMap)
+        this.selections = Object.values(selectionMap)
+        onSelectionChange.call(this, selectionMap)
         selectionLen = selection.length;
       }
     }),
