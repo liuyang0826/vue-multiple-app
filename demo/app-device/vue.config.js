@@ -1,0 +1,6 @@
+const withMultipleApp = require("@cisdiliuyang/vue-multiple-app/with-multiple-app")
+
+module.exports = withMultipleApp({
+    name: "app_device",
+    port: 8081
+})()

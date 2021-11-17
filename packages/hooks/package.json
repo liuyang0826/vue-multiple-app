@@ -1,0 +1,8 @@
+{
+  "name": "@cisdiliuyang/hooks",
+  "author": "liuyang<1161906592@qq.com>",
+  "version": "0.0.1",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}
