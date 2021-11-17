@@ -12,6 +12,7 @@ export const useLifecycle = (lifecycle, fn) => options => {
   return options;
 };
 
+
 export const useData = (data) => options => {
   const origin = options.data;
   options.data = function () {

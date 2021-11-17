@@ -17,5 +17,5 @@ module.exports = {
             })
         }
     },
-    transpileDependencies: [/(node_modules\/)?@cisdiliuyang\/.*/]
+    transpileDependencies: [/node_modules\/@cisdiliuyang\/.*/]
 }

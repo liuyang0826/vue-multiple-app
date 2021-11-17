@@ -1,57 +1,18 @@
 <template>
   <div class="home">
-    {{ searchLoading }}
     <el-form>
       <el-form-item label=""></el-form-item>
     </el-form>
     <button @click="handleSearch">点击</button>
     <button @click="handleAdd">新增</button>
     <div>212</div>
-    <el-dialog :visible.sync="addVisible" title="dsadsa">
-      <dialog-form :visible="addVisible" :data="addForm" />
-    </el-dialog>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
-import { Dialog } from "element-ui"
-import DialogForm from "./DialogForm";
-import {
-  pipe, useModalCtrl,
-  useTableCurd
-} from "../utils";
 
-const searchOptions = {
-  getTableData () {
-    console.log("getTableData", this);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1000);
-    });
-  },
-  hasPager: true,
-  immediate: true
-};
-
-export default pipe(
-    useTableCurd(searchOptions),
-    useModalCtrl({
-      namespace: "add",
-      afterHandler() {
-        console.log(this, arguments);
-      }
-    }),
-    useModalCtrl({ namespace: "edit" }),
-)({
+export default {
   name: "Home",
-  components: {
-    HelloWorld,
-    ElDialog: Dialog,
-    DialogForm,
-  },
   created () {
     console.log(this);
   },
@@ -60,7 +21,7 @@ export default pipe(
       console.log(1);
     }
   }
-});
+};
 </script>
 
 <style scoped>
