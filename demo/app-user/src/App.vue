@@ -10,11 +10,7 @@
 
 <style>
 .contanier {
-  width: 100%;
-  padding: 20px;
-  background: #fff;
-  min-height: calc(100vh - 120px);
-  box-sizing: border-box;
+  padding: 12px;
   border-radius: 4px;
 }
 #nav {

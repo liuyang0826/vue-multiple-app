@@ -1,11 +1,18 @@
 <template>
   <div id="app">
-    <button type="button" v-for="(item, index) in routes" :key="index" @click="handleClick(item)">
-      {{item.text}}
-    </button>
-    <div>{{$store.state.count}}</div>
-    <div>----{{ ($store.state["app_device"] || []).deviceList }}----</div>
-    <router-view />
+    <header class="header">
+    </header>
+    <aside class="aside">
+      <div class="logo">FAST - CURD</div>
+      <ul>
+        <li v-for="(item, index) in routes" :key="index" @click="handleClick(item)">
+          {{item.text}}
+        </li>
+      </ul>
+    </aside>
+    <main class="main">
+      <router-view />
+    </main>
   </div>
 </template>
 
@@ -18,11 +25,7 @@ export default {
     return {
       routes: [
         {
-          text: "home",
-          to: "/",
-        },
-        {
-          text: "user",
+          text: "测试页面",
           to: "/user/home",
         },
         {
@@ -61,12 +64,50 @@ export default {
 </script>
 
 <style>
-html, body, div, p, ol, ul, li {
+*, *:before, *:after {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 body {
-  padding: 20px;
-  background: #f0f0f0;
+  background-color: #f7f8fc;
+  padding: 66px 12px 12px 252px;
+}
+</style>
+
+<style scoped>
+.header {
+  position: fixed;
+  left: 240px;
+  top: 0;
+  right: 0;
+  height: 66px;
+  background: #fff;
+  z-index: 999;
+}
+
+.logo {
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.aside {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  z-index: 999;
+  background: #fff;
+}
+.main {
+  background: #fff;
+  margin-top: 12px;
+  min-height: calc(100vh - 90px);
+  border-radius: 4px;
 }
 </style>

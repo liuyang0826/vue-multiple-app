@@ -52,10 +52,13 @@ const remoteLoader = async ({ entry, name }) => {
 
 const loadable = ({ name, entry }) => {
   return {
-    render() {},
+    render(h) {
+      return h("div")
+    },
     async mounted () {
+      console.log(1111, this.$router);
       const unmount = (await (typeof entry === "function" ? entry() : remoteLoader({ name, entry }))).default({
-        root: this.$root.$el,
+        root: this.$el,
         store: this.$store,
         Vue: this.$root.constructor,
         VueRouter: this.$router.constructor,
