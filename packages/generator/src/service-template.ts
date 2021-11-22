@@ -1,7 +1,7 @@
 import { injectTemplate } from "./utils"
 const template =
-`//import http from "@http"
-const http = () => {}
+`import http from "@/http"
+// const http = () => {}
 
 <%template%>`
 

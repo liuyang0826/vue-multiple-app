@@ -2,7 +2,7 @@ import { injectTemplate } from "../../utils"
 
 const template = `
 <el-pagination
-  style="margin-top: 16px;text-align: right;"
+  style="margin-top: 12px;text-align: right;"
   small
   background
   layout="total, prev, pager, next, jumper"
