@@ -19,4 +19,10 @@
 .table-tool {
   margin-bottom: 20px;
 }
+.tree-content {
+  width: 320px;
+}
+.tree-wrap {
+  padding-top: 16px;
+}
 </style>

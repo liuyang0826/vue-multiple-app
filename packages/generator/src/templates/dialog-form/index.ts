@@ -34,7 +34,7 @@ const template = `
 
 const inputItemTemp = `
 <el-form-item label="<%label%>" prop="<%prop%>" label-width="<%labelWidth%>px">
-  <el-input type="<%inputType%>" v-model="form.<%prop%>" <%maxlength%> style="width: 240px;" placeholder="请输入" :rows="4" />
+  <el-input type="<%inputType%>" v-model="form.<%prop%>" <%maxlength%> style="width: 240px;" placeholder="请输入" :rows="4" show-word-limit />
 </el-form-item>`
 
 const selectItemTemp = `

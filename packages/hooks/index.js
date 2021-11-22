@@ -296,3 +296,33 @@ export const useModal = ({ onShow, formRules, doSubmit } = {}) => {
       })
   );
 };
+
+export const useTreeCurd = ({ doSearch, immediate, doDelete } = {}) => {
+  return pipe(
+    useData(function () {
+      return {
+        keywords: "",
+        treeData: []
+      }
+    }),
+    useMethods({
+      async handleSearch () {
+        await doSearch.call(this)
+      }
+    }),
+    immediate && useLifecycle("created", function () {
+      this.handleSearch();
+    }),
+    doDelete && useMethods({
+      handleDelete(...args) {
+        this.$confirm("确认删除？", "提示", {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          doDelete.call(this, ...args)
+        })
+      }
+    })
+  );
+};

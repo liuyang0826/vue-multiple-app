@@ -10,7 +10,7 @@ import {getTemplateById, getTemplates} from "../../scanner";
 export const templateId = "tabs"
 
 const template = `
-<el-tabs v-model="activeName" @tab-click="handleClick">
+<el-tabs v-model="activeName" @tab-click="handleClick" type="<%type%>">
   <%tabPanes%>
 </el-tabs>
 `
@@ -21,6 +21,7 @@ const tabPaneTemplate = `
 </el-tab-pane>`
 
 interface ITabsOptions {
+    type: string,
     tabPanes: {
         label: string
         name: string
@@ -29,7 +30,7 @@ interface ITabsOptions {
 }
 
 export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options, components }) => {
-    const { tabPanes } = options
+    const { type, tabPanes } = options
 
     const hooks: string[] = [
         `useData(function() {
@@ -57,6 +58,7 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
     return {
         name,
         template: injectTemplate(template, {
+            type,
             tabPanes: tabPanes.map((item, index) => {
                 return injectTemplate(tabPaneTemplate, {
                     ...item,
@@ -75,16 +77,24 @@ export const processTemplate: IProcessTemplate<ITabsOptions> = ({ name, options,
 export const configurator: IConfigurator<ITabsOptions> = async () => {
     const result = await basePrompt<ITabsOptions>({ templateId: "tabs" })
 
-    const { count } = await inquirer.prompt([
+    const { type, count } = await inquirer.prompt([
+        {
+            type: "list",
+            message: `tab风格类型:`,
+            name: "type",
+            default: "",
+            choices: ["card", "border-card"],
+        },
         {
             type: "number",
             message: "tab个数:",
             name: "count",
             default: 2
-        },
+        }
     ])
 
     const options: ITabsOptions = {
+        type,
         tabPanes: []
     }
 

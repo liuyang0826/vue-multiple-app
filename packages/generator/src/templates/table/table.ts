@@ -13,7 +13,7 @@ const tableColTemp = `
 <el-table-column label="<%label%>" prop="<%prop%>" />`
 
 const operationColTemp = `
-<el-table-column label="操作" width="<%width%>">
+<el-table-column label="操作" width="<%width%>" fixed="right">
   <template slot-scope="{row}">
     <%operations%>
   </template>
