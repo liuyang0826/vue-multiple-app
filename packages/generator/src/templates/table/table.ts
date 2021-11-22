@@ -1,7 +1,7 @@
 import { injectTemplate } from "../../utils"
 
 const template = `
-<el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="searchLoading"<%selectEvents%>>
+<el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="searchLoading"<%selectEvents%> height="calc(100vh - 210px)">
   <%selection%>
   <%orderIndex%>
   <%tableCols%>

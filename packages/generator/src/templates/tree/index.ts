@@ -103,7 +103,7 @@ export const configurator: IConfigurator<ITreeOptions> = async () => {
       },
       {
         type: "confirm",
-        message: `是否必填:`,
+        message: `是否支持搜索:`,
         name: `required`,
         default: true
       },
@@ -121,20 +121,13 @@ export const configurator: IConfigurator<ITreeOptions> = async () => {
 }
 
 
-export const injectParent: IInjectParent = ({ namespace }) => {
-  const hooks: string[] = [
-      `useData(function() {
-  return {
-    ${namespace}TreeData: {}
-  },
-})`
-]
+export const injectParent: IInjectParent = () => {
+  const hooks: string[] = []
 
-  const props = [ `:data="${namespace}TreeData"` ]
+  const props: any[] = []
 
   return {
       hooks,
       props,
   }
 }
-

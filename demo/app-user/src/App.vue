@@ -15,8 +15,10 @@
 }
 .tree-content {
   width: 320px;
+  padding: 0 16px;
+  margin-right: 10px;
 }
-.tree-wrap {
-  padding-top: 16px;
+.tree-inp {
+  margin-bottom: 12px;
 }
 </style>

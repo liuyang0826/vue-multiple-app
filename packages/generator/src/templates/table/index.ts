@@ -22,16 +22,18 @@ import {makeComponentCode} from "../../vue-template";
 export const templateId = "table"
 
 const template = `
-<div style="padding: 12px;">
-  <div style="display:flex;">
-    <%searchForm%>
-    <%handleButton%>
-  </div>
-  <%table%>
-  <%pagination%>
-  <%addForm%>
-  <%updateForm%>
+<div style="display: flex;padding: 16px;">
   <%components%>
+  <div style="flex:auto">
+    <div style="display:flex;">
+        <%searchForm%>
+        <%handleButton%>
+    </div>
+    <%table%>
+    <%pagination%>
+    <%addForm%>
+    <%updateForm%>
+  </div>
 </div>
 `
 
