@@ -71,7 +71,10 @@ export default {
 }
 body {
   background-color: #f7f8fc;
-  padding: 66px 12px 12px 252px;
+  padding: 56px 12px 12px 252px;
+}
+.el-table-column--selection .cell {
+  padding-right: 10px!important;
 }
 </style>
 
@@ -81,7 +84,7 @@ body {
   left: 240px;
   top: 0;
   right: 0;
-  height: 66px;
+  height: 56px;
   background: #fff;
   z-index: 999;
 }
@@ -102,12 +105,23 @@ body {
   bottom: 0;
   width: 240px;
   z-index: 999;
-  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
+  background-color: #415480;
+  color: #fff;
 }
+li {
+  line-height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+li:hover {
+  background-color: #303a65;
+}
+
 .main {
   background: #fff;
   margin-top: 12px;
-  min-height: calc(100vh - 90px);
+  min-height: calc(100vh - 80px);
   border-radius: 4px;
 }
 </style>

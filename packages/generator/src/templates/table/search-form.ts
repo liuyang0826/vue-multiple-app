@@ -1,7 +1,7 @@
 import { injectTemplate } from "../../utils"
 
 const template = `
-<el-form size="small" inline>
+<el-form size="mini" inline style="flex: 1;">
   <%formItems%>
   <el-form-item>
     <el-button @click="handleSearch" type="primary">查询</el-button>

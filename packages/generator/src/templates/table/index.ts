@@ -22,8 +22,8 @@ import {makeComponentCode} from "../../vue-template";
 export const templateId = "table"
 
 const template = `
-<div>
-  <div>
+<div style="padding: 12px;">
+  <div style="display:flex;">
     <%searchForm%>
     <%handleButton%>
   </div>
@@ -44,7 +44,8 @@ useTableCurd({
       pageNum: this.pageNum
     })
     if (status) {
-      this.tableData = data
+      this.tableData = data.list
+      this.total = data.total
     } else {
       this.$message.error(message)
     }

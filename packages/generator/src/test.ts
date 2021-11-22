@@ -9,15 +9,19 @@ writeFile({
     "options": {
         "tableCols": [
             {
-                "label": "name",
+                "label": "姓名",
                 "prop": "name"
+            },
+            {
+                "label": "性别",
+                "prop": "sex"
             }
         ],
-        "api": "sass",
+        "api": "/api/pageList",
         "formItems": [
             {
                 "type": "input",
-                "label": "name",
+                "label": "用户名",
                 "prop": "name"
             },
         ],
