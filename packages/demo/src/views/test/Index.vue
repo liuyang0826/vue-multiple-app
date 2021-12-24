@@ -7,6 +7,14 @@
     </div>
     <el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="pending" ref="tableRef">
       <el-table-column type="index" label="序号" width="55" align="center" :index="indexMethod" />
+      <el-table-column label="操作" width="176">
+        <template #default="{ row }">
+          <el-button size="small" type="text" @click="handleToggleEnable(row)">
+            {{ row.enable ? '禁用' : '启用' }}
+          </el-button>
+          <el-divider direction="vertical" />
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       style="margin-top: 16px; text-align: right"
@@ -80,6 +88,16 @@ function handleAdd() {
   add.visible = true
   add.data = {}
   add.title = ''
+}
+// 启用禁用
+async function handleToggleEnable(row) {
+  const { status, message } = await doToggleEnable(row.id)
+  if (status) {
+    ElMessage.success('操作成功')
+    updateTable()
+  } else {
+    ElMessage.error(message)
+  }
 }
 </script>
 

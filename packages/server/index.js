@@ -10,6 +10,7 @@ const cors = require('koa2-cors');
 const {firstToUpperCase, split} = require("./utils")
 const parseDefaultFunction = require("./filters/parse-default-function")
 const some = require("./filters/some")
+const autoFormWidth = require("./filters/auto-form-width")
 
 artTemplate(app, {
     root: path.resolve('templates'),
@@ -23,6 +24,7 @@ template.defaults.imports.firstToUpperCase = firstToUpperCase
 template.defaults.imports.split = split
 template.defaults.imports.parseDefaultFunction = parseDefaultFunction
 template.defaults.imports.some = some
+template.defaults.imports.autoFormWidth = autoFormWidth
 
 app.use(cors({
     allowHeaders: ["*"],

@@ -1,7 +1,6 @@
 const router = new (require("koa-router"))
 const schemaServices = require("../services/schema")
 const {firstToUpperCase} = require("../utils")
-const autoFormWidth = require("../utils/auto-form-width")
 
 router.post("/submit", async (ctx, next) => {
     console.log(JSON.stringify(ctx.request.body))
@@ -17,8 +16,7 @@ router.post("/submit", async (ctx, next) => {
             const addForm = data.addForm
             await ctx.create("dialog-form", {
                 ...addForm,
-                apiName: "add",
-                dialogWidth: autoFormWidth(addForm.formItems),
+                apiName: "add"
             }, {
                 type: "vue",
                 path: "test/components/AddForm.vue"
@@ -29,8 +27,7 @@ router.post("/submit", async (ctx, next) => {
             const updateForm = data.updateForm
             await ctx.create("dialog-form", {
                 ...updateForm,
-                apiName: "update",
-                dialogWidth: autoFormWidth(updateForm.formItems),
+                apiName: "update"
             }, {
                 type: "vue",
                 path: "test/components/UpdateForm.vue"

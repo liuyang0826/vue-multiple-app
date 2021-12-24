@@ -1,8 +1,8 @@
 <template>
-    <el-dialog :model-value="modelValue" :title="title" @update:modelValue="$emit('update:modelValue', $event)" width="<%= dialogWidth %>px" append-to-body :close-on-click-modal="false">
+    <el-dialog :model-value="modelValue" :title="title" @update:modelValue="$emit('update:modelValue', $event)" width="<%= $imports.autoFormWidth(formItems).dialogWidth %>px" append-to-body :close-on-click-modal="false">
         <el-form :model="form" size="small" inline :rules="rules" ref="formRef" style="margin-right: -10px;">
-            <% formItems.forEach(function(item){ %>
-                <el-form-item label="<%= item.label %>：" prop="<%= item.prop %>" label-width="<%= item.labelWidth %>px">
+            <% formItems.forEach(function(item, index){ %>
+                <el-form-item label="<%= item.label %>：" prop="<%= item.prop %>" label-width="<%= $imports.autoFormWidth(formItems).labelWidth[index] %>px">
                     <% if (item.tips) { %>
                         <template #label>
                             <div style="display: inline-flex;align-items: center;">
@@ -16,7 +16,7 @@
                             </div>
                         </template>
                     <% } %>
-                    <el-input clearable v-model="form.<%= item.prop %>" placeholder="请输入<%= item.label %>" style="width: <%= item.itemWidth %>px;" />
+                    <el-input clearable v-model="form.<%= item.prop %>" placeholder="请输入<%= item.label %>" style="width: <%= $imports.autoFormWidth(formItems).itemWidth %>px;" />
                 </el-form-item>
             <% }) %>
         </el-form>
@@ -72,7 +72,7 @@
                 try {
                     const { status, message } = await <%= apiName %>(
                         <% if (paramsTransform) { %>paramsTransform(<% } %>
-                        form
+                            form
                         <% if (paramsTransform) { %>)<% } %>
                     )
                     if (status) {

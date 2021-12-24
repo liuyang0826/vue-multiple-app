@@ -5,3 +5,7 @@ export const getTableData = async params => {
 export const add = async params => {
   return await http.post('', params)
 }
+
+export const doToggleEnable = async params => {
+  return await http.post('', params)
+}

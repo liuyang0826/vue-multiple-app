@@ -60,7 +60,9 @@
                             <el-divider direction="vertical"/>
                         <% } %>
                         <% if (hasToggleEnable) { %>
-                            <el-button size="small" type="text" @click="handleToggleEnable(row)">{{ row.<%= enableProp %> ? "禁用" : "启用" }}</el-button>
+                            <el-button size="small" type="text" @click="handleToggleEnable(row)">
+                                {{ row.<%= enableProp %> ? "禁用" : "启用" }}
+                            </el-button>
                             <el-divider direction="vertical"/>
                         <% } %>
                         <% if (hasMove) { %>
