@@ -1,0 +1,27 @@
+{
+  "name": "vite-crud",
+  "version": "0.0.0",
+  "scripts": {
+    "demo-dev": "vite --port 5002",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@babel/core": "^7.16.5",
+    "@element-plus/icons-vue": "^0.2.4",
+    "codemirror": "^5.65.0",
+    "ejs": "^3.1.6",
+    "element-plus": "^1.2.0-beta.6",
+    "magic-string": "^0.25.7",
+    "prettier": "^2.5.1",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.12"
+  },
+  "devDependencies": {
+    "@types/codemirror": "^5.60.5",
+    "@vitejs/plugin-vue": "^2.0.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2",
+    "vue-tsc": "^0.29.8"
+  }
+}
