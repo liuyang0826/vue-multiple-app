@@ -35,22 +35,32 @@ router.post("/submit", async (ctx, next) => {
                 data.hasAdd && {
                     name: "add",
                     method: "post",
-                    api: "/api/add",
+                    api: data.addForm.api,
                 },
                 data.hasUpdate && {
                     name: "update",
                     method: "post",
-                    api: "/api/update",
+                    api: data.updateForm.api,
                 },
                 data.hasDelete && {
-                    name: "deleteItem",
+                    name: "doDelete",
                     method: "post",
-                    api: "/api/delete",
+                    api: data.deleteApi,
                 },
                 data.hasBatchDelete && {
-                    name: "deleteBatch",
+                    name: "doBatchDelete",
                     method: "post",
-                    api: "/api/deleteBatch",
+                    api: data.batchDeleteApi,
+                },
+                data.hasToggleEnable && {
+                    name: "doToggleEnable",
+                    method: "post",
+                    api: data.toggleEnableApi,
+                },
+                data.hasMove && {
+                    name: "doMove",
+                    method: "post",
+                    api: data.moveApi,
                 },
                 ...data.searchItems.filter(d => d.type === "select" && d.optionType === "api").map((item) => {
                   return {

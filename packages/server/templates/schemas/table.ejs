@@ -172,14 +172,14 @@ export default function({
         },
         {
             type: "switch",
-            prop: "hasToggle",
+            prop: "hasToggleEnable",
             label: "启用禁用",
             effect({model, schemas}) {
-                if (model.hasToggle) {
+                if (model.hasToggleEnable) {
                     return [
                         {
                             type: "text",
-                            prop: "toggleApi",
+                            prop: "toggleEnableApi",
                             label: "接口地址"
                         }
                     ]

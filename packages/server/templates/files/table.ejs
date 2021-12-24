@@ -102,10 +102,16 @@
     import {
         getTableData,
     <% if (hasDelete) { %>
-        deleteItem,
+        doDelete,
     <% } %>
     <% if (hasBatchDelete) { %>
-        deleteBatch,
+        doBatchDelete,
+    <% } %>
+    <% if (hasToggle) { %>
+        doToggle,
+    <% } %>
+    <% if (hasMove) { %>
+        doMove,
     <% } %>
     <% searchItems.forEach(function(item){ %>
         <% if (item.type === "select" && item.optionType === "api") { %>
@@ -273,8 +279,14 @@
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning',
-        }).then(() => {
-
+        }).then(async () => {
+            const { status, message } = await doDelete(row.id)
+            if (status) {
+                ElMessage.success("操作成功")
+                updateTable()
+            } else {
+                ElMessage.error(message)
+            }
         })
     }
     <% } %>
@@ -314,9 +326,41 @@
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning',
-        }).then(() => {
-
+        }).then(async () => {
+            const { status, message } = await doBatchDelete(row.id)
+            if (status) {
+                ElMessage.success("操作成功")
+                updateTable()
+            } else {
+                ElMessage.error(message)
+            }
         })
+    }
+    <% } %>
+
+    <% if (hasToggleEnable) { %>
+    // 启用禁用
+    async function handleToggle(row) {
+        const { status, message } = await doToggleEnable(row.id)
+        if (status) {
+            ElMessage.success("操作成功")
+            updateTable()
+        } else {
+            ElMessage.error(message)
+        }
+    }
+    <% } %>
+
+    <% if (hasMove) { %>
+    // 上移下移
+    async function handleMove(row) {
+        const { status, message } = await doMove(row.id)
+        if (status) {
+            ElMessage.success("操作成功")
+            updateTable()
+        } else {
+            ElMessage.error(message)
+        }
     }
     <% } %>
 
