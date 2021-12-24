@@ -38,11 +38,13 @@ export function add(item: IFormItem) {
                 formItems: [],
                 schemas: schema.schemas,
                 model: newModel,
-                path: [...context.path, prop, item.context.model[item.prop].length]
+                path: [...context.path, prop, context.model[prop].length]
             }
             schema.context = newContext
             mapFormItems(newContext)
+        } else {
+            newModel[schema.prop] = schema.default
         }
     })
-    item.context.model[prop].push(newModel)
+    context.model[prop].push(newModel)
 }

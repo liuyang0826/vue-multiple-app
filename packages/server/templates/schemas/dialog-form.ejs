@@ -8,14 +8,16 @@
             schemas: [
                 {type: "text", prop: "label", label: "字段名",},
                 {type: "text", prop: "prop", label: "后端字段",},
-                {type: "switch", prop: "required", label: "必填", width: 80},
+                {type: "switch", prop: "required", label: "必填", width: 60, default: true},
+                {type: "text", prop: "tips", label: "提示内容",},
+                {type: "text", prop: "append", label: "后置内容",},
             ],
         },
         {type: "text", prop: "api", label: "接口地址",},
         {
             type: "code",
             prop: "paramsTransform",
-            label: "参数转换器",
+            label: "参数格式化",
             tips: `
 <div style="line-height: 20px;">
 <p>自定义一个用于转换保存数据的方法，默认会原样提交整个form对象。</p>

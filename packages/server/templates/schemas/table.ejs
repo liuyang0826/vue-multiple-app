@@ -10,9 +10,9 @@
                 {type: "text", prop: "width", label: "列宽",},
                 {
                     type: "code",
-                    label: "数据格式化",
+                    label: "格式化",
                     prop: "formatter",
-                    width: 90,
+                    width: 60,
                     tips: `
 <div style="line-height: 20px;">
 <p>自定义一个用于格式化数据的方法，默认直接展示该字段原始值。</p>
@@ -40,6 +40,7 @@ export default function(row) {
                     type: "select",
                     prop: "type",
                     label: "类型",
+                    default: "text",
                     options: [
                         { label: "文本", value: "text" },
                         { label: "下拉框", value: "select" },
@@ -47,7 +48,6 @@ export default function(row) {
                 },
                 {
                     type: "list",
-                    prop: "options",
                     label: "选项",
                     width: 60,
                     schemas: [
@@ -55,6 +55,7 @@ export default function(row) {
                             type: "radio",
                             prop: "optionType",
                             label: "类型",
+                            default: "fixed",
                             options: [
                                 { label: "固定项", value: "fixed" },
                                 { label: "接口", value: "api" },
@@ -63,7 +64,7 @@ export default function(row) {
                                 if (model.optionType === "api") {
                                     return [
                                         { type: "text",  prop: "api", label: "接口地址", },
-                                        { type: "text",  prop: "depProp", label: "关联props", placeholder: "逗号分割，当这些字段有值时才调接口" }
+                                        { type: "text",  prop: "depProp", label: "关联后端字段", placeholder: "逗号分割，当这些字段有值时才调接口" }
                                     ]
                                 } else {
                                     return [
@@ -177,6 +178,11 @@ export default function({
             effect({model, schemas}) {
                 if (model.hasToggleEnable) {
                     return [
+                        {
+                            type: "text",
+                            prop: "enableProp",
+                            label: "字段"
+                        },
                         {
                             type: "text",
                             prop: "toggleEnableApi",

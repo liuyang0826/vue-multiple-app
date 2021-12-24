@@ -33,7 +33,7 @@ const rules = reactive({})
 const context = reactive({
   formItems: [],
   schemas: [],
-  model: {},
+  model: JSON.parse(`{"tableCols":[],"searchItems":[],"hasAdd":true,"hasIndex":true,"hasPagination":true,"addForm":{"formItems":[{"label":"用户名","prop":"name","required":true,"tips":"用户名用户名用户名用户名用户名"}]}}`),
   path: []
 })
 

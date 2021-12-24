@@ -1,9 +1,22 @@
 <template>
-    <el-dialog :model-value="modelValue" :title="title" @update:modelValue="$emit('update:modelValue', $event)" width="732px" append-to-body :close-on-click-modal="false">
-        <el-form :model="form" size="small" inline :rules="rules" ref="formRef">
+    <el-dialog :model-value="modelValue" :title="title" @update:modelValue="$emit('update:modelValue', $event)" width="<%= dialogWidth %>px" append-to-body :close-on-click-modal="false">
+        <el-form :model="form" size="small" inline :rules="rules" ref="formRef" style="margin-right: -10px;">
             <% formItems.forEach(function(item){ %>
-                <el-form-item label="<%= item.label %>"  prop="<%= item.prop %>">
-                    <el-input clearable v-model="form.<%= item.prop %>" placeholder="请输入" />
+                <el-form-item label="<%= item.label %>：" prop="<%= item.prop %>" label-width="<%= item.labelWidth %>px">
+                    <% if (item.tips) { %>
+                        <template #label>
+                            <div style="display: inline-flex;align-items: center;">
+                                <%= item.label %>
+                                <el-tooltip style="margin-left: 2px;" content="<%= item.tips %>" placement="top">
+                                    <el-icon size="mini">
+                                        <Warning />
+                                    </el-icon>
+                                </el-tooltip>
+                                ：
+                            </div>
+                        </template>
+                    <% } %>
+                    <el-input clearable v-model="form.<%= item.prop %>" placeholder="请输入<%= item.label %>" style="width: <%= item.itemWidth %>px;" />
                 </el-form-item>
             <% }) %>
         </el-form>
@@ -15,9 +28,12 @@
 </template>
 
 <script setup>
-    import { watch } from "vue"
+    import { watch, nextTick } from "vue"
     import { <%= apiName %> } from "../services"
     import { ElMessage } from 'element-plus'
+    <% if ($imports.some(formItems, d => d.tips)) { %>
+    import { Warning } from "@element-plus/icons-vue"
+    <% } %>
     const props = defineProps({
         modelValue: Boolean,
         title: String,
@@ -33,14 +49,15 @@
         <% } %>
         <% }) %>
     }
-    watch(props.modelValue, (visible) => {
-      if (visible) {
-          loading = false
-          form = JSON.parse(JSON.stringify(data))
-          formRef.clearValidate()
-      }
-    }, {
-        immediate: true
+    watch(() => props.modelValue, (visible) => {
+        if (visible) {
+            return
+        }
+        nextTick(() => {
+            loading = false
+            form = JSON.parse(JSON.stringify(props.data))
+            formRef.clearValidate()
+        })
     })
 
     <% if (paramsTransform) { %>
@@ -54,7 +71,7 @@
                 loading = true
                 try {
                     const { status, message } = await <%= apiName %>(
-                        <% if (!paramsTransform) { %>paramsTransform(<% } %>
+                        <% if (paramsTransform) { %>paramsTransform(<% } %>
                         form
                         <% if (paramsTransform) { %>)<% } %>
                     )

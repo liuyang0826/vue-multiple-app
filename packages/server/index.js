@@ -9,6 +9,7 @@ const bodyParser = require('koa-bodyparser');
 const cors = require('koa2-cors');
 const {firstToUpperCase, split} = require("./utils")
 const parseDefaultFunction = require("./filters/parse-default-function")
+const some = require("./filters/some")
 
 artTemplate(app, {
     root: path.resolve('templates'),
@@ -21,6 +22,7 @@ template.defaults.rules.pop()
 template.defaults.imports.firstToUpperCase = firstToUpperCase
 template.defaults.imports.split = split
 template.defaults.imports.parseDefaultFunction = parseDefaultFunction
+template.defaults.imports.some = some
 
 app.use(cors({
     allowHeaders: ["*"],

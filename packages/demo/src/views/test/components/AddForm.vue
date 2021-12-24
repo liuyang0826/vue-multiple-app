@@ -3,11 +3,26 @@
     :model-value="modelValue"
     :title="title"
     @update:modelValue="$emit('update:modelValue', $event)"
-    width="732px"
+    width="396px"
     append-to-body
     :close-on-click-modal="false"
   >
-    <el-form :model="form" size="small" inline :rules="rules" ref="formRef"> </el-form>
+    <el-form :model="form" size="small" inline :rules="rules" ref="formRef" style="margin-right: -10px">
+      <el-form-item label="用户名：" prop="name" label-width="96px">
+        <template #label>
+          <div style="display: inline-flex; align-items: center">
+            用户名
+            <el-tooltip style="margin-left: 2px" content="用户名用户名用户名用户名用户名" placement="top">
+              <el-icon size="mini">
+                <Warning />
+              </el-icon>
+            </el-tooltip>
+            ：
+          </div>
+        </template>
+        <el-input clearable v-model="form.name" placeholder="请输入用户名" style="width: 260px" />
+      </el-form-item>
+    </el-form>
     <template #footer>
       <el-button size="small" @click="$emit('update:modelValue', false)">取消</el-button>
       <el-button size="small" type="primary" :loading="loading" @click="handleSubmit">确定</el-button>
@@ -16,9 +31,10 @@
 </template>
 
 <script setup>
-import { watch } from 'vue'
+import { watch, nextTick } from 'vue'
 import { add } from '../services'
 import { ElMessage } from 'element-plus'
+import { Warning } from '@element-plus/icons-vue'
 const props = defineProps({
   modelValue: Boolean,
   title: String,
@@ -27,33 +43,28 @@ const props = defineProps({
 let form = $ref({})
 let loading = $ref(false)
 let formRef = $ref()
-let rules = {}
+let rules = {
+  name: { required: true, message: '请输入用户名', trigger: ['change', 'blur'] }
+}
 watch(
-  props.modelValue,
+  () => props.modelValue,
   visible => {
     if (visible) {
-      loading = false
-      form = JSON.parse(JSON.stringify(data))
-      formRef.clearValidate()
+      return
     }
-  },
-  {
-    immediate: true
+    nextTick(() => {
+      loading = false
+      form = JSON.parse(JSON.stringify(props.data))
+      formRef.clearValidate()
+    })
   }
 )
-// 转换表单数据
-function paramsTransform(form) {
-  return {
-    realName: form.name,
-    price: form.price * 100
-  }
-}
 function handleSubmit() {
   formRef.validate(async flag => {
     if (flag) {
       loading = true
       try {
-        const { status, message } = await add(paramsTransform(form))
+        const { status, message } = await add(form)
         if (status) {
           ElMessage.success('操作成功')
         } else {

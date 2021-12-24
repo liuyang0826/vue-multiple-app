@@ -24,7 +24,7 @@
             v-for="subItem in item.schemas"
             :label="subItem.label"
             :width="subItem.width"
-            :min-width="subItem.width || 0"
+            :min-width="subItem.width || 160"
             :align="['list', 'code', 'more'].includes(subItem.type) ? 'center' : 'left'"
         >
           <template v-slot:default="{ row, $index }">

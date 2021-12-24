@@ -1,9 +1,10 @@
 const router = new (require("koa-router"))
 const schemaServices = require("../services/schema")
 const {firstToUpperCase} = require("../utils")
+const autoFormWidth = require("../utils/auto-form-width")
 
 router.post("/submit", async (ctx, next) => {
-    console.log(ctx.request.body)
+    console.log(JSON.stringify(ctx.request.body))
     const data = ctx.request.body
     try {
         ctx.status = 200
@@ -11,20 +12,30 @@ router.post("/submit", async (ctx, next) => {
             type: "vue",
             path: "test/Index.vue"
         })
-        data.hasAdd && await ctx.create("dialog-form", {
-            ...data.addForm,
-            apiName: "add",
-        }, {
-            type: "vue",
-            path: "test/components/AddForm.vue"
-        })
-        data.hasUpdate && await ctx.create("dialog-form", {
-            ...data.updateForm,
-            apiName: "update",
-        }, {
-            type: "vue",
-            path: "test/components/UpdateForm.vue"
-        })
+
+        if (data.hasAdd) {
+            const addForm = data.addForm
+            await ctx.create("dialog-form", {
+                ...addForm,
+                apiName: "add",
+                dialogWidth: autoFormWidth(addForm.formItems),
+            }, {
+                type: "vue",
+                path: "test/components/AddForm.vue"
+            })
+        }
+
+        if (data.hasUpdate) {
+            const updateForm = data.updateForm
+            await ctx.create("dialog-form", {
+                ...updateForm,
+                apiName: "update",
+                dialogWidth: autoFormWidth(updateForm.formItems),
+            }, {
+                type: "vue",
+                path: "test/components/UpdateForm.vue"
+            })
+        }
         await ctx.create("service", {
             services: [
                 {
