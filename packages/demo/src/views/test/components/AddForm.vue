@@ -29,6 +29,7 @@
     </template>
   </el-dialog>
 </template>
+
 <script setup>
 import { watch, nextTick } from 'vue'
 import { add } from '../services'

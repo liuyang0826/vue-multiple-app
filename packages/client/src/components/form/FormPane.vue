@@ -10,6 +10,7 @@
         :placeholder="item.placeholder"
         :prepend="item.prepend"
         :tips="item.tips"
+        :dialog-width="item.dialogWidth"
         @change="mapFormItems(item.context)"
     />
     <div v-else style="margin-bottom: 18px;">
@@ -39,6 +40,7 @@
                 :placeholder="subItem.placeholder"
                 :prepend="subItem.prepend"
                 :tips="subItem.tips"
+                :dialog-width="subItem.dialogWidth"
                 @change="mapFormItems(item.context)"
                 :context="subItem.context"
                 is-inner-table

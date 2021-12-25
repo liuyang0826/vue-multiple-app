@@ -57,7 +57,7 @@
     <el-input v-else :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" :placeholder="placeholder">
       <template v-if="prepend" #prepend>{{ prepend }}</template>
     </el-input>
-    <el-dialog v-if="hasDialog" v-model="visible" append-to-body width="480px">
+    <el-dialog v-if="hasDialog" v-model="visible" append-to-body :width="`${dialogWidth || 480}px`">
       <template #title>
         <div style="display: flex;align-items: center;">
           {{label}}
@@ -89,7 +89,8 @@ const props = defineProps<{
   prop: string
   prepend?: string
   tips?: string
-  modelValue?: string | boolean | number | any[]
+  modelValue?: any
+  dialogWidth?: any
   options?: {
     label: string
     value: string

@@ -25,7 +25,7 @@ import FormPane from "./components/form/FormPane.vue"
 import {onBeforeMount, onMounted, reactive, toRaw} from "vue";
 import { ArrowRightBold, ArrowLeftBold } from "@element-plus/icons-vue"
 import {useRoute} from "vue-router"
-import { mapFormItems } from "./utils"
+import { mapFormItems, resolveSchemas } from "./utils"
 
 const route = useRoute()
 const rules = reactive({})
@@ -33,19 +33,13 @@ const rules = reactive({})
 const context = reactive({
   formItems: [],
   schemas: [],
-  model: JSON.parse(`{"tableCols":[],"searchItems":[],"hasAdd":true,"hasIndex":true,"hasPagination":true,"addForm":{"formItems":[{"label":"用户名","prop":"name","required":true,"tips":"用户名用户名用户名用户名用户名"}]}}`),
+  model: {},
   path: []
 })
 
-onMounted(() => {
-  const script = document.createElement("script")
-  script.src = "http://127.0.0.1:5000/getSchemaById?id=1"
-  window._resolveSchema = function (_schemas) {
-    context.schemas = _schemas
-    delete window._resolveSchema
-    mapToFormItems()
-  }
-  document.head.appendChild(script)
+onMounted(async () => {
+  context.schemas = await resolveSchemas("tabs")
+  mapToFormItems()
 })
 
 function mapToFormItems() {

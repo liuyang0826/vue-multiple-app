@@ -27,6 +27,7 @@ import { reactive, onBeforeMount, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import AddForm from './components/AddForm.vue'
 import { getTableData } from './services'
+
 const query = reactive({})
 let pending = $ref(false)
 let pageSize = $ref(10)
@@ -53,6 +54,7 @@ async function updateTable() {
     pending = false
   }
 }
+
 function handleSearch() {
   handleCurrentChange(1)
 }
@@ -60,6 +62,7 @@ function handleCurrentChange(val) {
   pageNum = val
   updateTable()
 }
+
 function handleSizeChange(val) {
   pageSize = val
   updateTable()
@@ -76,9 +79,10 @@ const add = reactive({
 function handleAdd() {
   add.visible = true
   add.data = {}
-  add.title = ''
+  add.title = '21'
 }
 </script>
+
 <style>
 .container {
   background: #fff;

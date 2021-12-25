@@ -1,8 +1,22 @@
-export function mapFormItems(context: IContext) {
+export async function resolveSchemas(id) {
+    return new Promise(resolve => {
+        const script = document.createElement("script")
+        const cb = `schema_jsonp_${id}`
+        script.src = `http://127.0.0.1:5000/getSchemaById?cb=${cb}&id=${id}`
+        window[cb] = function (schemas) {
+            delete window[cb]
+            resolve(schemas)
+        }
+        document.head.appendChild(script)
+    })
+}
+
+export async function mapFormItems(context: IContext) {
     const formItems: IFormItem = []
-    function process(context: IContext) {
+    async function process(context: IContext) {
         const { schemas, model, path } = context
-        schemas?.forEach((schema) => {
+        for (let i = 0; i < schemas.length; i++) {
+            const schema = schemas[i]
             formItems.push(schema)
             schema.context = context
             if (!(schema.prop in model)) {
@@ -11,28 +25,29 @@ export function mapFormItems(context: IContext) {
                     model[schema.prop] = []
                 }
             }
-            const effect = schema.effect?.({ model, schemas })
+            const effect = await schema.effect?.({ model, schemas, resolveSchemas })
             if (!effect) {
-                return
+                continue
             }
             if (Array.isArray(effect)) {
-                process({...context, schemas: effect, path: [...path]})
+                await process({...context, schemas: effect, path: [...path]})
             } else {
                 if (!model[effect.prop]) {
                     model[effect.prop] = {}
                 }
-                process({...context, schemas: effect.schemas, model: model[effect.prop], path: [...path, effect.prop]})
+                await process({...context, schemas: effect.schemas, model: model[effect.prop], path: [...path, effect.prop]})
             }
-        })
+        }
     }
-    process(context)
+    await process(context)
     context.formItems = formItems
 }
 
-export function add(item: IFormItem) {
+export async function add(item: IFormItem) {
     const { prop, schemas, context } = item
     const newModel = {}
-    schemas.forEach((schema) => {
+    for (let i = 0; i < schemas.length; i++) {
+        const schema = schemas[i]
         if (["more", "list"].includes(schema.type)) {
             const newContext = {
                 formItems: [],
@@ -41,10 +56,10 @@ export function add(item: IFormItem) {
                 path: [...context.path, prop, context.model[prop].length]
             }
             schema.context = newContext
-            mapFormItems(newContext)
+            await mapFormItems(newContext)
         } else {
             newModel[schema.prop] = schema.default
         }
-    })
+    }
     context.model[prop].push(newModel)
 }

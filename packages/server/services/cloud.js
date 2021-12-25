@@ -9,7 +9,7 @@ async function getSchemaById(ctx) {
       })
     return ctx.render(template, data).replace(/<\/?script>/g, "")
   }
-  ctx.sendSchema(await resolveSchema("table"))
+  ctx.sendSchema(await resolveSchema(ctx.query.id), ctx.query.cb)
 }
 
 // 提交创建页面

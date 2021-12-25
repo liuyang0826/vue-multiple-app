@@ -3,9 +3,9 @@ const prettierOpt = require("../configs/prettier")
 
 function schemaMiddleware() {
     return async (ctx, next) => {
-        ctx.sendSchema = async function(schema) {
+        ctx.sendSchema = async function(schema, cb) {
             ctx.type = "js"
-            ctx.body = prettier.format(`window._resolveSchema(${schema})`, {
+            ctx.body = prettier.format(`window["${cb}"](${schema})`, {
                 prettierOpt,
                 parser: "babel"
             })
