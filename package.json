@@ -1,0 +1,12 @@
+{
+  "name": "fast-curd",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1161906592/vue-multiple-app.git"
+  },
+  "author": "liuyang<1161906592@qq.com>",
+  "license": "ISC",
+  "homepage": "https://github.com/1161906592/vue-multiple-app#readme"
+}

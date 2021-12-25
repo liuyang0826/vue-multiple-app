@@ -15,12 +15,12 @@
     "estree-walker": "^3.0.1",
     "koa": "^2.13.4",
     "koa-art-template": "^1.1.1",
+    "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.1.1",
     "koa2-cors": "^2.0.6",
     "magic-string": "^0.25.7",
     "nodemon": "^2.0.15",
-    "prettier": "^2.5.1",
-    "vue-router": "^4.0.12"
+    "prettier": "^2.5.1"
   },
   "nodemonConfig": {
     "watch": [
