@@ -2,8 +2,6 @@ const prettier = require("prettier");
 const fs = require("fs")
 const path = require("path")
 const prettierOpt = require("../configs/prettier.js")
-const cloudIdMap = require("../cloud-functions")
-const utils  = require("../utils")
 
 const serviceTemplate = fs.readFileSync(path.resolve("templates/files/service.ejs"), "utf8")
 
@@ -43,17 +41,10 @@ async function prepareDir(root) {
     }
 }
 
-async function resolveTemplate(cloudId) {
-    return cloudIdMap.get(cloudId).template
-}
-
 function createMiddleware() {
     return async (ctx, next) => {
-        ctx.create = async function(cloudId, data) {
-            const { template, components, services } = cloudIdMap.get(cloudId)
-
-            const { rootDir, componentsDir, servicesDir } = await prepareDir("test")
-
+        ctx.create = async function({ template, components, services, root }, data) {
+            const { rootDir, componentsDir, servicesDir } = await prepareDir(root)
             await Promise.all([
                 writeFileSync(
                     path.resolve(rootDir, "Index.vue"),
@@ -64,7 +55,7 @@ function createMiddleware() {
                         }
                     )
                 ),
-                ...(await components({ data, resolveTemplate })).map(({ template, data, name }) => writeFileSync(
+                ...components.map(({ template, data, name }) => writeFileSync(
                     path.resolve(componentsDir, `${name}.vue`),
                     prettier.format(
                         ctx.render(template, data).replace(/\n\s+\n/g, "\n"), {
@@ -77,7 +68,7 @@ function createMiddleware() {
                     path.resolve(servicesDir, "index.js"),
                     prettier.format(
                         ctx.render(serviceTemplate, {
-                            services: services({ data, utils })
+                            services
                         }).replace(/\n\s+\n/g, "\n"), {
                             ...prettierOpt,
                             parser: "babel"
@@ -86,7 +77,6 @@ function createMiddleware() {
                 )
             ])
         }
-
         await next()
     }
 }
