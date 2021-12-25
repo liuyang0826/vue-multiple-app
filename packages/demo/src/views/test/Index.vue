@@ -7,14 +7,6 @@
     </div>
     <el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="pending" ref="tableRef">
       <el-table-column type="index" label="序号" width="55" align="center" :index="indexMethod" />
-      <el-table-column label="操作" width="176">
-        <template #default="{ row }">
-          <el-button size="small" type="text" @click="handleToggleEnable(row)">
-            {{ row.enable ? '禁用' : '启用' }}
-          </el-button>
-          <el-divider direction="vertical" />
-        </template>
-      </el-table-column>
     </el-table>
     <el-pagination
       style="margin-top: 16px; text-align: right"
@@ -35,7 +27,6 @@ import { reactive, onBeforeMount, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import AddForm from './components/AddForm.vue'
 import { getTableData } from './services'
-
 const query = reactive({})
 let pending = $ref(false)
 let pageSize = $ref(10)
@@ -62,7 +53,6 @@ async function updateTable() {
     pending = false
   }
 }
-
 function handleSearch() {
   handleCurrentChange(1)
 }
@@ -70,7 +60,6 @@ function handleCurrentChange(val) {
   pageNum = val
   updateTable()
 }
-
 function handleSizeChange(val) {
   pageSize = val
   updateTable()
@@ -89,18 +78,7 @@ function handleAdd() {
   add.data = {}
   add.title = ''
 }
-// 启用禁用
-async function handleToggleEnable(row) {
-  const { status, message } = await doToggleEnable(row.id)
-  if (status) {
-    ElMessage.success('操作成功')
-    updateTable()
-  } else {
-    ElMessage.error(message)
-  }
-}
 </script>
-
 <style>
 .container {
   background: #fff;

@@ -1,40 +1,18 @@
-const path = require('path')
 const app = new (require("koa"))
-const artTemplate = require('koa-art-template');
-const template = require('art-template');
 const router = require("./router")
 const createMiddleware = require("./middlewares/create-middleware")
 const schemaMiddleware = require("./middlewares/schema-middleware")
+const renderMiddleware = require("./middlewares/render-middleware")
 const bodyParser = require('koa-bodyparser');
 const cors = require('koa2-cors');
-const {firstToUpperCase, split} = require("./utils")
-const parseDefaultFunction = require("./filters/parse-default-function")
-const some = require("./filters/some")
-const autoFormWidth = require("./filters/auto-form-width")
-
-artTemplate(app, {
-    root: path.resolve('templates'),
-    extname: '.ejs',
-    debug: true,
-    cache: false
-})
-
-template.defaults.rules.pop()
-template.defaults.imports.firstToUpperCase = firstToUpperCase
-template.defaults.imports.split = split
-template.defaults.imports.parseDefaultFunction = parseDefaultFunction
-template.defaults.imports.some = some
-template.defaults.imports.autoFormWidth = autoFormWidth
 
 app.use(cors({
     allowHeaders: ["*"],
 }))
-
 app.use(bodyParser())
-
+app.use(renderMiddleware())
 app.use(createMiddleware())
 app.use(schemaMiddleware())
-
 app.use(router.routes())
 
 app.listen("5000", () => {

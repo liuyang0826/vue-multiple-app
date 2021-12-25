@@ -119,7 +119,7 @@ export default function({
                 if (model.hasAdd) {
                     return {
                         prop: "addForm",
-                        schemas: <% include('./dialog-form') %>
+                        schemas: <%- dialogForm %>
                     }
                 }
             }
@@ -132,7 +132,7 @@ export default function({
                 if (model.hasUpdate) {
                     return {
                         prop: "updateForm",
-                        schemas: <% include('./dialog-form') %>
+                        schemas: <%- dialogForm %>
                     }
                 }
             }
