@@ -23,7 +23,7 @@ const dialogForm = {
       {},
       ...data.tabs.map((item) => resolveServices(item.schemaId, {
         data: item.itemSchemas,
-        name: item.componentName
+        name: item.name
       }))
     ]
   }

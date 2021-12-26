@@ -1,12 +1,21 @@
 <template>
   <div class="container">
-    <div style="display: flex; justify-content: flex-end">
+    <div style="display: flex">
+      <el-form size="mini" inline style="flex: 1">
+        <el-form-item label="姓名">
+          <el-input clearable v-model="query.name" @change="handleSearch" />
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="handleSearch" type="primary">查询</el-button>
+        </el-form-item>
+      </el-form>
       <div class="table-tool">
         <el-button size="mini" :icon="Plus" @click="handleAdd" type="primary">添加</el-button>
       </div>
     </div>
     <el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="pending" ref="tableRef">
       <el-table-column type="index" label="序号" width="55" align="center" :index="indexMethod" />
+      <el-table-column label="姓名" prop="name" />
     </el-table>
     <el-pagination
       style="margin-top: 16px; text-align: right"
@@ -76,7 +85,7 @@ const add = reactive({
 function handleAdd() {
   add.visible = true
   add.data = {}
-  add.title = ''
+  add.title = '新增用户'
 }
 </script>
 <style>

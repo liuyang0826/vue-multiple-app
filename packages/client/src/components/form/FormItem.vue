@@ -1,5 +1,5 @@
 <template>
-  <el-form-item :prop="paths.join('.')">
+  <el-form-item :prop="paths.join('.')" :rules="rules" :show-message="false">
     <template v-if="!isInnerTable" #label>
       <div style="display: flex;align-items: center;">
         {{label}}
@@ -93,6 +93,7 @@ const props = defineProps<{
   }[]
   isInnerTable?: boolean
   paths: string[]
+  rules?: any
 }>()
 
 const visible = $ref(false)

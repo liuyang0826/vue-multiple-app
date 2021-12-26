@@ -5,6 +5,7 @@
         :type="item.type"
         :label="item.label"
         :prop="item.prop"
+        :rules="item.rules"
         :paths="[...paths, ...(item.subPaths || []), item.prop]"
         v-model="getPropByPath(model, item.subPaths)[item.prop]"
         :options="item.options"
@@ -16,7 +17,7 @@
     <div v-else style="margin-bottom: 18px;">
       <div class="table-title">
         <span>{{item.label}}：</span>
-        <el-icon @click="getPropByPath(model, item.subPaths)[item.prop].push({})" style="cursor:pointer;">
+        <el-icon @click="handleAdd( item)" style="cursor:pointer;">
           <circle-plus-filled />
         </el-icon>
       </div>
@@ -34,7 +35,8 @@
               :type="subItem.type"
               :label="subItem.label"
               :prop="subItem.prop"
-              :paths="[...paths, ...(item.subPaths || []), item.prop, $index]"
+              :rules="subItem.rules"
+              :paths="[...paths, ...(item.subPaths || []), item.prop, $index, subItem.prop]"
               v-model="row[subItem.prop]"
               :options="subItem.options"
               :placeholder="subItem.placeholder"
@@ -67,7 +69,7 @@
 import FormItem from "./FormItem.vue"
 import { Delete, CirclePlusFilled } from "@element-plus/icons-vue"
 import {getPropByPath, resolveSchemas} from "../../utils"
-import {reactive, watch, watchSyncEffect} from "vue";
+import {reactive, watch} from "vue";
 
 const props = defineProps<{
   schemas: any[]
@@ -79,9 +81,11 @@ let formItems = $ref([])
 
 watch(() => [props.model, props.schemas], async () => {
   const newFormItems = []
-  async function process(schemas, model) {
+  async function process(schemas) {
     for (let i = 0; i < schemas.length; i++) {
       const schema = schemas[i]
+      const model = getPropByPath(props.model, schema.subPaths)
+      
       newFormItems.push(schema)
       if (!(schema.prop in model)) {
         model[schema.prop] = schema.default
@@ -94,22 +98,34 @@ watch(() => [props.model, props.schemas], async () => {
         continue
       }
       if (Array.isArray(effect)) {
-        await process(effect, model)
+        await process(effect.map(item => ({
+            ...item,
+            subPaths: schema.subPaths
+        })))
       } else {
         if (!model[effect.prop]) {
           model[effect.prop] = reactive({})
         }
-        await process((await effect.schemas).map(schema => ({
-          ...schema,
+        await process((await effect.schemas).map(item => ({
+          ...item,
           subPaths: [...(schema.subPaths || []), effect.prop]
-        })), model[effect.prop])
+        })))
       }
     }
   }
-  await process(props.schemas, props.model)
+  await process(props.schemas)
   formItems = newFormItems
 }, {
   immediate: true,
   deep: true
 })
+
+function handleAdd(item) {
+  const newModel = {}
+  item.schemas.forEach((schema) => {
+    newModel[schema.prop] = schema.default
+  })
+  getPropByPath(props.model, item.subPaths)[item.prop].push(newModel)
+}
+
 </script>

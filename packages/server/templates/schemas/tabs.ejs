@@ -6,7 +6,7 @@
             prop: "tabs",
             schemas: [
                 {type: "text", label: "名称", prop: "label"},
-                {type: "text", label: "id", prop: "name"},
+                {type: "text", label: "id", prop: "name", rules: { required: true, trigger: ["blur", "change"], message: "tab的id必须填写" }},
                 {
                     type: "list",
                     label: "配置组件",

@@ -2,7 +2,7 @@
   <div class="pane" :class="{ closed }">
     <div class="wrap">
       <div class="content">
-        <el-form :model="model" :rules="rules" size="mini">
+        <el-form :model="model" :rules="rules" size="mini" ref=formRef>
           <FormPane :schemas="schemas" :model="model" :paths="[]" />
         </el-form>
       </div>
@@ -22,13 +22,14 @@
 
 <script setup lang="ts">
 import FormPane from "./components/form/FormPane.vue"
-import {onBeforeMount, onMounted, provide, reactive, toRaw} from "vue";
+import {onMounted, provide} from "vue";
 import { ArrowRightBold, ArrowLeftBold } from "@element-plus/icons-vue"
+import { ElMessage } from "element-plus"
 import {useRoute} from "vue-router"
 import { resolveSchemas } from "./utils"
 
 const route = useRoute()
-const rules = reactive({})
+const rules = $ref({})
 
 let model = $ref({})
 let schemas = $ref({})
@@ -40,14 +41,21 @@ onMounted(async () => {
 })
 
 const closed = $ref(false)
+const formRef = $ref()
 
 function handleSubmit() {
-  fetch("http://127.0.0.1:5000/submit?id=tabs", {
-    method: "post",
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(model)
+  formRef.validate((flag, err) => {
+    if (flag) {
+      fetch("http://127.0.0.1:5000/submit?id=tabs", {
+        method: "post",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(model)
+      })
+    } else {
+      ElMessage.warning(Object.values(err)[0][0].message)
+    }
   })
 }
 
