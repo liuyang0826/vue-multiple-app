@@ -13,7 +13,6 @@ const dialogForm = {
     ]
   },
   services({ name, data, utils }) {
-    const { firstToUpperCase } = utils
     return [
       {
         name,

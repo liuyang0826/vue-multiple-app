@@ -16,6 +16,12 @@
     <el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="pending" ref="tableRef">
       <el-table-column type="index" label="序号" width="55" align="center" :index="indexMethod" />
       <el-table-column label="姓名" prop="name" />
+      <el-table-column label="操作" width="176">
+        <template #default="{ row }">
+          <el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>
+          <el-divider direction="vertical" />
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       style="margin-top: 16px; text-align: right"
@@ -34,7 +40,7 @@
 <script setup>
 import { reactive, onBeforeMount, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import AddForm from './AddForm.vue'
+import AddForm from './UserAddForm.vue'
 import { getTableData } from '../services/user'
 const query = reactive({})
 let pending = $ref(false)
@@ -86,6 +92,17 @@ function handleAdd() {
   add.visible = true
   add.data = {}
   add.title = '新增用户'
+}
+//编辑
+const update = reactive({
+  visible: false,
+  data: {},
+  title: ''
+})
+function handleUpdate(row) {
+  update.visible = true
+  update.data = row
+  update.title = '编辑用户'
 }
 </script>
 <style>

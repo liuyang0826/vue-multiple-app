@@ -1,6 +1,6 @@
 const itemWidth = 260
 
-function autoFormWidth (map) {
+function autoFormWidth(map) {
   return (formItems) => {
     if (!map.get(formItems)) {
       const formItemCount = formItems.length

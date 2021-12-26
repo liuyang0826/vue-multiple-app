@@ -1,24 +1,6 @@
 const cloudIdMap = require("../cloud-functions")
 const utils  = require("../utils")
 
-async function promiseFlatten(promise) {
-  const result = []
-  async function fn(list) {
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i]
-      if (item instanceof Promise) {
-        await fn(await item)
-      } else if (Array.isArray(item)) {
-        await fn(item)
-      } else {
-        result.push(item)
-      }
-    }
-  }
-  await fn(await promise)
-  return result
-}
-
 // 获取 schema
 async function getSchemaById(ctx) {
   const schemas = (await cloudIdMap.get(ctx.query.id)).schemas.replace(/<\/?script>/g, "")
@@ -37,13 +19,13 @@ async function submit(ctx) {
 
   function resolveServices(cloudId, { name, data }) {
     const { services } = cloudIdMap.get(cloudId)
-    return services({ name: utils.camelCaseToShortLine(name || ""), data, utils, resolveServices })
+    return services({ name: utils.firstToUpperCase(name), data, utils, resolveServices })
   }
 
   await ctx.create({
     root: "test",
-    components: await promiseFlatten(components({data, resolveComponents})),
-    services: services({ data, utils, resolveServices }).flat(Infinity)
+    components: components({data, resolveComponents}),
+    services: services({ data, utils, resolveServices })
   })
   ctx.body = "success"
 }

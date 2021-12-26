@@ -31,7 +31,7 @@
 </template>
 <script setup>
 import { watch, nextTick } from 'vue'
-import { submit } from '../services/add-form'
+import { submit } from '../services/userAddForm'
 import { ElMessage } from 'element-plus'
 import { Warning } from '@element-plus/icons-vue'
 const props = defineProps({
