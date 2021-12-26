@@ -16,7 +16,15 @@
                             </div>
                         </template>
                     <% } %>
-                    <el-input clearable v-model="form.<%= item.prop %>" placeholder="请输入<%= item.label %>" style="width: <%= $imports.autoFormWidth(formItems).itemWidth %>px;" />
+                    <el-input
+                        clearable
+                        v-model="form.<%= item.prop %>"
+                        placeholder="请输入<%= item.label %>"
+                        style="width: <%= $imports.autoFormWidth(formItems).itemWidth %>px;"
+                        <% if (!item.append) { %>/><% } %>
+                        <% if (item.append) { %>><% } %>
+                        <% if (item.append) { %><template #append><%= item.append %></template><% } %>
+                        <% if (item.append) { %></el-input><% } %>
                 </el-form-item>
             <% }) %>
         </el-form>

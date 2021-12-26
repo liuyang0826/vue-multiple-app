@@ -1,0 +1,100 @@
+{
+  "tabs": [
+    {
+      "label": "用户管理",
+      "name": "user",
+      "schemaId": "table",
+      "itemSchemas": {
+        "tableCols": [
+          {
+            "label": "姓名",
+            "prop": "name"
+          },
+          {
+            "label": "性别",
+            "prop": "sex"
+          }
+        ],
+        "searchItems": [
+          {
+            "label": "姓名",
+            "prop": "name",
+            "type": "text",
+            "optionType": "fixed",
+            "options": []
+          },
+          {
+            "label": "性别",
+            "prop": "sex",
+            "type": "select",
+            "optionType": "fixed",
+            "options": [
+              {
+                "label": "男",
+                "value": "1"
+              },
+              {
+                "label": "女",
+                "value": "2"
+              }
+            ]
+          }
+        ],
+        "hasAdd": true,
+        "hasUpdate": true,
+        "hasIndex": true,
+        "hasPagination": true,
+        "addForm": {
+          "title": "新增用户",
+          "formItems": [
+            {
+              "label": "姓名",
+              "prop": "name",
+              "required": true,
+              "tips": "姓名"
+            },
+            {
+              "label": "价格",
+              "prop": "price",
+              "required": true,
+              "append": "元"
+            }
+          ]
+        },
+        "updateForm": {
+          "title": "编辑用户",
+          "formItems": [
+            {
+              "label": "姓名",
+              "prop": "name",
+              "required": true,
+              "tips": "姓名"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "label": "项目管理",
+      "name": "project",
+      "schemaId": "table",
+      "itemSchemas": {
+        "tableCols": [
+          {
+            "label": "项目名称",
+            "prop": "name"
+          }
+        ],
+        "searchItems": [
+          {
+            "label": "项目名称",
+            "prop": "name",
+            "type": "text"
+          }
+        ],
+        "hasIndex": true,
+        "hasPagination": true
+      }
+    }
+  ]
+}

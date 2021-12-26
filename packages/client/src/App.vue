@@ -40,6 +40,14 @@ onMounted(async () => {
   schemas = await resolveSchemas("tabs")
 })
 
+onMounted(async () => {
+  fetch("http://127.0.0.1:5000/getHistoryForm?id=tabs")
+  .then(res => res.json())
+  .then(data => {
+    model = data
+  })
+})
+
 const closed = $ref(false)
 const formRef = $ref()
 

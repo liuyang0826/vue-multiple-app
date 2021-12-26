@@ -79,7 +79,26 @@ const props = defineProps<{
 
 let formItems = $ref([])
 
-watch(() => [props.model, props.schemas], async () => {
+// 由于深度watch整个表单对象，为了性能这里需要降频
+// 保证第一次立即执行，最后一次一定执行
+function debounce(fn, delay) {
+    let prevTime
+    let timer = null
+    return function () {
+      const now = Date.now()
+      const gap = now - prevTime
+      if (!prevTime || gap > delay) {
+        fn.apply(this, arguments)
+      } else {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            fn.apply(this, arguments)
+        }, gap);
+      }
+      prevTime = now
+  };
+}
+watch(() => [props.model, props.schemas], debounce(async () => {
   const newFormItems = []
   async function process(schemas) {
     for (let i = 0; i < schemas.length; i++) {
@@ -115,7 +134,7 @@ watch(() => [props.model, props.schemas], async () => {
   }
   await process(props.schemas)
   formItems = newFormItems
-}, {
+}, 600), {
   immediate: true,
   deep: true
 })

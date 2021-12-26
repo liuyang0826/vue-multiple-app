@@ -22,6 +22,11 @@
         </template>
         <el-input clearable v-model="form.name" placeholder="请输入姓名" style="width: 260px" />
       </el-form-item>
+      <el-form-item label="价格：" prop="price" label-width="82px">
+        <el-input clearable v-model="form.price" placeholder="请输入价格" style="width: 260px">
+          <template #append>元</template>
+        </el-input>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button size="small" @click="$emit('update:modelValue', false)">取消</el-button>
@@ -43,7 +48,8 @@ let form = $ref({})
 let loading = $ref(false)
 let formRef = $ref()
 let rules = {
-  name: { required: true, message: '请输入姓名', trigger: ['change', 'blur'] }
+  name: { required: true, message: '请输入姓名', trigger: ['change', 'blur'] },
+  price: { required: true, message: '请输入价格', trigger: ['change', 'blur'] }
 }
 watch(
   () => props.modelValue,
