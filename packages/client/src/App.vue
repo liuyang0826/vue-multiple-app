@@ -2,8 +2,8 @@
   <div class="pane" :class="{ closed }">
     <div class="wrap">
       <div class="content">
-        <el-form :model="context.model" :rules="rules" size="mini">
-          <FormPane :context="context" />
+        <el-form :model="model" :rules="rules" size="mini">
+          <FormPane :schemas="schemas" :model="model" :paths="[]" />
         </el-form>
       </div>
     </div>
@@ -22,39 +22,32 @@
 
 <script setup lang="ts">
 import FormPane from "./components/form/FormPane.vue"
-import {onBeforeMount, onMounted, reactive, toRaw} from "vue";
+import {onBeforeMount, onMounted, provide, reactive, toRaw} from "vue";
 import { ArrowRightBold, ArrowLeftBold } from "@element-plus/icons-vue"
 import {useRoute} from "vue-router"
-import { mapFormItems, resolveSchemas } from "./utils"
+import { resolveSchemas } from "./utils"
 
 const route = useRoute()
 const rules = reactive({})
 
-const context = reactive({
-  formItems: [],
-  schemas: [],
-  model: {},
-  path: []
-})
+let model = $ref({})
+let schemas = $ref({})
+
+provide("model", model)
 
 onMounted(async () => {
-  context.schemas = await resolveSchemas("tabs")
-  mapToFormItems()
+  schemas = await resolveSchemas("tabs")
 })
-
-function mapToFormItems() {
-  mapFormItems(context)
-}
 
 const closed = $ref(false)
 
 function handleSubmit() {
-  fetch("http://127.0.0.1:5000/submit", {
+  fetch("http://127.0.0.1:5000/submit?id=tabs", {
     method: "post",
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(context.model)
+    body: JSON.stringify(model)
   })
 }
 

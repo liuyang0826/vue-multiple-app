@@ -10,9 +10,7 @@ declare interface IFormItem extends ISchema {
 }
 
 declare interface IContext {
-    model: any
     schemas: ISchema[]
-    path: string[]
     formItems: IFormItem[]
 }
 

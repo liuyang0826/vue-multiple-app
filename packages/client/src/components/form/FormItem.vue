@@ -1,5 +1,5 @@
 <template>
-  <el-form-item :key="prop" :prop="prop">
+  <el-form-item :prop="paths.join('.')">
     <template v-if="!isInnerTable" #label>
       <div style="display: flex;align-items: center;">
         {{label}}
@@ -18,13 +18,11 @@
         v-if="type === 'switch'"
         :model-value="modelValue"
         @input="$emit('update:modelValue', $event)"
-        @change="$nextTick(() => $emit('change', $event))"
     />
     <el-select
         v-else-if="type === 'select'"
         :model-value="modelValue"
         @update:modelValue="$emit('update:modelValue', $event)"
-        @change="$emit('change', $event)"
         style="width: 100%;"
         :placeholder="placeholder"
     >
@@ -34,7 +32,6 @@
         v-else-if="type === 'checkboxGroup'"
         :model-value="modelValue"
         @update:modelValue="$emit('update:modelValue', $event)"
-        @change="$emit('change', $event)"
         style="width: 100%;"
     >
       <el-checkbox v-for="{label, value} in options" :key="value" :label="value">{{label}}</el-checkbox>
@@ -72,21 +69,20 @@
         </div>
       </template>
       <Codemirror v-if="type === 'code'" :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" />
-      <FormPane v-else :context="context" />
+      <slot />
     </el-dialog>
   </el-form-item>
 </template>
 
 <script setup lang="ts">
 import { Edit, Warning } from "@element-plus/icons-vue"
-import FormPane from "./FormPane.vue"
 import Codemirror from "../Codemirror.vue";
 
 const props = defineProps<{
   type: "text" | "number" | 'switch' | 'select' | 'radio'
   label?: string
+  prop?: string
   placeholder?: string
-  prop: string
   prepend?: string
   tips?: string
   modelValue?: any
@@ -95,8 +91,8 @@ const props = defineProps<{
     label: string
     value: string
   }[]
-  context?: any
   isInnerTable?: boolean
+  paths: string[]
 }>()
 
 const visible = $ref(false)

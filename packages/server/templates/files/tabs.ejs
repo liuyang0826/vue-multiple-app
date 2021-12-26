@@ -1,0 +1,16 @@
+<template>
+    <el-tabs type="card" v-model="activeTabName">
+        <% tabs.forEach(function (item) { %>
+            <el-tab-pane label="<%= item.label %>" name="<%= item.name %>">
+                <<%= $imports.camelCaseToShortLine(item.componentName) %> />
+            </el-tab-pane>
+        <% }) %>
+    </el-tabs>
+</template>
+
+<script setup>
+    <% tabs.forEach(function(item) { %>
+    import <%= item.componentName %> from "<%= $imports.getFilePath("components", item.componentName) %>"
+    <% }) %>
+    const activeTabName = $ref("<%= tabs[0].name %>")
+</script>

@@ -29,7 +29,7 @@
 
 <script setup>
     import { watch, nextTick } from "vue"
-    import { <%= apiName %> } from "../services"
+    import { submit } from "<%= $imports.getFilePath("service") %>"
     import { ElMessage } from 'element-plus'
     <% if ($imports.some(formItems, d => d.tips)) { %>
     import { Warning } from "@element-plus/icons-vue"
@@ -70,7 +70,7 @@
             if (flag) {
                 loading = true
                 try {
-                    const { status, message } = await <%= apiName %>(
+                    const { status, message } = await submit(
                         <% if (paramsTransform) { %>paramsTransform(<% } %>
                             form
                         <% if (paramsTransform) { %>)<% } %>

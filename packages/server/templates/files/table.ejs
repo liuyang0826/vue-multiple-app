@@ -99,7 +99,7 @@
     <% } %>
     <% if (hasAdd) { %>
     import { Plus } from "@element-plus/icons-vue"
-    import AddForm from "./components/AddForm.vue"
+    import AddForm from "<%= $imports.getFilePath("component", "AddForm") %>"
     <% } %>
     import {
         getTableData,
@@ -120,7 +120,7 @@
         get<%= $imports.firstToUpperCase(item.prop) %>Options,
         <% } %>
     <% }) %>
-    } from "./services"
+    } from "<%= $imports.getFilePath("service") %>"
 
     const query = reactive({})
     let pending = $ref(false)

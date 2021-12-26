@@ -2,23 +2,30 @@ const fs = require("fs")
 const path = require("path")
 
 const dialogForm = {
-  template: fs.readFileSync(path.resolve("templates/files/dialog-form.ejs"), "utf8"),
-  schemaTemplate: fs.readFileSync(path.resolve("templates/schemas/dialog-form.ejs"), "utf8"),
-  schema({ resolveSchema }) {
-    return {
-      template: dialogForm.schemaTemplate
-    }
-  },
-  components({ data, resolveTemplate }) {
+  schemas: fs.readFileSync(path.resolve("templates/schemas/dialog-form.ejs"), "utf8"),
+  async components({ name, data }) {
     return [
-
-    ].filter(Boolean)
+      {
+        template: fs.readFileSync(path.resolve("templates/files/dialog-form.ejs"), "utf8"),
+        name,
+        data
+      }
+    ]
   },
-  services({ data, utils }) {
+  services({ name, data, utils }) {
     const { firstToUpperCase } = utils
     return [
-
-    ].filter(Boolean)
+      {
+        name,
+        services: [
+          {
+            name: "submit",
+            method: "post",
+            api: data.api,
+          }
+        ]
+      }
+    ]
   }
 }
 

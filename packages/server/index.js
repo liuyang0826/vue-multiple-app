@@ -7,7 +7,7 @@ const bodyParser = require('koa-bodyparser');
 const cors = require('koa2-cors');
 
 app.use(cors({
-    allowHeaders: ["*"],
+  allowHeaders: ["*"],
 }))
 app.use(bodyParser())
 app.use(renderMiddleware())
@@ -16,5 +16,5 @@ app.use(schemaMiddleware())
 app.use(router.routes())
 
 app.listen("5000", () => {
-    console.log("ready on: http://127.0.0.1:5000");
+  console.log("ready on: http://127.0.0.1:5000");
 })
