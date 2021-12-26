@@ -63,12 +63,13 @@
       </el-table>
     </div>
   </div>
+  <div v-if="loading" style="font-size: 14px; text-align: center;line-height: 22px;">加载中...</div>
 </template>
 
 <script setup lang="ts">
 import FormItem from "./FormItem.vue"
 import { Delete, CirclePlusFilled } from "@element-plus/icons-vue"
-import {getPropByPath, resolveSchemas} from "../../utils"
+import {getPropByPath, resolveSchemas} from "../utils"
 import {reactive, watch} from "vue";
 
 const props = defineProps<{
@@ -78,6 +79,7 @@ const props = defineProps<{
 }>()
 
 let formItems = $ref([])
+let loading = $ref(false)
 
 // 由于深度watch整个表单对象，为了性能这里需要降频
 // 保证第一次立即执行，最后一次一定执行
@@ -99,6 +101,7 @@ function debounce(fn, delay) {
   };
 }
 watch(() => [props.model, props.schemas], debounce(async () => {
+  loading = true
   const newFormItems = []
   async function process(schemas) {
     for (let i = 0; i < schemas.length; i++) {
@@ -134,6 +137,7 @@ watch(() => [props.model, props.schemas], debounce(async () => {
   }
   await process(props.schemas)
   formItems = newFormItems
+  loading = false
 }, 600), {
   immediate: true,
   deep: true

@@ -22,6 +22,7 @@
       <el-table-column type="index" label="序号" width="55" align="center" :index="indexMethod" />
       <el-table-column label="姓名" prop="name" />
       <el-table-column label="性别" prop="sex" />
+      <el-table-column label="年龄" prop="age" />
       <el-table-column label="操作" width="176">
         <template #default="{ row }">
           <el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>
@@ -29,17 +30,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      style="margin-top: 16px; text-align: right"
-      small
-      background
-      layout="total, prev, pager, next, jumper"
-      :total="total"
-      :page-size="pageSize"
-      :current-page="pageNum"
-      @sizeChange="handleSizeChange"
-      @currentChange="handleCurrentChange"
-    />
     <add-form v-model="add.visible" :data="add.data" :title="add.title" />
   </div>
 </template>
@@ -79,14 +69,6 @@ async function updateTable() {
   }
 }
 function handleSearch() {
-  handleCurrentChange(1)
-}
-function handleCurrentChange(val) {
-  pageNum = val
-  updateTable()
-}
-function handleSizeChange(val) {
-  pageSize = val
   updateTable()
 }
 // 翻页序号

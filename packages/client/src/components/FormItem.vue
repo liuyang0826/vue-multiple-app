@@ -70,13 +70,16 @@
       </template>
       <Codemirror v-if="type === 'code'" :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" />
       <slot />
+      <template #footer>
+        <el-button size="small" type="primary" @click="visible = false">确定</el-button>
+      </template>
     </el-dialog>
   </el-form-item>
 </template>
 
 <script setup lang="ts">
 import { Edit, Warning } from "@element-plus/icons-vue"
-import Codemirror from "../Codemirror.vue";
+import Codemirror from "./Codemirror.vue";
 
 const props = defineProps<{
   type: "text" | "number" | 'switch' | 'select' | 'radio'

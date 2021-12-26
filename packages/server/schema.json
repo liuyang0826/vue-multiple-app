@@ -13,6 +13,10 @@
           {
             "label": "性别",
             "prop": "sex"
+          },
+          {
+            "label": "年龄",
+            "prop": "age"
           }
         ],
         "searchItems": [
@@ -43,7 +47,7 @@
         "hasAdd": true,
         "hasUpdate": true,
         "hasIndex": true,
-        "hasPagination": true,
+        "hasPagination": false,
         "addForm": {
           "title": "新增用户",
           "formItems": [
@@ -71,7 +75,12 @@
               "tips": "姓名"
             }
           ]
-        }
+        },
+        "hasDelete": false,
+        "hasBatchDelete": false,
+        "hasToggleEnable": false,
+        "hasMove": false,
+        "enableProp": "enable"
       }
     },
     {

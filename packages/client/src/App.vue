@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import FormPane from "./components/form/FormPane.vue"
+import FormPane from "./components/FormPane.vue"
 import {onMounted, provide} from "vue";
 import { ArrowRightBold, ArrowLeftBold } from "@element-plus/icons-vue"
 import { ElMessage } from "element-plus"
@@ -141,5 +141,26 @@ function handleSubmit() {
   border-radius: 18px;
   z-index: 100;
   cursor: pointer;
+}
+
+body .el-dialog__header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  border-bottom: 1px solid #eaeaea;
+  padding-top: 16px;
+  padding-bottom: 12px;
+}
+
+body .el-dialog__body {
+  padding-top:  16px;
+  padding-bottom:  0px;
+}
+
+body .el-dialog__footer {
+  padding-top: 12px;
+  padding-bottom: 16px;
+  border-top: 1px solid #eaeaea;
 }
 </style>
