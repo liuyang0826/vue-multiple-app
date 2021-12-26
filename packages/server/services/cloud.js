@@ -1,7 +1,12 @@
-const cloudIdMap = require("../cloud-functions")
 const utils  = require("../utils")
 const fs  = require("fs")
 const path  = require("path")
+
+const cloudIdMap = new Map([
+  ["dialog-form", require("../cloud-functions/dialog-form")],
+  ["table", require("../cloud-functions/table")],
+  ["tabs", require("../cloud-functions/tabs")]
+])
 
 // 获取 schema
 async function getSchemaById(ctx) {

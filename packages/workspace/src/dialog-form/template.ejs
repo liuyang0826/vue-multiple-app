@@ -1,0 +1,97 @@
+<template>
+  <el-dialog :model-value="modelValue" :title="title" @update:modelValue="$emit('update:modelValue', $event)" width="<%= $imports.autoFormWidth(formItems).dialogWidth %>px" append-to-body :close-on-click-modal="false">
+      <el-form :model="form" size="small" inline :rules="rules" ref="formRef" style="margin-right: -10px;">
+          <% formItems.forEach(function(item, index){ %>
+              <el-form-item label="<%= item.label %>：" prop="<%= item.prop %>" label-width="<%= $imports.autoFormWidth(formItems).labelWidth[index] %>px">
+                  <% if (item.tips) { %>
+                      <template #label>
+                          <div style="display: inline-flex;align-items: center;">
+                              <%= item.label %>
+                              <el-tooltip style="margin-left: 2px;" content="<%= item.tips %>" placement="top">
+                                  <el-icon size="mini">
+                                      <Warning />
+                                  </el-icon>
+                              </el-tooltip>
+                              ：
+                          </div>
+                      </template>
+                  <% } %>
+                  <el-input
+                      clearable
+                      v-model="form.<%= item.prop %>"
+                      placeholder="请输入<%= item.label %>"
+                      style="width: <%= $imports.autoFormWidth(formItems).itemWidth %>px;"
+                      <% if (!item.append) { %>/><% } %>
+                      <% if (item.append) { %>><% } %>
+                      <% if (item.append) { %><template #append><%= item.append %></template><% } %>
+                      <% if (item.append) { %></el-input><% } %>
+              </el-form-item>
+          <% }) %>
+      </el-form>
+      <template #footer>
+          <el-button size="small" @click="$emit('update:modelValue', false)">取消</el-button>
+          <el-button size="small" type="primary" :loading="loading" @click="handleSubmit">确定</el-button>
+      </template>
+  </el-dialog>
+</template>
+
+<script setup>
+  import { watch, nextTick } from "vue"
+  import { submit } from "<%= $imports.getFilePath("service") %>"
+  import { ElMessage } from 'element-plus'
+  <% if ($imports.some(formItems, d => d.tips)) { %>
+  import { Warning } from "@element-plus/icons-vue"
+  <% } %>
+  const props = defineProps({
+      modelValue: Boolean,
+      title: String,
+      data: Object,
+  })
+  let form = $ref({})
+  let loading = $ref(false)
+  let formRef = $ref()
+  let rules = {
+      <% formItems.forEach(function (item){ %>
+      <% if (item.required) { %>
+      <%= item.prop %>: { required: true, message: "请输入<%= item.label %>", trigger: ["change", "blur"] },
+      <% } %>
+      <% }) %>
+  }
+  watch(() => props.modelValue, (visible) => {
+      if (visible) {
+          return
+      }
+      nextTick(() => {
+          loading = false
+          form = JSON.parse(JSON.stringify(props.data))
+          formRef.clearValidate()
+      })
+  })
+
+  <% if (paramsTransform) { %>
+  // 转换表单数据
+  <%- $imports.parseDefaultFunction(paramsTransform, "paramsTransform") %>
+  <% } %>
+
+  function handleSubmit() {
+      formRef.validate(async (flag) => {
+          if (flag) {
+              loading = true
+              try {
+                  const { status, message } = await submit(
+                      <% if (paramsTransform) { %>paramsTransform(<% } %>
+                          form
+                      <% if (paramsTransform) { %>)<% } %>
+                  )
+                  if (status) {
+                      ElMessage.success("操作成功")
+                  } else {
+                      ElMessage.error(message)
+                  }
+              } finally {
+                  loading = false
+              }
+          }
+      })
+  }
+</script>

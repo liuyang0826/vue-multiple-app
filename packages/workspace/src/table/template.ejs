@@ -1,0 +1,376 @@
+<template>
+  <div class="container">
+      <div style="display:flex;<%= searchItems.length ? '' : 'justify-content: flex-end;' %>">
+          <% if (searchItems.length) { %>
+              <el-form size="mini" inline style="flex: 1;">
+                  <% searchItems.forEach(function(item){ %>
+                      <el-form-item label="<%= item.label %>">
+                          <% if (item.type === "text") { %>
+                              <el-input clearable v-model="query.<%= item.prop %>" @change="handleSearch"/>
+                          <% } %>
+                          <% if (item.type === "select") { %>
+                              <el-select clearable v-model="query.<%= item.prop %>" @change="handleSearch" placeholder="请选择<%= item.label %>">
+                                  <el-option v-for="{label, value} in <%= item.prop %>Options" :key="value" :value="value" :label="label" />
+                              </el-select>
+                          <% } %>
+                      </el-form-item>
+                  <% }) %>
+                  <el-form-item>
+                      <el-button @click="handleSearch" type="primary">查询</el-button>
+                  </el-form-item>
+              </el-form>
+          <% } %>
+          <% if (hasBatchDelete || hasAdd) { %>
+              <div class="table-tool">
+                  <% if (hasBatchDelete) { %>
+                      <el-button size="mini" type="danger" plain :disabled="!selections.length" @click="handleBatchDelete">
+                          批量删除
+                      </el-button>
+                  <% } %>
+                  <% if (hasAdd) { %>
+                      <el-button size="mini" :icon="Plus" @click="handleAdd" type="primary">添加</el-button>
+                  <% } %>
+              </div>
+          <% } %>
+      </div>
+      <el-table size="small" border style="margin-top: -6px" :data="tableData" v-loading="pending" ref="tableRef" <% if (hasBatchDelete) { %> @select="handleSelect" @select-all="handleSelectAll" <% } %>>
+          <% if (hasSelection || hasBatchDelete) { %>
+              <el-table-column type="selection" width="55" align="center"/>
+          <% } %>
+          <% if (hasIndex) { %>
+              <el-table-column type="index" label="序号" width="55" align="center" :index="indexMethod"/>
+          <% } %>
+          <% tableCols.forEach(function(item){ %>
+              <el-table-column
+                  label="<%= item.label %>"
+                  prop="<%= item.prop %>"
+                  <% if (item.width) { %>width="<%= item.width %>"<% } %>
+                  <% if (item.formatter) { %>:formatter="<%= item.prop%>Formatter"<% } %>
+              />
+          <% }) %>
+          <% if (hasUpdate || hasDelete || hasToggleEnable || hasMove) { %>
+              <el-table-column label="操作" width="176">
+                  <template #default="{row}">
+                      <% if (hasUpdate) { %>
+                          <el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>
+                          <el-divider direction="vertical"/>
+                      <% } %>
+                      <% if (hasDelete) { %>
+                          <el-button size="small" type="text" @click="handleDelete(row)">删除</el-button>
+                          <el-divider direction="vertical"/>
+                      <% } %>
+                      <% if (hasToggleEnable) { %>
+                          <el-button size="small" type="text" @click="handleToggleEnable(row)">
+                              {{ row.<%= enableProp %> ? "禁用" : "启用" }}
+                          </el-button>
+                          <el-divider direction="vertical"/>
+                      <% } %>
+                      <% if (hasMove) { %>
+                          <el-button size="small" type="text" @click="handleMove(row, 1)">上移</el-button>
+                          <el-divider direction="vertical"/>
+                          <el-button size="small" type="text" @click="handleMove(row, 0)">下移</el-button>
+                      <% } %>
+                  </template>
+              </el-table-column>
+          <% } %>
+      </el-table>
+      <% if (hasPagination) { %>
+          <el-pagination
+              style="margin-top: 16px;text-align: right;"
+              small
+              background
+              layout="total, prev, pager, next, jumper"
+              :total="total"
+              :page-size="pageSize"
+              :current-page="pageNum"
+              @sizeChange="handleSizeChange"
+              @currentChange="handleCurrentChange"
+          />
+      <% } %>
+      <% if (hasAdd) { %>
+          <add-form v-model="add.visible" :data="add.data" :title="add.title"/>
+      <% } %>
+  </div>
+</template>
+<script setup>
+  import { reactive, onBeforeMount, watch, <% if (hasBatchDelete) { %> nextTick <% } %> } from "vue";
+  <% if (hasDelete || hasBatchDelete) { %>
+  import { ElMessageBox, ElMessage } from 'element-plus'
+  <% } %>
+  <% if (hasAdd) { %>
+  import { Plus } from "@element-plus/icons-vue"
+  import AddForm from "<%= $imports.getFilePath("component", "AddForm") %>"
+  <% } %>
+  import {
+      getTableData,
+  <% if (hasDelete) { %>
+      doDelete,
+  <% } %>
+  <% if (hasBatchDelete) { %>
+      doBatchDelete,
+  <% } %>
+  <% if (hasToggle) { %>
+      doToggle,
+  <% } %>
+  <% if (hasMove) { %>
+      doMove,
+  <% } %>
+  <% searchItems.forEach(function(item){ %>
+      <% if (item.type === "select" && item.optionType === "api") { %>
+      get<%= $imports.firstToUpperCase(item.prop) %>Options,
+      <% } %>
+  <% }) %>
+  } from "<%= $imports.getFilePath("service") %>"
+
+  const query = reactive({})
+  let pending = $ref(false)
+  let pageSize = $ref(10)
+  let pageNum = $ref(1)
+  let total = $ref(0)
+  let tableData = $ref([])
+  <% if (hasBatchDelete) { %>
+  let selectionLen = 0
+  let selectionMap = $ref({})
+  const rowKey = "id"
+  const selections = $computed(() => Object.values(selectionMap))
+  const tableRef = $ref()
+  <% } %>
+
+  <% searchItems.forEach(function(item){ %>
+  <% if (item.type === "select") { %>
+  <% if (item.optionType === "fixed") { %>
+  let <%= item.prop %>Options = [
+      <% item.options.forEach(function(item){ %>
+      { label: "<%= item.label %>", value: "<%= item.value %>" },
+      <% }) %>
+  ]
+  <% } %>
+  <% if (item.optionType === "api") { %>
+  // <%= item.label %>选项
+  let <%= item.prop %>Options = $ref([])
+  <% if (item.depProp) { %>
+  watch([<% $imports.split(item.depProp, ",").forEach(function(item){  %> query.<%= item %>, <% }) %>], async (value) => {
+      if (value) {
+          const { status, data, message } = await get<%= $imports.firstToUpperCase(item.prop) %>Options()
+          if (status) {
+              <%= item.prop %>Options = data
+          } else {
+              ElMessage.error(message)
+          }
+      }
+  }, {
+      immediate: true
+  })
+  <% } %>
+  <% if (!item.depProp) { %>
+  onBeforeMount(async () => {
+      const { status, data, message } = await get<%= $imports.firstToUpperCase(item.prop) %>Options()
+      if (status) {
+          <%= item.prop %>Options = data
+      } else {
+          ElMessage.error(message)
+      }
+  })
+  <% } %>
+  <% } %>
+  <% } %>
+  <% }) %>
+
+  <% if (queryTransform) { %>
+  // 转换查询参数
+  <%- $imports.parseDefaultFunction(queryTransform, "queryTransform") %>
+  <% } %>
+
+  // 获取表格数据
+  async function updateTable() {
+      pending = true
+      try {
+          const { status, data, message } = await getTableData(
+          <% if (queryTransform) { %>queryTransform(<% } %>
+              {
+                  query,
+                  pageNum,
+                  pageSize
+              }
+          <% if (queryTransform) { %>)<% } %>
+          )
+          if (status) {
+              tableData = data.result
+              total = data.total
+              tableData = [{}]
+          } else {
+              ElMessage.error(message)
+          }
+      } finally {
+          pending = false
+          <% if (hasBatchDelete) { %>
+          nextTick(() => {
+              tableData.forEach((row) => {
+                  tableRef.toggleRowSelection(row, !!selectionMap[row[rowKey]])
+              })
+              selectionLen = tableData.filter(row => !!selectionMap[row[rowKey]]).length
+          })
+          <% } %>
+      }
+  }
+
+  function handleSearch() {
+      <% if (hasPagination) { %>
+      handleCurrentChange(1)
+      <% } %>
+      <% if (!hasPagination) { %>
+      updateTable()
+      <% } %>
+  }
+
+  <% if (hasPagination) { %>
+  function handleCurrentChange (val) {
+      pageNum = val
+      updateTable()
+  }
+
+  function handleSizeChange (val) {
+      pageSize = val
+      updateTable()
+  }
+  <% } %>
+
+  <% if (hasIndex) { %>
+  // 翻页序号
+  const indexMethod = (index) => pageSize * (pageNum - 1) + index + 1
+  <% } %>
+
+  onBeforeMount(handleSearch)
+
+  <% tableCols.forEach(function(item){ %>
+  <% if (item.formatter) { %>
+  // <%= item.label %>格式化
+  <%- $imports.parseDefaultFunction(item.formatter, item.prop + "Formatter") %>
+  <% } %>
+  <% }) %>
+  <% if (hasAdd) { %>
+  // 新增
+  const add = reactive({
+      visible: false,
+      data: {},
+      title: ""
+  })
+  function handleAdd() {
+      add.visible = true
+      add.data = {}
+      add.title = "<%= addForm.title %>"
+  }
+  <% } %>
+  <% if (hasUpdate) { %>
+  //编辑
+  const update = reactive({
+      visible: false,
+      data: {},
+      title: ""
+  })
+  function handleUpdate(row) {
+      update.visible = true
+      update.data = row
+      update.title = "<%= updateForm.title %>"
+  }
+  <% } %>
+  <% if (hasDelete) { %>
+  // 删除
+  function handleDelete() {
+      ElMessageBox.confirm('确认删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+      }).then(async () => {
+          const { status, message } = await doDelete(row.id)
+          if (status) {
+              ElMessage.success("操作成功")
+              updateTable()
+          } else {
+              ElMessage.error(message)
+          }
+      })
+  }
+  <% } %>
+
+  <% if (hasBatchDelete) { %>
+  // 翻页多选相关方法
+  function resetSelection(selectedRows) {
+      selectionMap = selectedRows ? selectedRows.reduce((acc, row) => ({...acc, [row[rowKey]]: row}), {}) : {}
+      selectionLen = data.filter(row => !!selectionMap[row[rowKey]]).length
+  }
+  function handleSelect(selection, row) {
+      if (selectionLen < selection.length) {
+          selectionMap[row[rowKey]] = row;
+      } else {
+          delete selectionMap[row[rowKey]];
+      }
+      selectionLen = selection.length;
+  }
+  function handleSelectAll(selection) {
+      if (selection.length) {
+          selection.forEach(row => {
+              selectionMap[row[rowKey]] = row;
+          });
+      } else {
+          tableData.forEach(row => {
+              delete selectionMap[row[rowKey]];
+          });
+      }
+      selectionLen = selection.length;
+  }
+  <% } %>
+
+  <% if (hasBatchDelete) { %>
+  // 批量删除
+  function handleBatchDelete() {
+      ElMessageBox.confirm('确认删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+      }).then(async () => {
+          const { status, message } = await doBatchDelete(row.id)
+          if (status) {
+              ElMessage.success("操作成功")
+              updateTable()
+          } else {
+              ElMessage.error(message)
+          }
+      })
+  }
+  <% } %>
+
+  <% if (hasToggleEnable) { %>
+  // 启用禁用
+  async function handleToggleEnable(row) {
+      const { status, message } = await doToggleEnable(row.id)
+      if (status) {
+          ElMessage.success("操作成功")
+          updateTable()
+      } else {
+          ElMessage.error(message)
+      }
+  }
+  <% } %>
+
+  <% if (hasMove) { %>
+  // 上移下移
+  async function handleMove(row) {
+      const { status, message } = await doMove(row.id)
+      if (status) {
+          ElMessage.success("操作成功")
+          updateTable()
+      } else {
+          ElMessage.error(message)
+      }
+  }
+  <% } %>
+
+</script>
+
+<style>
+  .container {
+      background: #fff;
+      padding: 10px;
+  }
+</style>
