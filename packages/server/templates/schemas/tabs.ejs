@@ -6,14 +6,13 @@
             prop: "tabs",
             schemas: [
                 {type: "text", label: "名称", prop: "label"},
-                {type: "text", label: "name", prop: "name"},
+                {type: "text", label: "id", prop: "name"},
                 {
                     type: "list",
                     label: "配置组件",
                     width: 80,
                     dialogWidth: 640,
                     schemas: [
-                        {type: "text", label: "组件名称", prop: "componentName"},
                         {
                             type: "select",
                             label: "选择组件",
@@ -21,11 +20,11 @@
                             options: [
                                 { label: "表格", value: "table" }
                             ],
-                            async effect({ model, resolveSchemas }) {
+                            effect({ model, resolveSchemas }) {
                                 if (model.schemaId === "table") {
                                     return {
                                         prop: "itemSchemas",
-                                        schemas: await resolveSchemas("table")
+                                        schemas: resolveSchemas("table")
                                     }
                                 }
                             }

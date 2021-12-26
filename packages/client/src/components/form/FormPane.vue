@@ -89,7 +89,7 @@ watch(() => [props.model, props.schemas], async () => {
           model[schema.prop] = reactive([])
         }
       }
-      const effect = await schema.effect?.({ model, schemas, resolveSchemas })
+      const effect = schema.effect?.({ model, schemas, resolveSchemas })
       if (!effect) {
         continue
       }
@@ -99,7 +99,10 @@ watch(() => [props.model, props.schemas], async () => {
         if (!model[effect.prop]) {
           model[effect.prop] = reactive({})
         }
-        await process(effect.schemas.map(d => ({...d, subPaths: [...(schema.subPaths || []), effect.prop]})), model[effect.prop])
+        await process((await effect.schemas).map(schema => ({
+          ...schema,
+          subPaths: [...(schema.subPaths || []), effect.prop]
+        })), model[effect.prop])
       }
     }
   }

@@ -6,8 +6,11 @@ async function promiseFlatten(promise) {
   async function fn(list) {
     for (let i = 0; i < list.length; i++) {
       const item = list[i]
+      console.log(item);
       if (item instanceof Promise) {
         await fn(await item)
+      } else if (Array.isArray(item)) {
+        await fn(item)
       } else {
         result.push(item)
       }

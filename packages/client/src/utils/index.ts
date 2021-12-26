@@ -1,7 +1,7 @@
 const schemasMap = new Map()
 
 export async function resolveSchemas(id) {
-    return schemasMap.get(id) || new Promise(resolve => {
+    return await (schemasMap.get(id) || schemasMap.set(id, new Promise(resolve => {
         const script = document.createElement("script")
         const cb = `schema_jsonp_${id}`
         script.src = `http://127.0.0.1:5000/getSchemaById?cb=${cb}&id=${id}`
@@ -12,7 +12,7 @@ export async function resolveSchemas(id) {
             document.head.removeChild(script)
         }
         document.head.appendChild(script)
-    })
+    })).get(id))
 }
 
 export function getPropByPath(data, paths = []) {

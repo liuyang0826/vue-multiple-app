@@ -3,7 +3,7 @@ const path = require("path")
 
 const dialogForm = {
   schemas: fs.readFileSync(path.resolve("templates/schemas/tabs.ejs"), "utf8"),
-  async components({name, data, resolveComponents}) {
+  components({name, data, resolveComponents}) {
     return [
       {
         template: fs.readFileSync(path.resolve("templates/files/tabs.ejs"), "utf8"),
@@ -13,7 +13,7 @@ const dialogForm = {
       ...data.tabs.map((item) => {
         return resolveComponents(item.schemaId, {
           data: item.itemSchemas,
-          name: item.componentName,
+          name: item.name,
         })
       })
     ]

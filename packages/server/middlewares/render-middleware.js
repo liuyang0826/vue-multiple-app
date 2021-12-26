@@ -20,13 +20,13 @@ function renderMiddlemare() {
         if (type === "service") {
           return `../services/${camelCaseToShortLine(filename)}`
         } else {
-          return `./${filename}.vue`
+          return `./${firstToUpperCase(filename)}.vue`
         }
       } else {
         if (type === "service") {
           return `./services/${camelCaseToShortLine(filename)}`
         } else {
-          return `./components/${filename}.vue`
+          return `./components/${firstToUpperCase(filename)}.vue`
         }
       }
     }

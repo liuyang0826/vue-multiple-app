@@ -3,7 +3,7 @@ const path = require("path")
 
 const table = {
   schemas: fs.readFileSync(path.resolve("templates/schemas/table.ejs"), "utf8"),
-  async components({name, data, resolveComponents}) {
+  components({name, data, resolveComponents}) {
     return [
       {
         template: fs.readFileSync(path.resolve("templates/files/table.ejs"), "utf8"),

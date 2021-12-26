@@ -115,11 +115,11 @@ export default function({
             type: "switch",
             prop: "hasAdd",
             label: "新增",
-            async effect({model, schemas, resolveSchemas}) {
+            effect({model, schemas, resolveSchemas}) {
                 if (model.hasAdd) {
                     return {
                         prop: "addForm",
-                        schemas: await resolveSchemas("dialog-form")
+                        schemas: resolveSchemas("dialog-form")
                     }
                 }
             }
@@ -128,11 +128,11 @@ export default function({
             type: "switch",
             prop: "hasUpdate",
             label: "编辑",
-            async effect({model, schemas, resolveSchemas}) {
+            effect({model, schemas, resolveSchemas}) {
                 if (model.hasUpdate) {
                     return {
                         prop: "updateForm",
-                        schemas: await resolveSchemas("dialog-form")
+                        schemas: resolveSchemas("dialog-form")
                     }
                 }
             }

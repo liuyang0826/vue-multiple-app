@@ -1,0 +1,60 @@
+<template>
+  <el-dialog
+    :model-value="modelValue"
+    :title="title"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    width="30px"
+    append-to-body
+    :close-on-click-modal="false"
+  >
+    <el-form :model="form" size="small" inline :rules="rules" ref="formRef" style="margin-right: -10px"> </el-form>
+    <template #footer>
+      <el-button size="small" @click="$emit('update:modelValue', false)">取消</el-button>
+      <el-button size="small" type="primary" :loading="loading" @click="handleSubmit">确定</el-button>
+    </template>
+  </el-dialog>
+</template>
+<script setup>
+import { watch, nextTick } from 'vue'
+import { submit } from '../services/add-form'
+import { ElMessage } from 'element-plus'
+const props = defineProps({
+  modelValue: Boolean,
+  title: String,
+  data: Object
+})
+let form = $ref({})
+let loading = $ref(false)
+let formRef = $ref()
+let rules = {}
+watch(
+  () => props.modelValue,
+  visible => {
+    if (visible) {
+      return
+    }
+    nextTick(() => {
+      loading = false
+      form = JSON.parse(JSON.stringify(props.data))
+      formRef.clearValidate()
+    })
+  }
+)
+function handleSubmit() {
+  formRef.validate(async flag => {
+    if (flag) {
+      loading = true
+      try {
+        const { status, message } = await submit(form)
+        if (status) {
+          ElMessage.success('操作成功')
+        } else {
+          ElMessage.error(message)
+        }
+      } finally {
+        loading = false
+      }
+    }
+  })
+}
+</script>

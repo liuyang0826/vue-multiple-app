@@ -3,7 +3,7 @@ const path = require("path")
 
 const dialogForm = {
   schemas: fs.readFileSync(path.resolve("templates/schemas/dialog-form.ejs"), "utf8"),
-  async components({ name, data }) {
+  components({ name, data }) {
     return [
       {
         template: fs.readFileSync(path.resolve("templates/files/dialog-form.ejs"), "utf8"),
