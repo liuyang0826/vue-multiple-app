@@ -25,8 +25,8 @@
       <el-form-item label="性别：" prop="sex" label-width="82px">
         <el-input clearable v-model="form.sex" placeholder="请输入性别" style="width: 260px" />
       </el-form-item>
-      <el-form-item label="年龄：" prop="age" label-width="82px">
-        <el-input clearable v-model="form.age" placeholder="请输入年龄" style="width: 260px" />
+      <el-form-item label="生日：" prop="birthday" label-width="82px">
+        <el-input clearable v-model="form.birthday" placeholder="请输入生日" style="width: 260px" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -52,7 +52,7 @@ let formRef = $ref()
 let rules = {
   name: { required: true, message: '请输入姓名', trigger: ['change', 'blur'] },
   sex: { required: true, message: '请输入性别', trigger: ['change', 'blur'] },
-  age: { required: true, message: '请输入年龄', trigger: ['change', 'blur'] }
+  birthday: { required: true, message: '请输入生日', trigger: ['change', 'blur'] }
 }
 watch(
   () => props.modelValue,

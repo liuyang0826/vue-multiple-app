@@ -6,8 +6,18 @@
       label: "表格列",
       colspan: 2,
       schemas: [
-        {type: "text", prop: "label", label: "表头",},
-        {type: "text", prop: "prop", label: "后端字段",},
+        {
+          type: "text",
+          prop: "label",
+          label: "表头",
+          rules: {required: true, trigger: ["blur", "change"], message: "表头必须填写"}
+        },
+        {
+          type: "text",
+          prop: "prop",
+          label: "后端字段",
+          rules: {required: true, trigger: ["blur", "change"], message: "表头必须填写"}
+        },
         {type: "text", prop: "width", label: "列宽", placeholder: "auto"},
         {
           type: "code",
@@ -37,8 +47,18 @@ export default function(row) {
       colspan: 2,
       cols: 2,
       schemas: [
-        {type: "text", prop: "label", label: "字段名",},
-        {type: "text", prop: "prop", label: "后端字段",},
+        {
+          type: "text",
+          prop: "label",
+          label: "字段名",
+          rules: {required: true, trigger: ["blur", "change"], message: "字段名必须填写"}
+        },
+        {
+          type: "text",
+          prop: "prop",
+          label: "后端字段",
+          rules: {required: true, trigger: ["blur", "change"], message: "后端字段必须填写"}
+        },
         {
           type: "select",
           prop: "type",

@@ -68,18 +68,21 @@
               "label": "姓名",
               "prop": "name",
               "required": true,
-              "tips": "姓名"
+              "tips": "姓名",
+              "type": "text"
             },
             {
               "label": "性别",
               "prop": "sex",
               "required": true,
-              "append": ""
+              "append": "",
+              "type": "text"
             },
             {
-              "label": "年龄",
-              "prop": "age",
-              "required": true
+              "label": "生日",
+              "prop": "birthday",
+              "required": true,
+              "type": "date"
             }
           ],
           "api": "/api/user/add"
@@ -91,18 +94,21 @@
               "label": "姓名",
               "prop": "name",
               "required": true,
-              "tips": "姓名"
+              "tips": "姓名",
+              "type": "text"
             },
             {
               "label": "性别",
               "prop": "sex",
-              "required": true
+              "required": true,
+              "type": "text"
             },
             {
               "label": "年龄",
               "prop": "age",
               "required": true,
-              "append": "岁"
+              "append": "岁",
+              "type": "text"
             }
           ],
           "api": "/api/user/update"

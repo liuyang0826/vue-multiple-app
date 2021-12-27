@@ -1,7 +1,7 @@
 <template>
-  <el-form-item :prop="paths.join('.')" :rules="rules" :show-message="false">
+  <el-form-item :prop="paths.join('.')" :rules="rules" :show-message="!isInnerTable">
     <template v-if="!isInnerTable" #label>
-      <div style="display: flex;align-items: center;">
+      <div style="display: inline-flex;align-items: center;">
         {{label}}
         <el-tooltip v-if="tips" style="margin-left: 2px;" effect="light" placement="bottom">
           <el-icon size="mini">

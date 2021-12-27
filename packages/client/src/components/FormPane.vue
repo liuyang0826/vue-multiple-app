@@ -34,6 +34,7 @@
               :tips="subItem.tips"
               :dialog-width="subItem.dialogWidth"
               is-inner-table
+              @update:modelValue="effect"
             >
               <FormPane
                 :schemas="subItem.schemas"
@@ -105,6 +106,7 @@
         :tips="item.tips"
         :dialog-width="item.dialogWidth"
         :style="itemStyle(item)"
+        @update:modelValue="effect"
     />
   </template>
   <div v-if="loading" style="font-size: 14px; text-align: center;line-height: 22px;">加载中...</div>
@@ -114,7 +116,7 @@
 import FormItem from "./FormItem.vue"
 import { Delete, CirclePlusFilled, RemoveFilled, Bottom, Top } from "@element-plus/icons-vue"
 import {getPropByPath, resolveSchemas} from "../utils"
-import {reactive, watch} from "vue";
+import {onMounted, reactive, watch} from "vue";
 
 const props = defineProps<{
   schemas: any[]
@@ -125,7 +127,6 @@ const props = defineProps<{
 let formItems = $ref([])
 let loading = $ref(false)
 
-// 由于深度watch整个表单对象，为了性能这里需要降频
 // 保证第一次立即执行，最后一次一定执行
 function debounce(fn, delay) {
     let prevTime
@@ -151,11 +152,10 @@ const getAllSchemas = () => {
   .then((data) => data)
 }
 
-watch(() => props.model, debounce(async () => {
+const effect = debounce(async () => {
   loading = true
   const newFormItems = []
   async function process(schemas) {
-    console.log(schemas);
     for (let i = 0; i < schemas.length; i++) {
       const schema = schemas[i]
       newFormItems.push(schema)
@@ -210,9 +210,10 @@ watch(() => props.model, debounce(async () => {
   await process(props.schemas)
   formItems = newFormItems
   loading = false
-}, 600), {
-  immediate: true,
-  deep: true
+}, 600)
+
+watch(() => props.model, effect, {
+  immediate: true
 })
 
 function handleAdd(item) {
