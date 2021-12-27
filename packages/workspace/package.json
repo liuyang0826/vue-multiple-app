@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "node script/build.js"
+    "build": "node build/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
     "rollup": "^2.62.0",
+    "rollup-plugin-terser": "^7.0.2",
     "rollup-pluginutils": "^2.8.2"
   }
 }

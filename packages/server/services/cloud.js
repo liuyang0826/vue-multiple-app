@@ -3,9 +3,9 @@ const fs  = require("fs")
 const path  = require("path")
 
 const cloudIdMap = new Map([
-  ["dialog-form", require("../cloud-functions/dialog-form")],
-  ["table", require("../cloud-functions/table")],
-  ["tabs", require("../cloud-functions/tabs")]
+  ["dialog-form", require("../workspace/dialog-form")],
+  ["table", require("../workspace/table")],
+  ["tabs", require("../workspace/tabs")]
 ])
 
 // 获取 schema

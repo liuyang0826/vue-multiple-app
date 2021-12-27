@@ -6,3 +6,4 @@ dist-ssr
 .vscode
 .idea
 *-lock.yaml
+packages/server/workspace
