@@ -22,10 +22,11 @@
         </template>
         <el-input clearable v-model="form.name" placeholder="请输入姓名" style="width: 260px" />
       </el-form-item>
-      <el-form-item label="价格：" prop="price" label-width="82px">
-        <el-input clearable v-model="form.price" placeholder="请输入价格" style="width: 260px">
-          <template #append>元</template>
-        </el-input>
+      <el-form-item label="性别：" prop="sex" label-width="82px">
+        <el-input clearable v-model="form.sex" placeholder="请输入性别" style="width: 260px" />
+      </el-form-item>
+      <el-form-item label="年龄：" prop="age" label-width="82px">
+        <el-input clearable v-model="form.age" placeholder="请输入年龄" style="width: 260px" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -34,6 +35,7 @@
     </template>
   </el-dialog>
 </template>
+
 <script setup>
 import { watch, nextTick } from 'vue'
 import { submit } from '../services/userAddForm'
@@ -49,7 +51,8 @@ let loading = $ref(false)
 let formRef = $ref()
 let rules = {
   name: { required: true, message: '请输入姓名', trigger: ['change', 'blur'] },
-  price: { required: true, message: '请输入价格', trigger: ['change', 'blur'] }
+  sex: { required: true, message: '请输入性别', trigger: ['change', 'blur'] },
+  age: { required: true, message: '请输入年龄', trigger: ['change', 'blur'] }
 }
 watch(
   () => props.modelValue,

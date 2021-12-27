@@ -10,7 +10,7 @@ async function index(name) {
     input: path.resolve(`src/${name}/index.js`),
     plugins: [
       ejs(),
-      terser(),
+      // terser(),
     ]
   });
   await bundle.write({

@@ -1,27 +1,17 @@
 <template>
-  <div v-for="item in formItems" :key="[...paths, item.prop].join('.')">
-    <form-item
-        v-if="item.type !== 'list'"
-        :type="item.type"
-        :label="item.label"
-        :prop="item.prop"
-        :rules="item.rules"
-        :paths="[...paths, ...(item.subPaths || []), item.prop]"
-        v-model="getPropByPath(model, item.subPaths)[item.prop]"
-        :options="item.options"
-        :placeholder="item.placeholder"
-        :prepend="item.prepend"
-        :tips="item.tips"
-        :dialog-width="item.dialogWidth"
-    />
-    <div v-else style="margin-bottom: 18px;">
+  <template v-for="item in formItems">
+    <div
+        :key="[...paths, item.prop].join('.')"
+        v-if="item.type === 'table'"
+        :style="itemStyle(item)"
+    >
       <div class="table-title">
         <span>{{item.label}}：</span>
-        <el-icon @click="handleAdd( item)" style="cursor:pointer;">
+        <!--<el-icon @click="handleAdd( item)" style="cursor:pointer;">
           <circle-plus-filled />
-        </el-icon>
+        </el-icon>-->
       </div>
-      <el-table :data="getPropByPath(model, item.subPaths)[item.prop]" border size="mini" stripe>
+      <el-table :data="getPropByPath(model, item.subPaths)[item.prop]" border size="mini" stripe style="margin-bottom: 8px;">
         <el-table-column
             v-for="subItem in item.schemas"
             :label="subItem.label"
@@ -61,14 +51,68 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-button @click="handleAdd(item)" style="width: 100%;margin-bottom: 16px;">增加{{item.label}}</el-button>
     </div>
-  </div>
+    <div
+        :key="[...paths, item.prop].join('.')"
+        v-else-if="item.type === 'list'"
+        :style="itemStyle(item)"
+    >
+      <div class="table-title">
+        <span>{{item.label}}：</span>
+      </div>
+      <div
+          v-for="(row, $index) in getPropByPath(model, item.subPaths)[item.prop]"
+          :key="$index"
+          class="group"
+      >
+        <div class="list-title">
+          <span style="flex: 1;">{{item.label}} #{{$index + 1}}</span>
+          <el-popconfirm title="确定删除？" @confirm="getPropByPath(model, item.subPaths)[item.prop].splice($index, 1)">
+            <template #reference>
+              <el-icon style="cursor:pointer;">
+                <remove-filled />
+              </el-icon>
+            </template>
+          </el-popconfirm>
+        </div>
+        <div class="list-wrap" :style="{gridTemplateColumns: `repeat(${item.cols || 1},minmax(0,1fr))`}">
+          <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.subPaths || []), item.prop, $index]" :model="row"/>
+        </div>
+      </div>
+      <el-button @click="handleAdd(item)" style="width: 100%;margin-bottom: 12px;">增加{{item.label}}</el-button>
+    </div>
+    <div
+        :key="item.key || [...paths, item.prop].join('.')"
+        v-else-if="item.type === 'child'"
+        class="group list-wrap"
+        :style="{gridTemplateColumns: `repeat(${item.cols || 1},minmax(0,1fr))`, ...itemStyle(item)}"
+    >
+      <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.subPaths || [])]" :model="getPropByPath(model, item.subPaths)"/>
+    </div>
+    <form-item
+        v-else
+        :key="[...paths, item.prop].join('.')"
+        :type="item.type"
+        :label="item.label"
+        :prop="item.prop"
+        :rules="item.rules"
+        :paths="[...paths, ...(item.subPaths || []), item.prop]"
+        v-model="getPropByPath(model, item.subPaths)[item.prop]"
+        :options="item.options"
+        :placeholder="item.placeholder"
+        :prepend="item.prepend"
+        :tips="item.tips"
+        :dialog-width="item.dialogWidth"
+        :style="itemStyle(item)"
+    />
+  </template>
   <div v-if="loading" style="font-size: 14px; text-align: center;line-height: 22px;">加载中...</div>
 </template>
 
 <script setup lang="ts">
 import FormItem from "./FormItem.vue"
-import { Delete, CirclePlusFilled } from "@element-plus/icons-vue"
+import { Delete, CirclePlusFilled, RemoveFilled, Bottom, Top } from "@element-plus/icons-vue"
 import {getPropByPath, resolveSchemas} from "../utils"
 import {reactive, watch} from "vue";
 
@@ -111,14 +155,19 @@ watch(() => props.model, debounce(async () => {
   loading = true
   const newFormItems = []
   async function process(schemas) {
+    console.log(schemas);
     for (let i = 0; i < schemas.length; i++) {
       const schema = schemas[i]
       newFormItems.push(schema)
       const model = getPropByPath(props.model, schema.subPaths)
       if (!(schema.prop in model)) {
         model[schema.prop] = schema.default
-        if (["checkboxGroup", "list"].includes(schema.type) && !model[schema.prop]) {
-          model[schema.prop] = reactive([])
+        if (["checkboxGroup", "list", "table"].includes(schema.type) && !model[schema.prop]) {
+          const newModel = {}
+          schema.schemas.forEach((schema) => {
+            newModel[schema.prop] = schema.default
+          })
+          model[schema.prop] = [newModel]
         }
       }
       if (schema.getOptions && !schema.isOptionsReady) {
@@ -145,12 +194,16 @@ watch(() => props.model, debounce(async () => {
         })))
       } else {
         if (!model[effect.prop]) {
-          model[effect.prop] = reactive({})
+          model[effect.prop] = {}
         }
-        await process((await effect.schemas).map(item => ({
-          ...item,
+        const { cols, schemas } = await effect.schemas
+        newFormItems.push({
+          ...effect,
+          type: "child",
+          schemas,
+          cols,
           subPaths: [...(schema.subPaths || []), effect.prop]
-        })))
+        })
       }
     }
   }
@@ -170,4 +223,9 @@ function handleAdd(item) {
   getPropByPath(props.model, item.subPaths)[item.prop].push(newModel)
 }
 
+function itemStyle(item) {
+  return {
+    gridColumn: `span ${item.colspan || 1}/span ${item.colspan || 1}`
+  }
+}
 </script>

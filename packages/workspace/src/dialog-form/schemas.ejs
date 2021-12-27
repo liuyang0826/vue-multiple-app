@@ -1,10 +1,12 @@
-<script>
+<script cols="2">
   [
-    {type: "text", prop: "title", label: "标题",},
+    {type: "text", prop: "title", label: "标题", colspan: 2},
     {
       type: "list",
       prop: "formItems",
       label: "表单项",
+      colspan: 2,
+      cols: 2,
       schemas: [
         {type: "text", prop: "label", label: "字段名",},
         {type: "text", prop: "prop", label: "后端字段",},
@@ -37,3 +39,4 @@ export default function(form) {
     },
   ]
 </script>
+

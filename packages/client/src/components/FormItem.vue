@@ -101,5 +101,5 @@ const props = defineProps<{
 
 const visible = $ref(false)
 
-const hasDialog = $computed(() => ['list', 'code', 'more'].includes(props.type))
+const hasDialog = $computed(() => ['list', 'code', 'more', 'table'].includes(props.type))
 </script>

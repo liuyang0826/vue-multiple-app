@@ -1,13 +1,14 @@
-<script>
+<script cols="2">
   [
     {
-      type: "list",
+      type: "table",
       prop: "tableCols",
-      label: "表格",
+      label: "表格列",
+      colspan: 2,
       schemas: [
         {type: "text", prop: "label", label: "表头",},
         {type: "text", prop: "prop", label: "后端字段",},
-        {type: "text", prop: "width", label: "列宽",},
+        {type: "text", prop: "width", label: "列宽", placeholder: "auto"},
         {
           type: "code",
           label: "格式化",
@@ -32,7 +33,9 @@ export default function(row) {
     {
       type: "list",
       prop: "searchItems",
-      label: "查询",
+      label: "查询字段",
+      colspan: 2,
+      cols: 2,
       schemas: [
         {type: "text", prop: "label", label: "字段名",},
         {type: "text", prop: "prop", label: "后端字段",},
@@ -44,44 +47,44 @@ export default function(row) {
           options: [
             {label: "文本", value: "text"},
             {label: "下拉框", value: "select"},
-          ]
-        },
-        {
-          type: "more",
-          label: "选项",
-          width: 60,
-          schemas: [
-            {
-              type: "radio",
-              prop: "optionType",
-              label: "类型",
-              default: "fixed",
-              options: [
-                {label: "固定项", value: "fixed"},
-                {label: "接口", value: "api"},
-              ],
-              effect({model, schemas}) {
-                if (model.optionType === "api") {
-                  return [
-                    {type: "text", prop: "api", label: "接口地址",},
-                    {type: "text", prop: "depProp", label: "关联后端字段", placeholder: "逗号分割，当这些字段有值时才调接口"}
-                  ]
-                } else {
-                  return [
-                    {
-                      type: "list",
-                      prop: "options",
-                      label: "选项",
-                      schemas: [
-                        {type: "text", prop: "label", label: "键",},
-                        {type: "text", prop: "value", label: "值",},
+          ],
+          effect({ model }) {
+            if (model.type === 'select') {
+              return [
+                {
+                  type: "radio",
+                  prop: "optionType",
+                  label: "类型",
+                  default: "fixed",
+                  options: [
+                    {label: "固定项", value: "fixed"},
+                    {label: "接口", value: "api"},
+                  ],
+                  effect({model, schemas}) {
+                    if (model.optionType === "api") {
+                      return [
+                        {type: "text", prop: "api", label: "接口地址",},
+                        {type: "text", prop: "depProp", label: "关联后端字段", placeholder: "逗号分割，当这些字段有值时才调接口"}
+                      ]
+                    } else {
+                      return [
+                        {
+                          type: "table",
+                          prop: "options",
+                          label: "选项",
+                          colspan: 2,
+                          schemas: [
+                            {type: "text", prop: "label", label: "键",},
+                            {type: "text", prop: "value", label: "值",},
+                          ]
+                        }
                       ]
                     }
-                  ]
-                }
-              }
-            },
-          ]
+                  }
+                },
+              ]
+            }
+          }
         },
       ]
     },
@@ -89,6 +92,7 @@ export default function(row) {
       type: "code",
       prop: "queryTransform",
       label: "参数格式化",
+      colspan: 2,
       tips: `
 <div style="line-height: 20px;">
 <p>自定义一个用于格式化查询参数的方法，默认{ query, pageSize, pageNum }。</p>
@@ -115,10 +119,12 @@ export default function({
       type: "switch",
       prop: "hasAdd",
       label: "新增",
+      colspan: 2,
       effect({model, schemas, resolveSchemas}) {
         if (model.hasAdd) {
           return {
             prop: "addForm",
+            colspan: 2,
             schemas: resolveSchemas("dialog-form")
           }
         }
@@ -128,10 +134,12 @@ export default function({
       type: "switch",
       prop: "hasUpdate",
       label: "编辑",
+      colspan: 2,
       effect({model, schemas, resolveSchemas}) {
         if (model.hasUpdate) {
           return {
             prop: "updateForm",
+            colspan: 2,
             schemas: resolveSchemas("dialog-form")
           }
         }
@@ -175,6 +183,7 @@ export default function({
       type: "switch",
       prop: "hasToggleEnable",
       label: "启用禁用",
+      colspan: 2,
       effect({model, schemas}) {
         if (model.hasToggleEnable) {
           return [

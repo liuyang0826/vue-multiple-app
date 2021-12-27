@@ -1,7 +1,7 @@
-<script>
+<script cols="1">
   [
     {
-      type: "list",
+      type: "table",
       label: "标签项",
       prop: "tabs",
       schemas: [
@@ -16,7 +16,7 @@
           type: "list",
           label: "配置组件",
           width: 80,
-          dialogWidth: 640,
+          dialogWidth: 800,
           schemas: [
             {
               type: "select",
@@ -30,6 +30,7 @@
                 if (model.schemaId) {
                   return {
                     prop: "itemSchemas",
+                    key: model.schemaId,
                     schemas: resolveSchemas(model.schemaId)
                   }
                 }

@@ -1,22 +1,31 @@
 <template>
-  <div class="pane" :class="{ closed }">
-    <div class="wrap">
-      <div class="content">
-        <el-form :model="model" :rules="rules" size="mini" ref=formRef>
-          <FormPane :schemas="schemas" :model="model" :paths="[]" />
-        </el-form>
+  <el-config-provider :locale="locale">
+    <div class="pane" :class="{ closed }">
+      <div class="wrap">
+        <div class="content">
+          <el-form
+              :model="model"
+              :rules="rules"
+              size="mini"
+              ref="formRef"
+              class="list-wrap"
+              :style="{gridTemplateColumns: `repeat(${cols || 1},minmax(0,1fr))`}"
+          >
+            <FormPane :schemas="schemas" :model="model" :paths="[]" />
+          </el-form>
+        </div>
       </div>
+      <div class="footer">
+        <el-button size="mini" type="primary" @click="handleSubmit">保存</el-button>
+      </div>
+      <button class="toggle" type="button" @click="closed = !closed">
+        <el-icon>
+          <arrow-left-bold v-if="closed"  />
+          <arrow-right-bold v-else  />
+        </el-icon>
+      </button>
     </div>
-    <div class="footer">
-      <el-button size="mini" type="primary" @click="handleSubmit">保存</el-button>
-    </div>
-    <button class="toggle" type="button" @click="closed = !closed">
-      <el-icon>
-        <arrow-left-bold v-if="closed"  />
-        <arrow-right-bold v-else  />
-      </el-icon>
-    </button>
-  </div>
+  </el-config-provider>
   <iframe :src="route.query.path" style="width: 100vw;height: 100vh;display: block;border: none;" />
 </template>
 
@@ -33,11 +42,14 @@ const rules = $ref({})
 
 let model = $ref({})
 let schemas = $ref({})
+let cols = $ref(1)
 
 provide("model", model)
 
 onMounted(async () => {
-  schemas = await resolveSchemas("tabs")
+  const result = await resolveSchemas("tabs")
+  schemas = result.schemas
+  cols = result.cols
 })
 
 onMounted(async () => {
@@ -65,6 +77,16 @@ function handleSubmit() {
       ElMessage.warning(Object.values(err)[0][0].message)
     }
   })
+}
+
+const locale = {
+  name: 'zh-cn',
+  el: {
+    popconfirm: {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    }
+  }
 }
 
 </script>
@@ -112,8 +134,43 @@ function handleSubmit() {
   align-items: center;
   justify-content: space-between;
   font-size: 14px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: rgb(96, 98, 102);
+}
+
+.list-title {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: rgb(96, 98, 102);
+  height: 28px;
+}
+
+.move {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: #000;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.list-wrap {
+  display: grid;
+  gap: 0 12px;
+}
+
+.group {
+  border: 1px solid #eaeaea;
+  padding: 10px;
+  border-radius: 2px;
+  margin-bottom: 8px;
 }
 
 .footer {
@@ -154,13 +211,21 @@ body .el-dialog__header {
 }
 
 body .el-dialog__body {
-  padding-top:  16px;
-  padding-bottom:  0px;
+  padding-top: 16px;
+  padding-bottom: 0px;
 }
 
 body .el-dialog__footer {
   padding-top: 12px;
   padding-bottom: 16px;
   border-top: 1px solid #eaeaea;
+}
+
+body .el-form-item__label {
+  padding-right: 4px;
+}
+
+body .el-popconfirm__icon {
+  margin-top: -2px;
 }
 </style>

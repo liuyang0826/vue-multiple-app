@@ -8,15 +8,23 @@
         "tableCols": [
           {
             "label": "姓名",
-            "prop": "name"
+            "prop": "name",
+            "width": ""
           },
           {
             "label": "性别",
-            "prop": "sex"
+            "prop": "sex",
+            "width": "200"
           },
           {
             "label": "年龄",
-            "prop": "age"
+            "prop": "age",
+            "width": "200"
+          },
+          {
+            "label": "是否可用",
+            "prop": "enable",
+            "width": "200"
           }
         ],
         "searchItems": [
@@ -42,12 +50,17 @@
                 "value": "2"
               }
             ]
+          },
+          {
+            "label": "年龄",
+            "prop": "age",
+            "type": "text"
           }
         ],
         "hasAdd": true,
         "hasUpdate": true,
         "hasIndex": true,
-        "hasPagination": false,
+        "hasPagination": true,
         "addForm": {
           "title": "新增用户",
           "formItems": [
@@ -58,12 +71,18 @@
               "tips": "姓名"
             },
             {
-              "label": "价格",
-              "prop": "price",
+              "label": "性别",
+              "prop": "sex",
               "required": true,
-              "append": "元"
+              "append": ""
+            },
+            {
+              "label": "年龄",
+              "prop": "age",
+              "required": true
             }
-          ]
+          ],
+          "api": "/api/user/add"
         },
         "updateForm": {
           "title": "编辑用户",
@@ -73,14 +92,30 @@
               "prop": "name",
               "required": true,
               "tips": "姓名"
+            },
+            {
+              "label": "性别",
+              "prop": "sex",
+              "required": true
+            },
+            {
+              "label": "年龄",
+              "prop": "age",
+              "required": true,
+              "append": "岁"
             }
-          ]
+          ],
+          "api": "/api/user/update"
         },
-        "hasDelete": false,
-        "hasBatchDelete": false,
-        "hasToggleEnable": false,
-        "hasMove": false,
-        "enableProp": "enable"
+        "hasDelete": true,
+        "hasBatchDelete": true,
+        "hasToggleEnable": true,
+        "hasMove": true,
+        "enableProp": "enable",
+        "deleteApi": "/api/user/delete",
+        "batchDeleteApi": "/api/user/batchDelete",
+        "toggleEnableApi": "/api/user/toggleEnable",
+        "moveApi": "/api/user/move"
       }
     },
     {
@@ -102,7 +137,23 @@
           }
         ],
         "hasIndex": true,
-        "hasPagination": true
+        "hasPagination": true,
+        "hasAdd": false,
+        "hasUpdate": false,
+        "addForm": {
+          "formItems": [
+            {
+              "required": true
+            }
+          ]
+        },
+        "updateForm": {
+          "formItems": [
+            {
+              "required": true
+            }
+          ]
+        }
       }
     }
   ]

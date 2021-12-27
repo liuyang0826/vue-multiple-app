@@ -8,6 +8,7 @@
     </el-tab-pane>
   </el-tabs>
 </template>
+
 <script setup>
 import user from './components/User.vue'
 import project from './components/Project.vue'

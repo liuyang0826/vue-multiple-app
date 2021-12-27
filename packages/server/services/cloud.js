@@ -10,14 +10,14 @@ const cloudIdMap = new Map([
 
 // 获取 schema
 async function getSchemaById(ctx) {
-  const schemas = (await cloudIdMap.get(ctx.query.id)).schemas.replace(/<\/?script>/g, "")
+  const schemas = (await cloudIdMap.get(ctx.query.id)).schemas
   ctx.sendSchema(schemas, ctx.query.cb)
 }
 
 // 提交创建页面
 async function submit(ctx) {
   const data = ctx.request.body
-  fs.writeFileSync(path.resolve("schema.json"), JSON.stringify(data, null, 2), "utf8")
+  fs.writeFileSync(path.resolve("history.json"), JSON.stringify(data, null, 2), "utf8")
   const { component, service } = cloudIdMap.get(ctx.query.id)
 
   function resolveComponent(cloudId, { name, data }) {
@@ -45,7 +45,7 @@ async function uploadCloudFounction(ctx) {
 
 async function getHistoryForm(ctx) {
   ctx.type = "json"
-  ctx.body = fs.readFileSync(path.resolve("schema.json"), "utf8")
+  ctx.body = fs.readFileSync(path.resolve("history.json"), "utf8")
 }
 
 async function getAllSchemas(ctx) {
