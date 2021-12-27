@@ -1,0 +1,38 @@
+<template>
+    <div style="display:flex;">
+        <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick"/>
+        <div style="flex: 1;">
+            <% components.forEach(function (item) { %>
+                <<%= $imports.camelCaseToShortLine(item.name) %> />
+            <% }) %>
+        </div>
+    </div>
+</template>
+
+<script setup>
+    <% components.forEach(function(item) { %>
+    import <%= item.name %> from "<%= $imports.getFilePath("components", item.name) %>"
+    <% }) %>
+    import {onBeforeMount} from "vue"
+    import {getTreeData} from "<%= $imports.getFilePath("service") %>"
+    import {ElMessage} from 'element-plus'
+
+    const defaultProps = {
+      children: 'children',
+      label: 'label',
+    }
+
+    const keyword = $ref("")
+    let treeData = $ref([])
+
+    async function updateTreeData() {
+      const {status, data, message} = await getTreeData()
+      if (status) {
+        treeData = data
+      } else {
+        ElMessage.error(message)
+      }
+    }
+
+    onBeforeMount(updateTreeData)
+</script>

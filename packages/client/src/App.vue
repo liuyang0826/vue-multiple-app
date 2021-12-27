@@ -1,5 +1,5 @@
 <template>
-  <el-config-provider :locale="locale">
+  <el-config-provider :locale="zhCn">
     <div class="pane" :class="{ closed }">
       <div class="wrap">
         <div class="content">
@@ -36,6 +36,7 @@ import { ArrowRightBold, ArrowLeftBold } from "@element-plus/icons-vue"
 import { ElMessage } from "element-plus"
 import {useRoute} from "vue-router"
 import { resolveSchemas } from "./utils"
+import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 
 const route = useRoute()
 const rules = $ref({})
@@ -78,17 +79,6 @@ function handleSubmit() {
     }
   })
 }
-
-const locale = {
-  name: 'zh-cn',
-  el: {
-    popconfirm: {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-    }
-  }
-}
-
 </script>
 
 <style>

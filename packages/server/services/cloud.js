@@ -5,7 +5,8 @@ const path  = require("path")
 const cloudIdMap = new Map([
   ["dialog-form", require("../workspace/dialog-form")],
   ["table", require("../workspace/table")],
-  ["tabs", require("../workspace/tabs")]
+  ["tabs", require("../workspace/tabs")],
+  ["tree", require("../workspace/tree")]
 ])
 
 // 获取 schema
@@ -53,6 +54,7 @@ async function getAllSchemas(ctx) {
   ctx.body = JSON.stringify([
     { name: "表格", id: "table" },
     { name: "标签页", id: "tabs" },
+    { name: "左右布局", id: "tree" },
   ])
 }
 
