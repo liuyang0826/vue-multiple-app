@@ -43,25 +43,15 @@ async function prepareDir(root) {
 }
 
 async function resolveWalker(promise, cb) {
-  async function fn(list, prefix = "") {
-    let curPrefix
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i]
-      if (!item) {
-        continue
-      }
-      if (item.name) {
-        curPrefix = item.name
-      }
-      if (item instanceof Promise) {
-        await fn(await item, curPrefix)
-      } else if (Array.isArray(item)) {
-        await fn(item, curPrefix)
-      } else {
-        if (prefix) {
-          item.name = prefix + item.name
-        }
-        await cb(item)
+  async function fn({entry, children}, prefix = "") {
+    if (prefix) {
+      entry.name = prefix + entry.name
+    }
+    await cb(entry)
+    if (children && children.filter(Boolean).length) {
+      for (let i = 0; i < children.length; i++) {
+        const item = children[i]
+        await fn(await item, entry.name)
       }
     }
   }
@@ -70,10 +60,10 @@ async function resolveWalker(promise, cb) {
 
 function createMiddleware() {
   return async (ctx, next) => {
-    ctx.create = async function ({components, services, root}) {
+    ctx.create = async function ({component, service, root}) {
       const {rootDir, componentsDir, servicesDir} = await prepareDir(root)
 
-      await resolveWalker(components, async ({template, data, name}) => {
+      await resolveWalker(component, async ({template, data, name}) => {
         ctx.state.isComponent = !!name
         const filename = ctx.state.filename = name || "Index"
         ctx.state.pathPrefix = name
@@ -88,7 +78,7 @@ function createMiddleware() {
         )
       })
 
-      await resolveWalker(services, async ({name, services}) => {
+      await resolveWalker(service, async ({name, services}) => {
         if (!services || !services.length) {
           return
         }

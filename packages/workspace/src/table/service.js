@@ -1,7 +1,7 @@
-export default function ({data, utils, name, resolveServices}) {
+export default function service({data, utils, name, resolveService}) {
   const {firstToUpperCase} = utils
-  return [
-    {
+  return {
+    entry: {
       name,
       services: [
         {
@@ -38,13 +38,15 @@ export default function ({data, utils, name, resolveServices}) {
         })
       ]
     },
-    data.hasAdd && resolveServices("dialog-form", {
-      name: "addForm",
-      data: data.addForm
-    }),
-    data.hasUpdate && resolveServices("dialog-form", {
-      name: "updateForm",
-      data: data.updateForm
-    })
-  ]
+    children: [
+      data.hasAdd && resolveService("dialog-form", {
+        name: "addForm",
+        data: data.addForm
+      }),
+      data.hasUpdate && resolveService("dialog-form", {
+        name: "updateForm",
+        data: data.updateForm
+      })
+    ]
+  }
 }

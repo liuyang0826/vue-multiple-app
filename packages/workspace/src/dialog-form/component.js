@@ -1,11 +1,11 @@
 import template from "./template.ejs"
 
-export default function components({ name, data }) {
-  return [
-    {
+export default function component({ name, data }) {
+  return {
+    entry: {
       template,
       name,
       data
     }
-  ]
+  }
 }

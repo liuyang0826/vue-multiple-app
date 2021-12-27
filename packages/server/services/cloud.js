@@ -18,22 +18,22 @@ async function getSchemaById(ctx) {
 async function submit(ctx) {
   const data = ctx.request.body
   fs.writeFileSync(path.resolve("schema.json"), JSON.stringify(data, null, 2), "utf8")
-  const { components, services } = cloudIdMap.get(ctx.query.id)
+  const { component, service } = cloudIdMap.get(ctx.query.id)
 
-  function resolveComponents(cloudId, { name, data }) {
-    const { components } = cloudIdMap.get(cloudId)
-    return components({ name: utils.firstToUpperCase(name), data, resolveComponents })
+  function resolveComponent(cloudId, { name, data }) {
+    const { component } = cloudIdMap.get(cloudId)
+    return component({ name: utils.firstToUpperCase(name), data, resolveComponent })
   }
 
-  function resolveServices(cloudId, { name, data }) {
-    const { services } = cloudIdMap.get(cloudId)
-    return services({ name: utils.firstToUpperCase(name), data, utils, resolveServices })
+  function resolveService(cloudId, { name, data }) {
+    const { service } = cloudIdMap.get(cloudId)
+    return service({ name: utils.firstToUpperCase(name), data, utils, resolveService })
   }
 
   await ctx.create({
     root: "test",
-    components: components({data, resolveComponents}),
-    services: services({ data, utils, resolveServices })
+    component: component({data, resolveComponent}),
+    service: service({ data, utils, resolveService })
   })
   ctx.body = "success"
 }

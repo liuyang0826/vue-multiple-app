@@ -1,6 +1,6 @@
-export default function services({ name, data, utils }) {
-  return [
-    {
+export default function service({ name, data, utils }) {
+  return {
+    entry: {
       name,
       services: [
         {
@@ -10,5 +10,5 @@ export default function services({ name, data, utils }) {
         }
       ]
     }
-  ]
+  }
 }

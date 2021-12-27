@@ -1,9 +1,9 @@
 import schemas from "./schemas.ejs"
-import components from "./components"
-import services from "./services"
+import component from "./component"
+import service from "./service"
 
 export default {
   schemas,
-  components,
-  services
+  component,
+  service
 }
