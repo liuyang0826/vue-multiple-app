@@ -48,9 +48,18 @@ async function getHistoryForm(ctx) {
   ctx.body = fs.readFileSync(path.resolve("schema.json"), "utf8")
 }
 
+async function getAllSchemas(ctx) {
+  ctx.type = "json"
+  ctx.body = JSON.stringify([
+    { name: "表格", id: "table" },
+    { name: "标签页", id: "tabs" },
+  ])
+}
+
 module.exports = {
   getSchemaById,
   submit,
   uploadCloudFounction,
   getHistoryForm,
+  getAllSchemas,
 }

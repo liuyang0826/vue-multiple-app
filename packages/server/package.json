@@ -20,7 +20,8 @@
     "koa2-cors": "^2.0.6",
     "magic-string": "^0.25.7",
     "nodemon": "^2.0.15",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "sequelize": "^7.0.0-alpha.2"
   },
   "nodemonConfig": {
     "watch": [

@@ -2,15 +2,15 @@
   [
     {
       type: "list",
-      label: "tabs项",
+      label: "标签项",
       prop: "tabs",
       schemas: [
-        {type: "text", label: "名称", prop: "label"},
+        {type: "text", label: "标签名称", prop: "label"},
         {
           type: "text",
-          label: "id",
+          label: "标签id",
           prop: "name",
-          rules: {required: true, trigger: ["blur", "change"], message: "tab的id必须填写"}
+          rules: {required: true, trigger: ["blur", "change"], message: "标签id必须填写"}
         },
         {
           type: "list",
@@ -22,18 +22,19 @@
               type: "select",
               label: "选择组件",
               prop: "schemaId",
-              options: [
-                {label: "表格", value: "table"}
-              ],
+              options: [],
+              async getOptions({ getAllSchemas }) {
+                return (await getAllSchemas()).map(d => ({ label: d.name, value: d.id} ))
+              },
               effect({model, resolveSchemas}) {
-                if (model.schemaId === "table") {
+                if (model.schemaId) {
                   return {
                     prop: "itemSchemas",
-                    schemas: resolveSchemas("table")
+                    schemas: resolveSchemas(model.schemaId)
                   }
                 }
               }
-            },
+            }
           ]
         }
       ]

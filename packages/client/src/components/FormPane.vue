@@ -100,29 +100,48 @@ function debounce(fn, delay) {
       prevTime = now
   };
 }
-watch(() => [props.model, props.schemas], debounce(async () => {
+
+const getAllSchemas = () => {
+  return fetch("http://127.0.0.1:5000/getAllSchemas")
+  .then(res => res.json())
+  .then((data) => data)
+}
+
+watch(() => props.model, debounce(async () => {
   loading = true
   const newFormItems = []
   async function process(schemas) {
     for (let i = 0; i < schemas.length; i++) {
       const schema = schemas[i]
-      const model = getPropByPath(props.model, schema.subPaths)
-      
       newFormItems.push(schema)
+      const model = getPropByPath(props.model, schema.subPaths)
       if (!(schema.prop in model)) {
         model[schema.prop] = schema.default
         if (["checkboxGroup", "list"].includes(schema.type) && !model[schema.prop]) {
           model[schema.prop] = reactive([])
         }
       }
+      if (schema.getOptions && !schema.isOptionsReady) {
+        // 异步拉取options
+        schema.isOptionsReady = true
+        schema.getOptions({
+          getAllSchemas
+        }).then((options) => {
+          schema.isOptionsReady = true
+          schema.options = options
+        }).catch(() => {
+          schema.isOptionsReady = false
+        })
+      }
+
       const effect = schema.effect?.({ model, schemas, resolveSchemas })
       if (!effect) {
         continue
       }
       if (Array.isArray(effect)) {
         await process(effect.map(item => ({
-            ...item,
-            subPaths: schema.subPaths
+          ...item,
+          subPaths: schema.subPaths
         })))
       } else {
         if (!model[effect.prop]) {
