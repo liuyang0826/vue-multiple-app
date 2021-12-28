@@ -1,5 +1,6 @@
+import http from '../../../http'
 export const getTableData = async params => {
-  return await http.post('/api/pageList', params)
+  return await http.post('/api/user/pageList', params)
 }
 
 export const doDelete = async params => {

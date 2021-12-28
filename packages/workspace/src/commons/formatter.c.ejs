@@ -1,0 +1,22 @@
+<script>
+    export default {
+      type: "code",
+      label: "格式化",
+      prop: "formatter",
+      width: 80,
+      dialogWidth: 600,
+      tips: `
+<div style="line-height: 20px;">
+<p>自定义一个用于格式化数据的方法，默认直接展示该字段原始值。</p>
+<p>须遵循ES规范，示例如下：</p>
+<div style="margin-top: 6px;background: #f2f4fa;padding: 4px 8px;">
+<pre>
+export default function(row) {
+    return row.price / 1000 + "元"
+}
+</pre>
+</div>
+</div>
+`
+    }
+</script>

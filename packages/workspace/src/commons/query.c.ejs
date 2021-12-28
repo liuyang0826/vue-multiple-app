@@ -1,11 +1,11 @@
 <script>
     export default [
-      {type: "text", prop: "api", label: "数据接口", colspan: 2},
+      {type: "text", prop: "dataApi", label: "数据接口"},
       {
         type: "code",
         prop: "queryTransform",
         label: "参数格式化",
-        colspan: 2,
+        dialogWidth: 600,
         tips: `
 <div style="line-height: 20px;">
 <p>自定义一个用于格式化查询参数的方法，默认{ query, pageSize, pageNum }。</p>

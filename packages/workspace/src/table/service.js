@@ -7,7 +7,7 @@ export default function service({data, utils, name, resolveService}) {
         {
           name: "getTableData",
           method: "post",
-          api: "/api/pageList",
+          api: data.dataApi,
         },
         data.hasDelete && {
           name: "doDelete",

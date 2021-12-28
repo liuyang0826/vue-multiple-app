@@ -49,7 +49,7 @@
               />
           <% }) %>
           <% if (hasUpdate || hasDelete || hasToggleEnable || hasMove) { %>
-              <el-table-column label="操作" width="176">
+              <el-table-column label="操作" width="<%= [hasUpdate, hasDelete, hasToggleEnable, hasMove, hasMove].filter((d) => d).length * 44 %>">
                   <template #default="{row}">
                       <% if (hasUpdate) { %>
                           <el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>
@@ -88,7 +88,10 @@
           />
       <% } %>
       <% if (hasAdd) { %>
-          <add-form v-model="add.visible" :data="add.data" :title="add.title"/>
+          <add-form v-model="add.visible" :data="add.data" :title="add.title" @success="updateTable"/>
+      <% } %>
+      <% if (hasUpdate) { %>
+          <update-form v-model="update.visible" :data="update.data" :title="update.title" @success="updateTable"/>
       <% } %>
   </div>
 </template>
@@ -101,6 +104,9 @@
   import { Plus } from "@element-plus/icons-vue"
   import AddForm from "<%= $imports.getFilePath("component", "AddForm") %>"
   <% } %>
+  <% if (hasUpdate) { %>
+  import UpdateForm from "<%= $imports.getFilePath("component", "UpdateForm") %>"
+  <% } %>
   import {
       getTableData,
   <% if (hasDelete) { %>
@@ -109,8 +115,8 @@
   <% if (hasBatchDelete) { %>
       doBatchDelete,
   <% } %>
-  <% if (hasToggle) { %>
-      doToggle,
+  <% if (hasToggleEnable) { %>
+      doToggleEnable,
   <% } %>
   <% if (hasMove) { %>
       doMove,
@@ -149,7 +155,7 @@
   // <%= item.label %>选项
   let <%= item.prop %>Options = $ref([])
   <% if (item.depProp) { %>
-  watch([<% $imports.split(item.depProp, ",").forEach(function(item){  %> query.<%= item %>, <% }) %>], async (value) => {
+  watch([<% item.depProp.split(",").forEach(function(item){  %> query.<%= item %>, <% }) %>], async (value) => {
       if (value) {
           const { status, data, message } = await get<%= $imports.firstToUpperCase(item.prop) %>Options()
           if (status) {
@@ -197,7 +203,6 @@
           if (status) {
               tableData = data.result
               total = data.total
-              tableData = [{}]
           } else {
               ElMessage.error(message)
           }
@@ -252,12 +257,24 @@
   // 新增
   const add = reactive({
       visible: false,
-      data: {},
+      data: {
+      <% addForm.formItems.forEach(function (item){ %>
+      <% if (["checkboxGroup"].includes(item.type)) { %>
+        <%= item.prop %>: [],
+      <% } %>
+      <% }) %>
+      },
       title: ""
   })
   function handleAdd() {
       add.visible = true
-      add.data = {}
+      add.data = {
+      <% addForm.formItems.forEach(function (item){ %>
+      <% if (["checkboxGroup"].includes(item.type)) { %>
+        <%= item.prop %>: [],
+      <% } %>
+      <% }) %>
+      }
       add.title = "<%= addForm.title %>"
   }
   <% } %>

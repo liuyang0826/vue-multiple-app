@@ -40,7 +40,7 @@
       <el-table-column label="性别" prop="sex" width="200" />
       <el-table-column label="年龄" prop="age" width="200" />
       <el-table-column label="是否可用" prop="enable" width="200" />
-      <el-table-column label="操作" width="176">
+      <el-table-column label="操作" width="220">
         <template #default="{ row }">
           <el-button size="small" type="text" @click="handleUpdate(row)">编辑</el-button>
           <el-divider direction="vertical" />
@@ -67,7 +67,8 @@
       @sizeChange="handleSizeChange"
       @currentChange="handleCurrentChange"
     />
-    <add-form v-model="add.visible" :data="add.data" :title="add.title" />
+    <add-form v-model="add.visible" :data="add.data" :title="add.title" @success="updateTable" />
+    <update-form v-model="update.visible" :data="update.data" :title="update.title" @success="updateTable" />
   </div>
 </template>
 <script setup>
@@ -75,7 +76,8 @@ import { reactive, onBeforeMount, watch, nextTick } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import AddForm from './UserAddForm.vue'
-import { getTableData, doDelete, doBatchDelete, doMove } from '../services/user'
+import UpdateForm from './UserUpdateForm.vue'
+import { getTableData, doDelete, doBatchDelete, doToggleEnable, doMove } from '../services/user'
 
 const query = reactive({})
 let pending = $ref(false)
@@ -92,19 +94,28 @@ let sexOptions = [
   { label: '男', value: '1' },
   { label: '女', value: '2' }
 ]
+// 转换查询参数
+function queryTransform({ query, pageSize, pageNum }) {
+  return {
+    query: { ...query, category: 1 },
+    pageSize,
+    pageNum
+  }
+}
 // 获取表格数据
 async function updateTable() {
   pending = true
   try {
-    const { status, data, message } = await getTableData({
-      query,
-      pageNum,
-      pageSize
-    })
+    const { status, data, message } = await getTableData(
+      queryTransform({
+        query,
+        pageNum,
+        pageSize
+      })
+    )
     if (status) {
       tableData = data.result
       total = data.total
-      tableData = [{}]
     } else {
       ElMessage.error(message)
     }
@@ -137,12 +148,16 @@ onBeforeMount(handleSearch)
 // 新增
 const add = reactive({
   visible: false,
-  data: {},
+  data: {
+    hobby: []
+  },
   title: ''
 })
 function handleAdd() {
   add.visible = true
-  add.data = {}
+  add.data = {
+    hobby: []
+  }
   add.title = '新增用户'
 }
 //编辑

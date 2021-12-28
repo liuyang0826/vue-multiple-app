@@ -51,34 +51,37 @@
         <edit/>
       </el-icon>
     </div>
+    <div v-else-if="type === 'more' && !isInnerTable" class="more-line" @click="$emit('update:modelValue', !modelValue)">
+      {{ modelValue ? "收起" : "展开" }}<el-icon :class="{ 'active': modelValue }"><arrow-right /></el-icon>
+    </div>
     <el-input v-else :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" :placeholder="placeholder">
       <template v-if="prepend" #prepend>{{ prepend }}</template>
     </el-input>
-    <el-dialog v-if="hasDialog" v-model="visible" append-to-body :width="`${dialogWidth || 480}px`">
+    <el-drawer v-if="hasDialog" v-model="visible" append-to-body :show-close="false" :size="`${dialogWidth || 480}px`">
       <template #title>
         <div style="display: flex;align-items: center;">
-          {{label}}
-          <el-tooltip v-if="tips" style="margin-left: 2px;" effect="light" placement="bottom">
-            <el-icon size="mini">
-              <Warning />
-            </el-icon>
-            <template #content>
-              <div v-html="tips"></div>
-            </template>
-          </el-tooltip>
+          <div style="display: flex;align-items: center;flex: 1;">
+            {{label}}
+            <el-tooltip v-if="tips" style="margin-left: 2px;" effect="light" placement="bottom">
+              <el-icon size="mini">
+                <Warning />
+              </el-icon>
+              <template #content>
+                <div v-html="tips"></div>
+              </template>
+            </el-tooltip>
+          </div>
+          <el-button size="mini" type="primary" @click="visible = false">确定</el-button>
         </div>
       </template>
-      <Codemirror v-if="type === 'code'" :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" />
-      <slot />
-      <template #footer>
-        <el-button size="small" type="primary" @click="visible = false">确定</el-button>
-      </template>
-    </el-dialog>
+      <Codemirror v-if="type === 'code' && visible" :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" />
+      <slot v-else />
+    </el-drawer>
   </el-form-item>
 </template>
 
 <script setup lang="ts">
-import { Edit, Warning } from "@element-plus/icons-vue"
+import { Edit, Warning, ArrowRight } from "@element-plus/icons-vue"
 import Codemirror from "./Codemirror.vue";
 
 const props = defineProps<{
@@ -101,5 +104,22 @@ const props = defineProps<{
 
 const visible = $ref(false)
 
-const hasDialog = $computed(() => ['list', 'code', 'more', 'table'].includes(props.type))
+const hasDialog = $computed(() => (props.type === 'more' && props.isInnerTable) || ['list', 'code', 'table'].includes(props.type))
 </script>
+
+<style>
+.more-line {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  color: var(--el-text-color-regular);
+  cursor: pointer;
+}
+.more-line .el-icon {
+  transition: transform .3s ease;
+  margin-left: 4px;
+}
+.more-line .active {
+  transform: rotate(90deg);
+}
+</style>

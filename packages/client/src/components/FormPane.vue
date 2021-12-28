@@ -19,6 +19,19 @@
             :min-width="subItem.width || 160"
             :align="['list', 'code', 'more'].includes(subItem.type) ? 'center' : 'left'"
         >
+          <template v-if="subItem.tips" #header="{ column }">
+            <div style="display: inline-flex;align-items: center;">
+              {{column.label}}
+              <el-tooltip style="margin-left: 2px" effect="light"  placement="top">
+                <el-icon size="mini">
+                  <warning />
+                </el-icon>
+                <template #content>
+                  <div v-html="subItem.tips"></div>
+                </template>
+              </el-tooltip>
+            </div>
+          </template>
           <template v-slot:default="{ row, $index }">
             <form-item
               style="margin-bottom: 0;"
@@ -114,7 +127,7 @@
 
 <script setup lang="ts">
 import FormItem from "./FormItem.vue"
-import { Delete, CirclePlusFilled, RemoveFilled, Bottom, Top } from "@element-plus/icons-vue"
+import { Delete, CirclePlusFilled, RemoveFilled, Bottom, Top, Warning } from "@element-plus/icons-vue"
 import {getPropByPath, resolveSchemas} from "../utils"
 import {onMounted, reactive, watch} from "vue";
 

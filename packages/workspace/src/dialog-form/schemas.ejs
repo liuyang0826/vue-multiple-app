@@ -20,6 +20,7 @@
           label: "后端字段",
           rules: {required: true, trigger: ["blur", "change"], message: "后端字段必须填写"}
         },
+        {type: "switch", prop: "required", label: "必填", width: 60, default: true},
         {
           type: "select",
           prop: "type",
@@ -28,13 +29,33 @@
           options: [
             {label: "文本", value: "text"},
             {label: "下拉框", value: "select"},
-            {label: "单选框", value: "radio"},
+            {label: "单选框", value: "radioGroup"},
             {label: "复选框", value: "checkboxGroup"},
             {label: "日期时间", value: "date"},
           ],
           effect({ model }) {
+            if (model.type === "text") {
+              return [
+                {
+                  type: "more",
+                  prop: "showMore",
+                  label: "更多选项",
+                  colspan: 2,
+                  effect({model}) {
+                    if (model.showMore) {
+                      return [
+                        { type: "text", prop: "maxlength", label: "最大长度" },
+                        {type: "text", prop: "tips", label: "提示内容",},
+                        {type: "text", prop: "prepend", label: "前置内容",},
+                        {type: "text", prop: "append", label: "后置内容",},
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
             if (model.type === "date") {
-              return  [
+              return [
                 {
                   type: "select",
                   prop: "dateType",
@@ -52,12 +73,12 @@
                 }
               ]
             }
-            if (['select', 'radio', 'checkboxGroup'].includes(model.type)) {
+            if (['select', 'radioGroup', 'checkboxGroup'].includes(model.type)) {
               return [
                 {
                   type: "radio",
                   prop: "optionType",
-                  label: "类型",
+                  label: "选项类型",
                   default: "fixed",
                   options: [
                     {label: "固定项", value: "fixed"},
@@ -67,7 +88,7 @@
                     if (model.optionType === "api") {
                       return [
                         {type: "text", prop: "api", label: "接口地址",},
-                        {type: "text", prop: "depProp", label: "关联后端字段", placeholder: "逗号分割，当这些字段有值时才调接口"}
+                        {type: "text", prop: "depProp", label: "关联字段", tips: "逗号分割，当这些字段有值时才调接口"}
                       ]
                     } else {
                       return [
@@ -88,17 +109,15 @@
               ]
             }
           }
-        },
-        {type: "switch", prop: "required", label: "必填", width: 60, default: true},
-        {type: "text", prop: "tips", label: "提示内容",},
-        {type: "text", prop: "append", label: "后置内容",},
+        }
       ],
     },
     {type: "text", prop: "api", label: "接口地址",},
     {
       type: "code",
-      prop: "paramsTransform",
-      label: "参数格式化",
+      prop: "formTransform",
+      label: "表单格式化",
+      dialogWidth: 600,
       tips: `
 <div style="line-height: 20px;">
 <p>自定义一个用于转换保存数据的方法，默认会原样提交整个form对象。</p>

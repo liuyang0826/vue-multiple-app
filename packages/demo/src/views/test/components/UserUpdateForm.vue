@@ -20,13 +20,13 @@
             ：
           </div>
         </template>
-        <el-input clearable v-model="form.name" placeholder="请输入姓名" style="width: 260px" />
+        <el-input v-model="form.name" placeholder="请输入姓名" style="width: 260px" />
       </el-form-item>
       <el-form-item label="性别：" prop="sex" label-width="82px">
-        <el-input clearable v-model="form.sex" placeholder="请输入性别" style="width: 260px" />
+        <el-input v-model="form.sex" placeholder="请输入性别" style="width: 260px" />
       </el-form-item>
       <el-form-item label="年龄：" prop="age" label-width="82px">
-        <el-input clearable v-model="form.age" placeholder="请输入年龄" style="width: 260px">
+        <el-input v-model="form.age" placeholder="请输入年龄" style="width: 260px">
           <template #append>岁</template>
         </el-input>
       </el-form-item>
@@ -48,6 +48,7 @@ const props = defineProps({
   title: String,
   data: Object
 })
+const emit = defineEmits(['update:modelValue', 'success'])
 let form = $ref({})
 let loading = $ref(false)
 let formRef = $ref()
@@ -62,21 +63,30 @@ watch(
     if (visible) {
       return
     }
+    loading = false
+    form = JSON.parse(JSON.stringify(props.data))
     nextTick(() => {
-      loading = false
-      form = JSON.parse(JSON.stringify(props.data))
       formRef.clearValidate()
     })
   }
 )
+// 转换表单数据
+function formTransform(form) {
+  return {
+    realName: form.name,
+    price: form.price * 100
+  }
+}
 function handleSubmit() {
   formRef.validate(async flag => {
     if (flag) {
       loading = true
       try {
-        const { status, message } = await submit(form)
+        const { status, message } = await submit(formTransform(form))
         if (status) {
           ElMessage.success('操作成功')
+          emit('update:modelValue', false)
+          emit('success')
         } else {
           ElMessage.error(message)
         }

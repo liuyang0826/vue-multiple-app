@@ -1,4 +1,5 @@
 const itemWidth = 260
+const dateWidth = 340
 
 function autoFormWidth(map) {
   return (formItems) => {
@@ -16,14 +17,27 @@ function autoFormWidth(map) {
         }
         return maxLabel
       })
+      const inputWidths = Array.from({length: cols}).map((_, index) => {
+        let maxInput = 0
+        for (let i = index; i < formItemCount; i += cols) {
+          const item = formItems[i]
+          const curWidth = item.dateType === "datetimerange" ? dateWidth : itemWidth
+          if (curWidth > maxInput) {
+            maxInput = curWidth
+          }
+        }
+        return maxInput
+      })
       const labelWidth = {}
+      const inputWidth = {}
       formItems.forEach((item, index) => {
         labelWidth[index] = labelWidths[index % cols]
+        inputWidth[index] = inputWidths[index % cols]
       })
       map.set(formItems, {
         labelWidth,
-        itemWidth,
-        dialogWidth: labelWidths.reduce((a, b) => a + b, 0) + itemWidth * cols + 40 + (cols - 1) * 10
+        inputWidth,
+        dialogWidth: labelWidths.reduce((a, b) => a + b, 0) + inputWidths.reduce((a, b) => a + b, 0) * cols + 40 + (cols - 1) * 10
       })
     }
     return map.get(formItems)

@@ -49,7 +49,6 @@ async function updateTable() {
     if (status) {
       tableData = data.result
       total = data.total
-      tableData = [{}]
     } else {
       ElMessage.error(message)
     }

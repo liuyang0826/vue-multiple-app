@@ -68,24 +68,67 @@
               "label": "姓名",
               "prop": "name",
               "required": true,
-              "tips": "姓名",
-              "type": "text"
+              "tips": "\b姓名不可更改",
+              "type": "text",
+              "maxlength": "2"
             },
             {
               "label": "性别",
               "prop": "sex",
               "required": true,
               "append": "",
-              "type": "text"
+              "type": "radioGroup",
+              "optionType": "fixed",
+              "options": [
+                {
+                  "label": "男",
+                  "value": "1"
+                },
+                {
+                  "label": "女",
+                  "value": "2"
+                }
+              ]
+            },
+            {
+              "label": "年龄",
+              "prop": "age",
+              "required": true,
+              "type": "text",
+              "dateType": "date",
+              "append": "岁"
             },
             {
               "label": "生日",
               "prop": "birthday",
+              "type": "date",
               "required": true,
-              "type": "date"
+              "dateType": "datetimerange"
+            },
+            {
+              "label": "爱好",
+              "prop": "hobby",
+              "type": "checkboxGroup",
+              "required": true,
+              "optionType": "fixed",
+              "options": [
+                {
+                  "label": "篮球",
+                  "value": "1"
+                },
+                {
+                  "label": "唱歌",
+                  "value": "2"
+                },
+                {
+                  "label": "游泳",
+                  "value": "3"
+                }
+              ]
             }
           ],
-          "api": "/api/user/add"
+          "api": "/api/user/add",
+          "formTransform": "export default function(form) {\n    return {\n        realName: form.name,\n        price: form.price * 100\n    }\n}"
         },
         "updateForm": {
           "title": "编辑用户",
@@ -111,7 +154,8 @@
               "type": "text"
             }
           ],
-          "api": "/api/user/update"
+          "api": "/api/user/update",
+          "formTransform": "export default function(form) {\n    return {\n        realName: form.name,\n        price: form.price * 100\n    }\n}"
         },
         "hasDelete": true,
         "hasBatchDelete": true,
@@ -121,7 +165,15 @@
         "deleteApi": "/api/user/delete",
         "batchDeleteApi": "/api/user/batchDelete",
         "toggleEnableApi": "/api/user/toggleEnable",
-        "moveApi": "/api/user/move"
+        "moveApi": "/api/user/move",
+        "addFormType": "dialog",
+        "dataApi": "/api/user/pageList",
+        "queryTransform": "export default function({\n    query,\n    pageSize,\n    pageNum\n}) {\n    return {\n        query: { ...query, category: 1 },\n        pageSize,\n        pageNum\n    }\n}",
+        "hasViewDetail": true,
+        "viewDetailType": "page",
+        "viewDetailFields": [
+          {}
+        ]
       }
     },
     {
@@ -159,7 +211,10 @@
               "required": true
             }
           ]
-        }
+        },
+        "hasViewDetail": false,
+        "viewDetailType": "dialog",
+        "viewDetailFields": []
       }
     }
   ]

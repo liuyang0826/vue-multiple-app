@@ -9,8 +9,8 @@ import 'codemirror/theme/idea.css'
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/addon/edit/closebrackets.js'
 
-const emit = defineEmits("update:modelValue")
-defineProps(["modelValue"])
+const emit = defineEmits(["update:modelValue"])
+const props = defineProps(["modelValue"])
 
 const rootRef = $ref()
 onMounted(() => {
@@ -22,7 +22,7 @@ onMounted(() => {
       autoCloseTags: true,
       theme: "idea"
     })
-    // codeMirror.setValue(modelValue)
+    codeMirror.setValue(props.modelValue || "")
     codeMirror.on("change", (e) => {
       emit("update:modelValue", e.getValue())
     })

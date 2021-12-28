@@ -190,7 +190,12 @@ function handleSubmit() {
   cursor: pointer;
 }
 
-body .el-dialog__header {
+body .el-drawer {
+  overflow: auto;
+  font-size: 14px;
+}
+
+body .el-drawer__header {
   position: sticky;
   top: 0;
   background: #fff;
@@ -198,6 +203,7 @@ body .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
   padding-top: 16px;
   padding-bottom: 12px;
+  margin-bottom: 0;
 }
 
 body .el-dialog__body {

@@ -16,15 +16,44 @@
                           </div>
                       </template>
                   <% } %>
-                  <el-input
-                      clearable
-                      v-model="form.<%= item.prop %>"
-                      placeholder="请输入<%= item.label %>"
-                      style="width: <%= $imports.autoFormWidth(formItems).itemWidth %>px;"
+                  <% if (item.type === "text") { %>
+                      <el-input
+                          v-model="form.<%= item.prop %>"
+                          placeholder="请输入<%= item.label %>"
+                          <% if (item.maxlength) { %>:maxlength="<%= item.maxlength %>"<% } %>
+                          style="width: <%= $imports.autoFormWidth(formItems).inputWidth[index] %>px;"
                       <% if (!item.append) { %>/><% } %>
                       <% if (item.append) { %>><% } %>
                       <% if (item.append) { %><template #append><%= item.append %></template><% } %>
                       <% if (item.append) { %></el-input><% } %>
+                  <% } %>
+                  <% if (item.type === "select") { %>
+                      <el-select
+                          v-model="form.<%= item.prop %>"
+                          placeholder="请选择<%= item.label %>"
+                          style="width: <%= $imports.autoFormWidth(formItems).inputWidth[index] %>px;"
+                      >
+                          <el-option v-for="({ label, value }) in <%= item.prop %>Options" :key="value" :label="label" :value="value" />
+                      </el-select>
+                  <% } %>
+                  <% if (item.type === "date") { %>
+                      <el-date-picker
+                          type="<%= item.dateType %>"
+                          v-model="form.<%= item.prop %>"
+                          placeholder="请选择<%= item.label %>"
+                          style="width: <%= $imports.autoFormWidth(formItems).inputWidth[index] %>px;"
+                      />
+                  <% } %>
+                  <% if (item.type === "checkboxGroup") { %>
+                      <el-checkbox-group v-model="form.<%= item.prop %>">
+                          <el-checkbox v-for="({ label, value }) in <%= item.prop %>Options" :key="value" :label="value" >{{ label }}</el-checkbox>
+                      </el-checkbox-group>
+                  <% } %>
+                  <% if (item.type === "radioGroup") { %>
+                      <el-radio-group v-model="form.<%= item.prop %>">
+                          <el-radio v-for="({ label, value }) in <%= item.prop %>Options" :key="value" :label="value" >{{ label }}</el-radio>
+                      </el-radio-group>
+                  <% } %>
               </el-form-item>
           <% }) %>
       </el-form>
@@ -39,7 +68,7 @@
   import { watch, nextTick } from "vue"
   import { submit } from "<%= $imports.getFilePath("service") %>"
   import { ElMessage } from 'element-plus'
-  <% if ($imports.some(formItems, d => d.tips)) { %>
+  <% if (formItems.some(d => d.tips)) { %>
   import { Warning } from "@element-plus/icons-vue"
   <% } %>
   const props = defineProps({
@@ -47,30 +76,46 @@
       title: String,
       data: Object,
   })
-  let form = $ref({})
+  const emit = defineEmits(["update:modelValue", "success"])
+  let form = $ref({
+  <% formItems.forEach(function (item){ %>
+  <% if (["checkboxGroup"].includes(item.type)) { %>
+  <%= item.prop %>: [],
+  <% } %>
+  <% }) %>
+  })
   let loading = $ref(false)
   let formRef = $ref()
   let rules = {
       <% formItems.forEach(function (item){ %>
       <% if (item.required) { %>
-      <%= item.prop %>: { required: true, message: "请输入<%= item.label %>", trigger: ["change", "blur"] },
+      <%= item.prop %>: { required: true, message: "请<%= ["text"].includes(item.type) ? "输入" : "选择" %><%= item.label %>", trigger: ["change", "blur"] },
       <% } %>
       <% }) %>
   }
+  <% formItems.forEach(function (item){ %>
+  <% if (["select", "checkboxGroup", "radioGroup"].includes(item.type)) { %>
+  const <%= item.prop %>Options = [
+  <% item.options.forEach(function(item){ %>
+    { label: "<%= item.label %>", value: "<%= item.value %>" },
+  <% }) %>
+  ]
+  <% } %>
+  <% }) %>
   watch(() => props.modelValue, (visible) => {
       if (visible) {
           return
       }
+      loading = false
+      form = JSON.parse(JSON.stringify(props.data))
       nextTick(() => {
-          loading = false
-          form = JSON.parse(JSON.stringify(props.data))
           formRef.clearValidate()
       })
   })
 
-  <% if (paramsTransform) { %>
+  <% if (formTransform) { %>
   // 转换表单数据
-  <%- $imports.parseDefaultFunction(paramsTransform, "paramsTransform") %>
+  <%- $imports.parseDefaultFunction(formTransform, "formTransform") %>
   <% } %>
 
   function handleSubmit() {
@@ -79,12 +124,14 @@
               loading = true
               try {
                   const { status, message } = await submit(
-                      <% if (paramsTransform) { %>paramsTransform(<% } %>
+                      <% if (formTransform) { %>formTransform(<% } %>
                           form
-                      <% if (paramsTransform) { %>)<% } %>
+                      <% if (formTransform) { %>)<% } %>
                   )
                   if (status) {
                       ElMessage.success("操作成功")
+                      emit("update:modelValue", false)
+                      emit("success")
                   } else {
                       ElMessage.error(message)
                   }
