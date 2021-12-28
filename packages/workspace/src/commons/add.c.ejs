@@ -1,0 +1,34 @@
+<script>
+  export default {
+    type: "switch",
+    prop: "hasAdd",
+    label: "新增",
+    // colspan: 2,
+    effect({model, schemas, resolveSchemas}) {
+      if (model.hasAdd) {
+        return [
+          {
+            type: "select",
+            prop: "addFormType",
+            label: "表单类型",
+            // colspan: 2,
+            options: [
+              { label: "弹窗", value: "dialog" },
+              { label: "页面", value: "page" },
+            ],
+            default: "dialog",
+            effect({ model }) {
+              if (model.addFormType === "dialog") {
+                return {
+                  prop: "addForm",
+                  colspan: 2,
+                  schemas: resolveSchemas("dialog-form")
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+</script>

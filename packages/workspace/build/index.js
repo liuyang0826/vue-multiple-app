@@ -5,7 +5,7 @@ const glob = require('glob');
 const ejs = require('./rollup-plugin-ejs');
 const { terser } = require('rollup-plugin-terser');
 
-async function index(name) {
+async function build(name) {
   const bundle = await rollup.rollup({
     input: path.resolve(`src/${name}/index.js`),
     plugins: [
@@ -22,7 +22,7 @@ async function index(name) {
 
 async function buildAll() {
   const files = glob.sync('src/**/index.js')
-  await Promise.all(files.map((file) => index(file.match(/src\/(.+)\/index.js/)[1])))
+  await Promise.all(files.map((file) => build(file.match(/src\/(.+)\/index.js/)[1])))
   uploader()
 }
 
@@ -30,4 +30,6 @@ function uploader() {
   fs.moveSync(path.resolve("dist"), path.resolve("../server/workspace"), { overwrite: true })
 }
 
-buildAll();
+buildAll().catch((e) => {
+  console.log(e);
+});

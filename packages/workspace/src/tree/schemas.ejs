@@ -1,5 +1,9 @@
 <script cols="2">
-  [
+  import querySchemas from "../commons/query.c.ejs"
+  import addSchema from "../commons/add.c.ejs"
+  import updateSchema from "../commons/update.c.ejs"
+  import delSchema from "../commons/delete.c.ejs"
+  export default [
     {
       type: "select",
       prop: "type",
@@ -11,53 +15,10 @@
         {label: "列表", value: "list"},
       ]
     },
-    {type: "text", prop: "api", label: "数据接口", colspan: 2},
-    {
-      type: "switch",
-      prop: "hasAdd",
-      label: "新增",
-      colspan: 2,
-      effect({model, schemas, resolveSchemas}) {
-        if (model.hasAdd) {
-          return {
-            prop: "addForm",
-            colspan: 2,
-            schemas: resolveSchemas("dialog-form")
-          }
-        }
-      }
-    },
-    {
-      type: "switch",
-      prop: "hasUpdate",
-      label: "编辑",
-      colspan: 2,
-      effect({model, schemas, resolveSchemas}) {
-        if (model.hasUpdate) {
-          return {
-            prop: "updateForm",
-            colspan: 2,
-            schemas: resolveSchemas("dialog-form")
-          }
-        }
-      }
-    },
-    {
-      type: "switch",
-      prop: "hasDelete",
-      label: "删除",
-      effect({model, schemas}) {
-        if (model.hasDelete) {
-          return [
-            {
-              type: "text",
-              prop: "deleteApi",
-              label: "接口地址"
-            }
-          ]
-        }
-      }
-    },
+    ...querySchemas,
+    addSchema,
+    updateSchema,
+    delSchema,
     {
       type: "table",
       prop: "components",

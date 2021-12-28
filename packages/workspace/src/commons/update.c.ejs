@@ -1,0 +1,17 @@
+<script>
+  export default {
+    type: "switch",
+    prop: "hasUpdate",
+    label: "编辑",
+    colspan: 2,
+    effect({model, schemas, resolveSchemas}) {
+      if (model.hasUpdate) {
+        return {
+          prop: "updateForm",
+          colspan: 2,
+          schemas: resolveSchemas("dialog-form")
+        }
+      }
+    }
+  }
+</script>

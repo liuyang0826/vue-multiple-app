@@ -1,5 +1,5 @@
 <script cols="2">
-  [
+  export default [
     {type: "text", prop: "title", label: "标题", colspan: 2},
     {
       type: "list",
@@ -37,7 +37,7 @@
               return  [
                 {
                   type: "select",
-                  prop: "type",
+                  prop: "dateType",
                   label: "时间类型",
                   default: "date",
                   options: [

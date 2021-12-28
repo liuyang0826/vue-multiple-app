@@ -1,0 +1,32 @@
+<script>
+    export default [
+      {type: "text", prop: "api", label: "数据接口", colspan: 2},
+      {
+        type: "code",
+        prop: "queryTransform",
+        label: "参数格式化",
+        colspan: 2,
+        tips: `
+<div style="line-height: 20px;">
+<p>自定义一个用于格式化查询参数的方法，默认{ query, pageSize, pageNum }。</p>
+<p>须遵循ES规范，示例如下：</p>
+<div style="margin-top: 6px;background: #f2f4fa;padding: 4px 8px;">
+<pre>
+export default function({
+    query,
+    pageSize,
+    pageNum
+}) {
+    return {
+        query: { ...query, category: 1 },
+        pageSize,
+        pageNum
+    }
+}
+</pre>
+</div>
+</div>
+`
+      },
+    ]
+</script>

@@ -1,0 +1,18 @@
+<script>
+  export default {
+    type: "switch",
+    prop: "hasDelete",
+    label: "删除",
+    effect({model, schemas}) {
+      if (model.hasDelete) {
+        return [
+          {
+            type: "text",
+            prop: "deleteApi",
+            label: "接口地址"
+          }
+        ]
+      }
+    }
+  }
+</script>
