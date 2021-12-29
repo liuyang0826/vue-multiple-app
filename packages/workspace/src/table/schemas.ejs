@@ -7,6 +7,9 @@
   import moveSchema from "../commons/move.c.ejs"
   import formatterSchema from "../commons/formatter.c.ejs"
   import styleSchema from "../commons/style.c.ejs"
+  import formItemBaseSchemas from "../commons/form-item-base.c.ejs"
+  import formItemTypeSchema from "../commons/form-item-type.c.ejs"
+  import formItemTipsSchema from "../commons/form-item-tips.c.ejs"
   export default [
     {
       type: "table",
@@ -37,61 +40,16 @@
       colspan: 2,
       cols: 2,
       schemas: [
+        ...formItemBaseSchemas,
         {
-          type: "text",
-          prop: "label",
-          label: "字段名",
-          rules: {required: true, trigger: ["blur", "change"], message: "字段名必须填写"}
-        },
-        {
-          type: "text",
-          prop: "prop",
-          label: "后端字段",
-          rules: {required: true, trigger: ["blur", "change"], message: "后端字段必须填写"}
-        },
-        {
-          type: "select",
-          prop: "type",
-          label: "类型",
-          default: "text",
-          options: [
-            {label: "文本", value: "text"},
-            {label: "下拉框", value: "select"},
-          ],
-          effect({ model }) {
-            if (model.type === 'select') {
+          type: "more",
+          prop: "showMore",
+          label: "更多选项",
+          colspan: 2,
+          effect({model}) {
+            if (model.showMore) {
               return [
-                {
-                  type: "radio",
-                  prop: "optionType",
-                  label: "类型",
-                  default: "fixed",
-                  options: [
-                    {label: "固定项", value: "fixed"},
-                    {label: "接口", value: "api"},
-                  ],
-                  effect({model, schemas}) {
-                    if (model.optionType === "api") {
-                      return [
-                        {type: "text", prop: "api", label: "接口地址",},
-                        {type: "text", prop: "depProp", label: "关联后端字段", placeholder: "逗号分割，当这些字段有值时才调接口"}
-                      ]
-                    } else {
-                      return [
-                        {
-                          type: "table",
-                          prop: "options",
-                          label: "选项",
-                          colspan: 2,
-                          schemas: [
-                            {type: "text", prop: "label", label: "键",},
-                            {type: "text", prop: "value", label: "值",},
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
+                formItemTypeSchema,
               ]
             }
           }

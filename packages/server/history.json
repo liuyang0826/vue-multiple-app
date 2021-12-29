@@ -55,7 +55,13 @@
           {
             "label": "年龄",
             "prop": "age",
-            "type": "text"
+            "type": "select",
+            "optionType": "api",
+            "options": [
+              {}
+            ],
+            "api": "/dsd",
+            "optionsWhen": "export default function(form) {\n    return form.name?.length\n}"
           }
         ],
         "hasAdd": true,
@@ -72,7 +78,8 @@
               "tips": "<div style=\"color: orange;\">\n    这个字段的作用是xxx。\n</div>",
               "type": "text",
               "maxlength": "2",
-              "showMore": true
+              "showMore": false,
+              "when": ""
             },
             {
               "label": "性别",
@@ -98,7 +105,8 @@
               "required": true,
               "type": "text",
               "dateType": "date",
-              "append": "岁"
+              "append": "岁",
+              "when": "export default function(form) {\n    return form.name\n}"
             },
             {
               "label": "生日",

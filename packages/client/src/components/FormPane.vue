@@ -11,7 +11,7 @@
           <circle-plus-filled />
         </el-icon>-->
       </div>
-      <el-table :data="getPropByPath(model, item.subPaths)[item.prop]" border size="mini" stripe style="margin-bottom: 8px;">
+      <el-table :data="getPropByPath(model, item.$subPaths)[item.prop]" border size="mini" stripe style="margin-bottom: 8px;">
         <el-table-column
             v-for="subItem in item.schemas"
             :label="subItem.label"
@@ -39,7 +39,7 @@
               :label="subItem.label"
               :prop="subItem.prop"
               :rules="subItem.rules"
-              :paths="[...paths, ...(item.subPaths || []), item.prop, $index, subItem.prop]"
+              :paths="[...paths, ...(item.$subPaths || []), item.prop, $index, subItem.prop]"
               v-model="row[subItem.prop]"
               :options="subItem.options"
               :placeholder="subItem.placeholder"
@@ -52,7 +52,7 @@
             >
               <FormPane
                 :schemas="subItem.schemas"
-                :paths="[...paths, ...(item.subPaths || []), item.prop, $index]"
+                :paths="[...paths, ...(item.$subPaths || []), item.prop, $index]"
                 :model="row"
               />
             </form-item>
@@ -60,7 +60,7 @@
         </el-table-column>
         <el-table-column fixed="right" width="40" align="center">
           <template v-slot:default="{ $index }">
-            <el-icon size="mini" @click="getPropByPath(model, item.subPaths)[item.prop].splice($index, 1)" style="cursor:pointer;">
+            <el-icon size="mini" @click="getPropByPath(model, item.$subPaths)[item.prop].splice($index, 1)" style="cursor:pointer;">
               <delete />
             </el-icon>
           </template>
@@ -77,13 +77,13 @@
         <span>{{item.label}}：</span>
       </div>
       <div
-          v-for="(row, $index) in getPropByPath(model, item.subPaths)[item.prop]"
+          v-for="(row, $index) in getPropByPath(model, item.$subPaths)[item.prop]"
           :key="$index"
           class="group"
       >
         <div class="list-title">
           <span style="flex: 1;">{{item.label}} #{{$index + 1}}</span>
-          <el-popconfirm title="确定删除？" @confirm="getPropByPath(model, item.subPaths)[item.prop].splice($index, 1)">
+          <el-popconfirm title="确定删除？" @confirm="getPropByPath(model, item.$subPaths)[item.prop].splice($index, 1)">
             <template #reference>
               <el-icon style="cursor:pointer;">
                 <remove-filled />
@@ -92,7 +92,7 @@
           </el-popconfirm>
         </div>
         <div class="list-wrap" :style="{gridTemplateColumns: `repeat(${item.cols || 1},minmax(0,1fr))`}">
-          <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.subPaths || []), item.prop, $index]" :model="row"/>
+          <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.$subPaths || []), item.prop, $index]" :model="row"/>
         </div>
       </div>
       <el-button @click="handleAdd(item)" style="width: 100%;margin-bottom: 12px;">增加{{item.label}}</el-button>
@@ -103,7 +103,7 @@
         class="group list-wrap"
         :style="{gridTemplateColumns: `repeat(${item.cols || 1},minmax(0,1fr))`, ...itemStyle(item)}"
     >
-      <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.subPaths || [])]" :model="getPropByPath(model, item.subPaths)"/>
+      <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.$subPaths || [])]" :model="getPropByPath(model, item.$subPaths)"/>
     </div>
     <form-item
         v-else
@@ -112,8 +112,8 @@
         :label="item.label"
         :prop="item.prop"
         :rules="item.rules"
-        :paths="[...paths, ...(item.subPaths || []), item.prop]"
-        v-model="getPropByPath(model, item.subPaths)[item.prop]"
+        :paths="[...paths, ...(item.$subPaths || []), item.prop]"
+        v-model="getPropByPath(model, item.$subPaths)[item.prop]"
         :options="item.options"
         :placeholder="item.placeholder"
         :prepend="item.prepend"
@@ -167,6 +167,8 @@ const getAllSchemas = () => {
   .then((data) => data)
 }
 
+let isInit = true
+
 const effect = debounce(async () => {
   loading = true
   const newFormItems = []
@@ -174,7 +176,7 @@ const effect = debounce(async () => {
     for (let i = 0; i < schemas.length; i++) {
       const schema = schemas[i]
       newFormItems.push(schema)
-      const model = getPropByPath(props.model, schema.subPaths)
+      const model = getPropByPath(props.model, schema.$subPaths)
       if (!(schema.prop in model)) {
         model[schema.prop] = schema.default
         if (["checkboxGroup", "list", "table"].includes(schema.type) && !model[schema.prop]) {
@@ -187,17 +189,22 @@ const effect = debounce(async () => {
       }
       if (schema.getOptions && !schema.isOptionsReady) {
         // 异步拉取options
-        schema.isOptionsReady = true
+        schema.$isOptionsReady = true
         schema.getOptions({
           getAllSchemas
         }).then((options) => {
-          schema.isOptionsReady = true
+          schema.$isOptionsReady = true
           schema.options = options
         }).catch(() => {
-          schema.isOptionsReady = false
+          schema.$isOptionsReady = false
         })
       }
 
+      // 第一次加载收起更多
+      if (schema.type === 'more' && !schema.$isLoaded) {
+        schema.$isLoaded = true
+        model[schema.prop] = false
+      }
       const effect = schema.effect?.({ model, schemas, resolveSchemas })
       if (!effect) {
         continue
@@ -205,7 +212,7 @@ const effect = debounce(async () => {
       if (Array.isArray(effect)) {
         await process(effect.map(item => ({
           ...item,
-          subPaths: schema.subPaths
+          $subPaths: schema.$subPaths
         })))
       } else {
         if (!model[effect.prop]) {
@@ -217,7 +224,7 @@ const effect = debounce(async () => {
           type: "child",
           schemas,
           cols,
-          subPaths: [...(schema.subPaths || []), effect.prop]
+          $subPaths: [...(schema.$subPaths || []), effect.prop]
         })
       }
     }
@@ -236,7 +243,7 @@ function handleAdd(item) {
   item.schemas.forEach((schema) => {
     newModel[schema.prop] = schema.default
   })
-  getPropByPath(props.model, item.subPaths)[item.prop].push(newModel)
+  getPropByPath(props.model, item.$subPaths)[item.prop].push(newModel)
 }
 
 function itemStyle(item) {

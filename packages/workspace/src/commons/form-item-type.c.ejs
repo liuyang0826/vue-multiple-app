@@ -1,0 +1,79 @@
+<script>
+  import optionsWhenSchema from "../commons/options-when.c.ejs"
+  export default {
+      type: "select",
+      prop: "type",
+      label: "类型",
+      default: "text",
+      options: [
+        {label: "文本", value: "text"},
+        {label: "下拉框", value: "select"},
+        {label: "单选框", value: "radioGroup"},
+        {label: "复选框", value: "checkboxGroup"},
+        {label: "日期时间", value: "date"},
+      ],
+      effect({ model }) {
+        if (model.type === "text") {
+          return [
+            {type: "text", prop: "maxlength", label: "最大长度" },
+            {type: "text", prop: "prepend", label: "前置内容",},
+            {type: "text", prop: "append", label: "后置内容",},
+          ]
+        }
+        if (model.type === "date") {
+          return [
+            {
+              type: "select",
+              prop: "dateType",
+              label: "时间类型",
+              default: "date",
+              options: [
+                {label: "日期", value: "date"},
+                {label: "日期时间", value: "datetime"},
+                {label: "日期范围", value: "daterange"},
+                {label: "日期时间范围", value: "datetimerange"},
+                {label: "年", value: "year"},
+                {label: "月", value: "month"},
+                {label: "周", value: "week"},
+              ],
+            },
+          ]
+        }
+        if (['select', 'radioGroup', 'checkboxGroup'].includes(model.type)) {
+          return [
+            {
+              type: "radio",
+              prop: "optionType",
+              label: "选项类型",
+              default: "fixed",
+              options: [
+                {label: "固定项", value: "fixed"},
+                {label: "接口", value: "api"},
+              ],
+              effect({model, schemas}) {
+                if (model.optionType === "api") {
+                  return [
+                    {type: "text", prop: "api", label: "接口地址",},
+                    optionsWhenSchema
+                  ]
+                } else {
+                  return [
+                    {
+                      type: "table",
+                      prop: "options",
+                      label: "选项",
+                      colspan: 2,
+                      schemas: [
+                        {type: "text", prop: "label", label: "键",},
+                        {type: "text", prop: "value", label: "值",},
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+</script>

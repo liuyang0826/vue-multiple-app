@@ -1,0 +1,21 @@
+<script>
+  export default {
+    type: "code",
+    prop: "optionsWhen",
+    label: "调用时机",
+    tips: `
+<div style="line-height: 20px;">
+<p>自定义一个用于控制调用获取选项接口时机方法，默认组件渲染完成立即调用。</p>
+<p>须遵循ES规范，示例如下：</p>
+<div style="margin-top: 6px;background: #f2f4fa;padding: 4px 8px;">
+<pre>
+// 返回true时调用接口
+export default function(form) {
+    return form.price > 100
+}
+</pre>
+</div>
+</div>
+`
+  }
+</script>

@@ -2,7 +2,12 @@
   <el-dialog :model-value="modelValue" :title="title" @update:modelValue="$emit('update:modelValue', $event)" width="<%= $imports.autoFormWidth(formItems).dialogWidth %>px" append-to-body :close-on-click-modal="false">
       <el-form :model="form" size="small" inline :rules="rules" ref="formRef" style="margin-right: -10px;">
           <% formItems.forEach(function(item, index){ %>
-              <el-form-item label="<%= item.label %>：" prop="<%= item.prop %>" label-width="<%= $imports.autoFormWidth(formItems).labelWidth[index] %>px">
+              <el-form-item
+                      label="<%= item.label %>："
+                      prop="<%= item.prop %>"
+                      label-width="<%= $imports.autoFormWidth(formItems).labelWidth[index] %>px"
+                      <% if (item.formWhen) { %> v-if="<%= item.prop %>When(form)" <% } %>
+              >
                   <% if (item.tips) { %>
                       <template #label>
                           <div style="display: inline-flex;align-items: center;">
@@ -113,6 +118,11 @@
     { label: "<%= item.label %>", value: "<%= item.value %>" },
   <% }) %>
   ]
+  <% } %>
+  <% }) %>
+  <% formItems.forEach(function (item){ %>
+  <% if (item.formWhen) { %>
+  <%- $imports.parseDefaultFunction(item.formWhen, item.prop + "When") %>
   <% } %>
   <% }) %>
   watch(() => props.modelValue, (visible) => {
