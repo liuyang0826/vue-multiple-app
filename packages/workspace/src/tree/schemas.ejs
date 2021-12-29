@@ -6,60 +6,63 @@
   import toggleEnableSchema from "../commons/toggle-enable.c.ejs"
   import moveSchema from "../commons/move.c.ejs"
   import styleSchema from "../commons/style.c.ejs"
-  export default [
-    {
-      type: "select",
-      prop: "type",
-      label: "左侧类型",
-      default: "tree",
-      options: [
-        {label: "树", value: "tree"},
-        {label: "列表", value: "list"},
-      ]
-    },
-    {type: "text", prop: "title", label: "左侧标题"},
-    ...querySchemas,
-    addSchema,
-    updateSchema,
-    delSchema,
-    toggleEnableSchema,
-    moveSchema,
-    {
-      type: "table",
-      prop: "components",
-      label: "右侧组件",
-      colspan: 2,
-      schemas: [
-        {type: "text", prop: "name", label: "组件id", colspan: 2},
-        {
-          type: "list",
-          label: "配置组件",
-          width: 70,
-          dialogWidth: 800,
-          schemas: [
-            {
-              type: "select",
-              label: "选择组件",
-              prop: "schemaId",
-              options: [],
-              async getOptions({ getAllSchemas }) {
-                return (await getAllSchemas()).map(d => ({ label: d.name, value: d.id} ))
-              },
-              effect({model, resolveSchemas}) {
-                if (model.schemaId) {
-                  return {
-                    prop: "itemSchemas",
-                    key: model.schemaId,
-                    schemas: resolveSchemas(model.schemaId)
+  export default {
+    cols: 2,
+    schemas: [
+      {
+        type: "select",
+        prop: "type",
+        label: "左侧类型",
+        default: "tree",
+        options: [
+          {label: "树", value: "tree"},
+          {label: "列表", value: "list"},
+        ]
+      },
+      {type: "text", prop: "title", label: "左侧标题"},
+      ...querySchemas,
+      addSchema,
+      updateSchema,
+      delSchema,
+      toggleEnableSchema,
+      moveSchema,
+      {
+        type: "table",
+        prop: "components",
+        label: "右侧组件",
+        colspan: 2,
+        schemas: [
+          {type: "text", prop: "name", label: "组件id", colspan: 2},
+          {
+            type: "list",
+            label: "配置组件",
+            width: 70,
+            dialogWidth: 800,
+            schemas: [
+              {
+                type: "select",
+                label: "选择组件",
+                prop: "schemaId",
+                options: [],
+                async getOptions({ getAllSchemas }) {
+                  return (await getAllSchemas()).map(d => ({ label: d.name, value: d.id} ))
+                },
+                effect({model, resolveSchemas}) {
+                  if (model.schemaId) {
+                    return {
+                      prop: "itemSchemas",
+                      key: model.schemaId,
+                      schemas: resolveSchemas(model.schemaId)
+                    }
                   }
                 }
               }
-            }
-          ]
-        }
-      ]
-    },
-    styleSchema
-  ]
+            ]
+          }
+        ]
+      },
+      styleSchema
+    ]
+  }
 </script>
 

@@ -1,4 +1,4 @@
-<script cols="2">
+<script>
   import querySchemas from "../commons/query.c.ejs"
   import addSchema from "../commons/add.c.ejs"
   import updateSchema from "../commons/update.c.ejs"
@@ -10,108 +10,111 @@
   import formItemBaseSchemas from "../commons/form-item-base.c.ejs"
   import formItemTypeSchema from "../commons/form-item-type.c.ejs"
   import formItemTipsSchema from "../commons/form-item-tips.c.ejs"
-  export default [
-    {
-      type: "table",
-      prop: "tableCols",
-      label: "表格列",
-      colspan: 2,
-      schemas: [
-        {
-          type: "text",
-          prop: "label",
-          label: "表头",
-          rules: {required: true, trigger: ["blur", "change"], message: "表头必须填写"}
-        },
-        {
-          type: "text",
-          prop: "prop",
-          label: "后端字段",
-          rules: {required: true, trigger: ["blur", "change"], message: "表头必须填写"}
-        },
-        {type: "text", prop: "width", label: "列宽", placeholder: "auto"},
-        formatterSchema,
-      ],
-    },
-    {
-      type: "list",
-      prop: "searchItems",
-      label: "查询字段",
-      colspan: 2,
-      cols: 2,
-      schemas: [
-        ...formItemBaseSchemas,
-        {
-          type: "more",
-          prop: "showMore",
-          label: "更多选项",
-          colspan: 2,
-          effect({model}) {
-            if (model.showMore) {
-              return [
-                formItemTypeSchema,
-              ]
+  export default {
+    cols: 2,
+    schemas: [
+      {
+        type: "table",
+        prop: "tableCols",
+        label: "表格列",
+        colspan: 2,
+        schemas: [
+          {
+            type: "text",
+            prop: "label",
+            label: "表头",
+            rules: {required: true, trigger: ["blur", "change"], message: "表头必须填写"}
+          },
+          {
+            type: "text",
+            prop: "prop",
+            label: "后端字段",
+            rules: {required: true, trigger: ["blur", "change"], message: "表头必须填写"}
+          },
+          {type: "text", prop: "width", label: "列宽", placeholder: "auto"},
+          formatterSchema,
+        ],
+      },
+      {
+        type: "list",
+        prop: "searchItems",
+        label: "查询字段",
+        colspan: 2,
+        cols: 2,
+        schemas: [
+          ...formItemBaseSchemas,
+          {
+            type: "more",
+            prop: "showMore",
+            label: "更多选项",
+            colspan: 2,
+            effect({model}) {
+              if (model.showMore) {
+                return [
+                  formItemTypeSchema,
+                ]
+              }
             }
+          },
+        ]
+      },
+      ...querySchemas,
+      addSchema,
+      updateSchema,
+      delSchema,
+      {type: "switch", prop: "hasIndex", label: "序号", default: true},
+      {type: "switch", prop: "hasPagination", label: "分页", default: true},
+      {
+        type: "switch",
+        prop: "hasBatchDelete",
+        label: "批量删除",
+        effect({model, schemas}) {
+          if (model.hasBatchDelete) {
+            return [
+              {
+                type: "text",
+                prop: "batchDeleteApi",
+                label: "接口地址"
+              }
+            ]
           }
-        },
-      ]
-    },
-    ...querySchemas,
-    addSchema,
-    updateSchema,
-    delSchema,
-    {type: "switch", prop: "hasIndex", label: "序号", default: true},
-    {type: "switch", prop: "hasPagination", label: "分页", default: true},
-    {
-      type: "switch",
-      prop: "hasBatchDelete",
-      label: "批量删除",
-      effect({model, schemas}) {
-        if (model.hasBatchDelete) {
-          return [
-            {
-              type: "text",
-              prop: "batchDeleteApi",
-              label: "接口地址"
-            }
-          ]
         }
-      }
-    },
-    {
-      type: "switch",
-      prop: "hasViewDetail",
-      label: "查看详情",
-      effect({model, schemas}) {
-        if (model.hasViewDetail) {
-          return [
-            {
-              type: "select",
-              prop: "viewDetailType",
-              label: "查看方式",
-              default: "dialog",
-              options: [
-                { label: "弹窗", value: "dialog" },
-                { label: "页面", value: "page" },
-              ],
-            },
-            {
-              type: "table",
-              prop: "viewDetailFields",
-              label: "查看字段",
-              colspan: 2,
-              schemas: [
-                {type: "text", prop: "label", label: "字段名"},
-                {type: "text", prop: "prop", label: "后端字段"},
-                formatterSchema,
-              ]
-            }
-          ]
+      },
+      {
+        type: "switch",
+        prop: "hasViewDetail",
+        label: "查看详情",
+        effect({model, schemas}) {
+          if (model.hasViewDetail) {
+            return [
+              {
+                type: "select",
+                prop: "viewDetailType",
+                label: "查看方式",
+                default: "dialog",
+                options: [
+                  { label: "弹窗", value: "dialog" },
+                  { label: "页面", value: "page" },
+                ],
+              },
+              {
+                type: "table",
+                prop: "viewDetailFields",
+                label: "查看字段",
+                colspan: 2,
+                schemas: [
+                  {type: "text", prop: "label", label: "字段名"},
+                  {type: "text", prop: "prop", label: "后端字段"},
+                  formatterSchema,
+                ]
+              }
+            ]
+          }
         }
-      }
-    },
-    toggleEnableSchema,
-    moveSchema,
-    styleSchema
-  ]
+      },
+      toggleEnableSchema,
+      moveSchema,
+      styleSchema
+    ]
+  }
 </script>
