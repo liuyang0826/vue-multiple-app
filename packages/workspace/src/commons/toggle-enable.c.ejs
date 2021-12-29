@@ -1,0 +1,25 @@
+<script>
+  export default {
+    type: "switch",
+    prop: "hasToggleEnable",
+    label: "启用禁用",
+    colspan: 2,
+    effect({model, schemas}) {
+      if (model.hasToggleEnable) {
+        return [
+          {
+            type: "text",
+            prop: "enableProp",
+            label: "字段",
+            default: "enable"
+          },
+          {
+            type: "text",
+            prop: "toggleEnableApi",
+            label: "接口地址"
+          }
+        ]
+      }
+    }
+  }
+</script>

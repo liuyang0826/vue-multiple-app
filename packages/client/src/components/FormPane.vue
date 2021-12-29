@@ -45,6 +45,7 @@
               :placeholder="subItem.placeholder"
               :prepend="subItem.prepend"
               :tips="subItem.tips"
+              :code-mode="subItem.codeMode"
               :dialog-width="subItem.dialogWidth"
               is-inner-table
               @update:modelValue="effect"
@@ -117,12 +118,13 @@
         :placeholder="item.placeholder"
         :prepend="item.prepend"
         :tips="item.tips"
+        :code-mode="item.codeMode"
         :dialog-width="item.dialogWidth"
         :style="itemStyle(item)"
         @update:modelValue="effect"
     />
   </template>
-  <div v-if="loading" style="font-size: 14px; text-align: center;line-height: 22px;">加载中...</div>
+  <div v-if="loading" style="font-size: 14px; text-align: center;line-height: 22px;grid-column: span 2 / span 2;">加载中...</div>
 </template>
 
 <script setup lang="ts">

@@ -1,0 +1,46 @@
+<script>
+  export default {
+    type: "switch",
+    prop: "hasCustomStyle",
+    label: "自定义样式",
+    effect({ model }) {
+      if (model.hasCustomStyle) {
+        return [
+          {
+            type: "text",
+            prop: "rootClass",
+            label: "根结点类名",
+//             tips: `
+// <div style="line-height: 20px;">
+// <p>为当前组件根结点增加一个自定义class</p>
+// </div>
+// `
+          },
+          {
+            type: "code",
+            prop: "customStyle",
+            label: "样式代码",
+            codeMode: "css",
+            tips: `
+<div style="line-height: 20px;">
+<p>自定义拓展当前组件的css，默认scoped。</p>
+<p>示例如下：</p>
+<div style="margin-top: 6px;background: #f2f4fa;padding: 4px 8px;">
+<pre>
+.root {
+    padding: 16px;
+}
+.root :deep(.el-icon) {
+    color: red
+}
+</pre>
+</div>
+</div>
+`
+          },
+        ]
+      }
+    },
+    // colspan: 2,
+  }
+</script>

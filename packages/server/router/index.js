@@ -10,5 +10,6 @@ router.get("/getAllSchemas", cloudServices.getAllSchemas)
 
 router.post("/api/user/pageList", demoServices.pageList)
 router.post("/api/user/add", demoServices.add)
+router.get("/api/org/tree", demoServices.tree)
 
 module.exports = router

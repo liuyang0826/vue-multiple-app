@@ -7,7 +7,10 @@
                       <template #label>
                           <div style="display: inline-flex;align-items: center;">
                               <%= item.label %>
-                              <el-tooltip style="margin-left: 2px;" content="<%= item.tips %>" placement="top">
+                              <el-tooltip style="margin-left: 2px;" placement="top">
+                                  <template #content>
+                                      <%- item.tips %>
+                                  </template>
                                   <el-icon size="mini">
                                       <Warning />
                                   </el-icon>
@@ -40,7 +43,17 @@
                       <el-date-picker
                           type="<%= item.dateType %>"
                           v-model="form.<%= item.prop %>"
+                          <% if (!item.dateType.includes("range")) { %>
                           placeholder="请选择<%= item.label %>"
+                          <% } %>
+                          <% if (item.dateType === "datetimerange") { %>
+                          start-placeholder="请选择开始时间"
+                          end-placeholder="请选择结束时间"
+                          <% } %>
+                          <% if (item.dateType === "daterange") { %>
+                          start-placeholder="请选择开始日期"
+                          end-placeholder="请选择结束日期"
+                          <% } %>
                           style="width: <%= $imports.autoFormWidth(formItems).inputWidth[index] %>px;"
                       />
                   <% } %>
@@ -103,7 +116,7 @@
   <% } %>
   <% }) %>
   watch(() => props.modelValue, (visible) => {
-      if (visible) {
+      if (!visible) {
           return
       }
       loading = false

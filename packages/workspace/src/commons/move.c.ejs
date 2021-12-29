@@ -1,0 +1,18 @@
+<script>
+  export default {
+    type: "switch",
+    prop: "hasMove",
+    label: "上移下移",
+    effect({model, schemas}) {
+      if (model.hasMove) {
+        return [
+          {
+            type: "text",
+            prop: "moveApi",
+            label: "接口地址"
+          }
+        ]
+      }
+    }
+  }
+</script>

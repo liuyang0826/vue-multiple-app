@@ -3,7 +3,10 @@
   import addSchema from "../commons/add.c.ejs"
   import updateSchema from "../commons/update.c.ejs"
   import delSchema from "../commons/delete.c.ejs"
+  import toggleEnableSchema from "../commons/toggle-enable.c.ejs"
+  import moveSchema from "../commons/move.c.ejs"
   import formatterSchema from "../commons/formatter.c.ejs"
+  import styleSchema from "../commons/style.c.ejs"
   export default [
     {
       type: "table",
@@ -149,44 +152,8 @@
         }
       }
     },
-    {
-      type: "switch",
-      prop: "hasToggleEnable",
-      label: "启用禁用",
-      colspan: 2,
-      effect({model, schemas}) {
-        if (model.hasToggleEnable) {
-          return [
-            {
-              type: "text",
-              prop: "enableProp",
-              label: "字段",
-              default: "enable"
-            },
-            {
-              type: "text",
-              prop: "toggleEnableApi",
-              label: "接口地址"
-            }
-          ]
-        }
-      }
-    },
-    {
-      type: "switch",
-      prop: "hasMove",
-      label: "上移下移",
-      effect({model, schemas}) {
-        if (model.hasMove) {
-          return [
-            {
-              type: "text",
-              prop: "moveApi",
-              label: "接口地址"
-            }
-          ]
-        }
-      }
-    },
+    toggleEnableSchema,
+    moveSchema,
+    styleSchema
   ]
 </script>

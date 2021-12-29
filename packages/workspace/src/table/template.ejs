@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div <% if (rootClass) { %> class="<%= rootClass %>" <% } %>>
       <div style="display:flex;<%= searchItems.length ? '' : 'justify-content: flex-end;' %>">
           <% if (searchItems.length) { %>
               <el-form size="mini" inline style="flex: 1;">
@@ -385,9 +385,8 @@
 
 </script>
 
-<style>
-  .container {
-      background: #fff;
-      padding: 10px;
-  }
+<style scoped>
+    <% if (hasCustomStyle && customStyle) { %>
+    <%- customStyle %>
+    <% } %>
 </style>

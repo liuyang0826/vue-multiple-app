@@ -1,9 +1,11 @@
-<script cols="1">
+<script cols="2">
+  import styleSchema from "../commons/style.c.ejs"
   export default [
     {
       type: "table",
       label: "标签项",
       prop: "tabs",
+      colspan: 2,
       schemas: [
         {type: "text", label: "标签名称", prop: "label"},
         {
@@ -39,6 +41,7 @@
           ]
         }
       ]
-    }
+    },
+    styleSchema
   ]
 </script>

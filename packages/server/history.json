@@ -19,7 +19,8 @@
           {
             "label": "年龄",
             "prop": "age",
-            "width": "200"
+            "width": "200",
+            "formatter": "export default function(row) {\n    return row.age + \"岁\"\n}"
           },
           {
             "label": "是否可用",
@@ -68,9 +69,10 @@
               "label": "姓名",
               "prop": "name",
               "required": true,
-              "tips": "\b姓名不可更改",
+              "tips": "<div style=\"color: orange;\">\n    这个字段的作用是xxx。\n</div>",
               "type": "text",
-              "maxlength": "2"
+              "maxlength": "2",
+              "showMore": true
             },
             {
               "label": "性别",
@@ -173,49 +175,63 @@
         "viewDetailType": "page",
         "viewDetailFields": [
           {}
-        ]
+        ],
+        "hasCustomStyle": true,
+        "rootClass": "root",
+        "customStyle": ".root {\n  padding: 16px;\n}"
       }
     },
     {
-      "label": "项目管理",
-      "name": "project",
-      "schemaId": "table",
+      "label": "组织机构",
+      "name": "org",
+      "schemaId": "tree",
       "itemSchemas": {
-        "tableCols": [
-          {
-            "label": "项目名称",
-            "prop": "name"
-          }
-        ],
-        "searchItems": [
-          {
-            "label": "项目名称",
-            "prop": "name",
-            "type": "text"
-          }
-        ],
-        "hasIndex": true,
-        "hasPagination": true,
-        "hasAdd": false,
-        "hasUpdate": false,
+        "type": "tree",
+        "dataApi": "/api/org/tree",
+        "hasAdd": true,
+        "hasUpdate": true,
+        "hasDelete": true,
+        "components": [],
+        "addFormType": "dialog",
         "addForm": {
+          "title": "新增组织机构",
           "formItems": [
             {
-              "required": true
+              "label": "名称",
+              "prop": "label",
+              "required": true,
+              "type": "text",
+              "showMore": true
             }
-          ]
+          ],
+          "api": "/api/org/add"
         },
         "updateForm": {
+          "title": "编辑组织机构",
           "formItems": [
             {
-              "required": true
+              "label": "名称",
+              "prop": "label",
+              "required": true,
+              "type": "text"
             }
-          ]
+          ],
+          "api": "/api/org/update"
         },
-        "hasViewDetail": false,
-        "viewDetailType": "dialog",
-        "viewDetailFields": []
+        "deleteApi": "/api/org/delete",
+        "hasCustomStyle": true,
+        "rootClass": "root",
+        "customStyle": ".root {\n    height: calc(100vh - 54px);\n}",
+        "hasToggleEnable": true,
+        "hasMove": true,
+        "enableProp": "enable",
+        "moveApi": "/api/org/move",
+        "toggleEnableApi": "/api/org/toggleEnable",
+        "title": "组织机构"
       }
     }
-  ]
+  ],
+  "hasCustomStyle": false,
+  "rootClass": "root",
+  "customStyle": ".root {\n    height: calc(100vh - 54px);\n}"
 }

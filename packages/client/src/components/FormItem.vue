@@ -57,7 +57,7 @@
     <el-input v-else :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" :placeholder="placeholder">
       <template v-if="prepend" #prepend>{{ prepend }}</template>
     </el-input>
-    <el-drawer v-if="hasDialog" v-model="visible" append-to-body :show-close="false" :size="`${dialogWidth || 480}px`">
+    <el-drawer v-if="hasDialog" v-model="visible" append-to-body :show-close="false" :size="`${dialogWidth || 800}px`">
       <template #title>
         <div style="display: flex;align-items: center;">
           <div style="display: flex;align-items: center;flex: 1;">
@@ -74,8 +74,8 @@
           <el-button size="mini" type="primary" @click="visible = false">确定</el-button>
         </div>
       </template>
-      <Codemirror v-if="type === 'code' && visible" :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" />
-      <slot v-else />
+      <Codemirror v-if="type === 'code' && visible" :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" :code-mode="codeMode" />
+      <slot v-else-if="type !== 'code'" />
     </el-drawer>
   </el-form-item>
 </template>
@@ -91,6 +91,7 @@ const props = defineProps<{
   placeholder?: string
   prepend?: string
   tips?: string
+  codeMode?: string
   modelValue?: any
   dialogWidth?: any
   options?: {

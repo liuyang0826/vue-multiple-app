@@ -28,7 +28,28 @@ async function add(ctx) {
   })
 }
 
+async function tree(ctx) {
+  ctx.type = "json"
+  ctx.body = JSON.stringify({
+    status: true,
+    data: [
+      { label: "辩论社" },
+      { label: "宣传部" },
+      { label: "组织部" },
+      {
+        label: "电竞社",
+        children: [
+          { label: "战队一" },
+          { label: "战队二" },
+          { label: "战队三" },
+        ]
+      },
+    ]
+  })
+}
+
 module.exports = {
   pageList,
-  add
+  add,
+  tree,
 }

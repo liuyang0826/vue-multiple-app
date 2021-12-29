@@ -1,21 +1,95 @@
 <template>
-    <div style="display:flex;">
-        <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick"/>
+    <div <% if (rootClass) { %> class="<%= rootClass %>" <% } %> style="display:flex;">
+        <div style="width: 320px;padding:0 12px;border-right: 1px solid #eaeaea;">
+            <div class="title">
+                <span style="flex: 1;"><%= title %></span>
+                <el-icon style="cursor:pointer;" @click="handleAdd"><circle-plus-filled /></el-icon>
+            </div>
+            <el-input style="margin: 8px 0;" size="mini" />
+            <el-tree class="tree" :data="treeData" :props="defaultProps" @node-click="handleNodeClick">
+                <% if (hasUpdate || hasMove || hasDelete || hasToggleEnable) { %>
+                    <template #default="{ data: row }">
+                        <div class="custom-node">
+                            <span class="el-tree-node__label text">{{ row.label }}</span>
+                            <el-dropdown
+                                    :width="160"
+                                    trigger="hover"
+                                    placement="bottom-end"
+                                    :show-arrow="false"
+                                    size="small"
+                                    @command="commandHandlers[$event](row)"
+                                    @visible-change="$event => row.isShowDropdown = $event"
+                            >
+                                <el-icon :class="['more-icon', { show: row.isShowDropdown }]"><more-filled /></el-icon>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <% if (hasUpdate) { %>
+                                            <el-dropdown-item command="update">编辑</el-dropdown-item>
+                                        <% } %>
+                                        <% if (hasDelete) { %>
+                                            <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                        <% } %>
+                                        <% if (hasMove) { %>
+                                            <el-dropdown-item command="moveUp">上移</el-dropdown-item>
+                                        <% } %>
+                                        <% if (hasMove) { %>
+                                            <el-dropdown-item command="moveDown">下移</el-dropdown-item>
+                                        <% } %>
+                                        <% if (hasToggleEnable) { %>
+                                            <el-dropdown-item command="toggleEnable">{{ row.<%= enableProp %> ? "禁用" : "启用" }}</el-dropdown-item>
+                                        <% } %>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </div>
+                    </template>
+                <% } %>
+            </el-tree>
+        </div>
         <div style="flex: 1;">
             <% components.forEach(function (item) { %>
                 <<%= $imports.camelCaseToShortLine(item.name) %> />
             <% }) %>
         </div>
     </div>
+    <% if (hasAdd) { %>
+        <add-form v-model="add.visible" :data="add.data" :title="add.title" @success="updateTree"/>
+    <% } %>
+    <% if (hasUpdate) { %>
+        <update-form v-model="update.visible" :data="update.data" :title="update.title" @success="updateTree"/>
+    <% } %>
 </template>
 
 <script setup>
+    import { reactive, onBeforeMount } from "vue";
+    <% if (hasDelete || hasBatchDelete) { %>
+    import { ElMessageBox, ElMessage } from 'element-plus'
+    <% } %>
+    <% if (hasAdd) { %>
+    import { Plus, MoreFilled, CirclePlusFilled } from "@element-plus/icons-vue"
+    import AddForm from "<%= $imports.getFilePath("component", "AddForm") %>"
+    <% } %>
+    <% if (hasUpdate) { %>
+    import UpdateForm from "<%= $imports.getFilePath("component", "UpdateForm") %>"
+    <% } %>
     <% components.forEach(function(item) { %>
     import <%= item.name %> from "<%= $imports.getFilePath("components", item.name) %>"
     <% }) %>
-    import {onBeforeMount} from "vue"
-    import {getTreeData} from "<%= $imports.getFilePath("service") %>"
-    import {ElMessage} from 'element-plus'
+    import {
+      getTreeData,
+        <% if (hasDelete) { %>
+      doDelete,
+        <% } %>
+        <% if (hasBatchDelete) { %>
+      doBatchDelete,
+        <% } %>
+        <% if (hasToggleEnable) { %>
+      doToggleEnable,
+        <% } %>
+        <% if (hasMove) { %>
+      doMove,
+        <% } %>
+    } from "<%= $imports.getFilePath("service") %>"
 
     const defaultProps = {
       children: 'children',
@@ -24,8 +98,9 @@
 
     const keyword = $ref("")
     let treeData = $ref([])
+    let curData = $ref(null)
 
-    async function updateTreeData() {
+    async function updateTree() {
       const {status, data, message} = await getTreeData()
       if (status) {
         treeData = data
@@ -34,5 +109,130 @@
       }
     }
 
-    onBeforeMount(updateTreeData)
+    onBeforeMount(updateTree)
+    
+    function handleNodeClick(data) {
+      curData = data
+    }
+
+    <% if (hasAdd) { %>
+    // 新增
+    const add = reactive({
+      visible: false,
+      data: {
+        <% addForm.formItems.forEach(function (item){ %>
+        <% if (["checkboxGroup"].includes(item.type)) { %>
+        <%= item.prop %>: [],
+        <% } %>
+        <% }) %>
+      },
+        title: ""
+    })
+    function handleAdd() {
+      add.visible = true
+      add.data = {
+        <% addForm.formItems.forEach(function (item){ %>
+        <% if (["checkboxGroup"].includes(item.type)) { %>
+        <%= item.prop %>: [],
+        <% } %>
+        <% }) %>
+        }
+      add.title = "<%= addForm.title %>"
+    }
+    <% } %>
+
+    <% if (hasUpdate) { %>
+    //编辑
+    const update = reactive({
+      visible: false,
+      data: {},
+      title: ""
+    })
+    function handleUpdate(row) {
+      update.visible = true
+      update.data = row
+      update.title = "<%= updateForm.title %>"
+    }
+    <% } %>
+
+    <% if (hasDelete) { %>
+    // 删除
+    function handleDelete() {
+      ElMessageBox.confirm('确认删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(async () => {
+        const { status, message } = await doDelete(row.id)
+        if (status) {
+          ElMessage.success("操作成功")
+          updateTree()
+        } else {
+          ElMessage.error(message)
+        }
+      })
+    }
+    <% } %>
+
+    <% if (hasToggleEnable) { %>
+    // 启用禁用
+    async function handleToggleEnable(row) {
+      const { status, message } = await doToggleEnable(row.id)
+      if (status) {
+        ElMessage.success("操作成功")
+        updateTree()
+      } else {
+        ElMessage.error(message)
+      }
+    }
+    <% } %>
+
+    <% if (hasMove) { %>
+    // 上移下移
+    async function handleMove(row) {
+      const { status, message } = await doMove(row.id)
+      if (status) {
+        ElMessage.success("操作成功")
+        updateTree()
+      } else {
+        ElMessage.error(message)
+      }
+    }
+    <% } %>
+
+    <% if (hasUpdate || hasMove || hasDelete || hasToggleEnable) { %>
+    const commandHandlers = {
+      <% if (hasUpdate) { %> update: row => handleUpdate(row), <% } %>
+      <% if (hasMove) { %> moveUp: row => handleMove(row, 1), <% } %>
+      <% if (hasMove) { %> moveDown: row => handleMove(row, 0), <% } %>
+      <% if (hasDelete) { %> delete: row => handleDelete(row), <% } %>
+      <% if (hasToggleEnable) { %> toggleEnable: row => handleToggleEnable(row), <% } %>
+    }
+    <% } %>
 </script>
+
+<style scoped>
+    .title {
+        display:flex;
+        align-items:center;
+    }
+    .custom-node {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+    .custom-node .text {
+        flex: 1;
+        overflow: hidden;
+    }
+    .tree .more-icon {
+        display: none;
+    }
+    .tree :deep(.el-tree-node__content:hover .more-icon), .tree .more-icon.show {
+        display: block;
+    }
+    <% if (hasCustomStyle && customStyle) { %>
+    <%- customStyle %>
+    <% } %>
+</style>

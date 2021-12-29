@@ -3,22 +3,27 @@
   import addSchema from "../commons/add.c.ejs"
   import updateSchema from "../commons/update.c.ejs"
   import delSchema from "../commons/delete.c.ejs"
+  import toggleEnableSchema from "../commons/toggle-enable.c.ejs"
+  import moveSchema from "../commons/move.c.ejs"
+  import styleSchema from "../commons/style.c.ejs"
   export default [
     {
       type: "select",
       prop: "type",
-      label: "类型",
-      colspan: 2,
+      label: "左侧类型",
       default: "tree",
       options: [
         {label: "树", value: "tree"},
         {label: "列表", value: "list"},
       ]
     },
+    {type: "text", prop: "title", label: "左侧标题"},
     ...querySchemas,
     addSchema,
     updateSchema,
     delSchema,
+    toggleEnableSchema,
+    moveSchema,
     {
       type: "table",
       prop: "components",
@@ -54,6 +59,7 @@
         }
       ]
     },
+    styleSchema
   ]
 </script>
 
