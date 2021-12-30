@@ -1,7 +1,6 @@
 import template from "./template.ejs"
 
 export default function component({ name, data, resolveComponent }) {
-  console.log(data);
   return {
     entry: {
       template,
@@ -17,6 +16,10 @@ export default function component({ name, data, resolveComponent }) {
         name: "UpdateForm",
         data: data.updateForm
       }),
+      ...data.components.map((item) => resolveComponent(item.schemaId, {
+        name: item.name,
+        data: item.itemSchemas
+      }))
     ]
   }
 }

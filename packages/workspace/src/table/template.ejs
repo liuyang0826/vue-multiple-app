@@ -5,13 +5,30 @@
               <el-form size="mini" inline style="flex: 1;">
                   <% searchItems.forEach(function(item){ %>
                       <el-form-item label="<%= item.label %>">
-                          <% if (item.type === "text") { %>
+                          <% if (!item.type || item.type === "text") { %>
                               <el-input clearable v-model="query.<%= item.prop %>" @change="handleSearch"/>
                           <% } %>
                           <% if (item.type === "select") { %>
                               <el-select clearable v-model="query.<%= item.prop %>" @change="handleSearch" placeholder="请选择<%= item.label %>">
                                   <el-option v-for="{label, value} in <%= item.prop %>Options" :key="value" :value="value" :label="label" />
                               </el-select>
+                          <% } %>
+                          <% if (item.type === "date") { %>
+                              <el-date-picker
+                                      type="<%= item.dateType %>"
+                                      v-model="query.<%= item.prop %>"
+                              <% if (!item.dateType.includes("range")) { %>
+                                      placeholder="请选择<%= item.label %>"
+                                      <% } %>
+                              <% if (item.dateType === "datetimerange") { %>
+                                      start-placeholder="请选择开始时间"
+                                      end-placeholder="请选择结束时间"
+                                      <% } %>
+                              <% if (item.dateType === "daterange") { %>
+                                      start-placeholder="请选择开始日期"
+                                      end-placeholder="请选择结束日期"
+                                      <% } %>
+                              />
                           <% } %>
                       </el-form-item>
                   <% }) %>
@@ -128,7 +145,13 @@
   <% }) %>
   } from "<%= $imports.getFilePath("service") %>"
 
-  const query = reactive({})
+  const query = reactive({
+  <% searchItems.forEach(function (item){ %>
+  <% if (["checkboxGroup"].includes(item.type) || (item.type === 'date' && item.dateType === "daterange")) { %>
+  <%= item.prop %>: [],
+  <% } %>
+  <% }) %>
+  })
   let pending = $ref(false)
   let pageSize = $ref(10)
   let pageNum = $ref(1)

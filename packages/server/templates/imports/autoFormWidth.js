@@ -10,7 +10,8 @@ function autoFormWidth(map) {
         let maxLabel = 0
         for (let i = index; i < formItemCount; i += cols) {
           const item = formItems[i]
-          const curWidth = item.label.length * 18 + 16 + (item.required ? 14 : 0) + (item.tips ? 16 : 0)
+          // 文字个数 * 18 + 冒号 * 18 + 必填* * 14 + 提示icon * 16
+          const curWidth = item.label.length * 18 + 18 + (item.required ? 14 : 0) + (item.tips ? 16 : 0)
           if (curWidth > maxLabel) {
             maxLabel = curWidth
           }

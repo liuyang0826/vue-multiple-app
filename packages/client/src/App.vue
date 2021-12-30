@@ -48,7 +48,7 @@ let cols = $ref(1)
 provide("model", model)
 
 onMounted(async () => {
-  const result = await resolveSchemas("tabs")
+  const result = await resolveSchemas("tree")
   schemas = result.schemas
   cols = result.cols
 })
@@ -67,7 +67,7 @@ const formRef = $ref()
 function handleSubmit() {
   formRef.validate((flag, err) => {
     if (flag) {
-      fetch("http://127.0.0.1:5000/submit?id=tabs", {
+      fetch("http://127.0.0.1:5000/submit?id=tree", {
         method: "post",
         headers: {
           'Content-Type': 'application/json'

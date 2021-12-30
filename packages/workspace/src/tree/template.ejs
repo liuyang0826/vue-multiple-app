@@ -1,11 +1,13 @@
 <template>
     <div <% if (rootClass) { %> class="<%= rootClass %>" <% } %> style="display:flex;">
-        <div style="width: 320px;padding:0 12px;border-right: 1px solid #eaeaea;">
-            <div class="title">
-                <span style="flex: 1;"><%= title %></span>
-                <el-icon style="cursor:pointer;" @click="handleAdd"><circle-plus-filled /></el-icon>
+        <div class="left">
+            <div class="header">
+                <div style="display:flex;align-items:center;">
+                    <span style="flex: 1;"><%= title %></span>
+                    <el-icon style="cursor:pointer;" @click="handleAdd"><circle-plus-filled /></el-icon>
+                </div>
+                <el-input style="margin: 8px 0;" size="mini" />
             </div>
-            <el-input style="margin: 8px 0;" size="mini" />
             <el-tree class="tree" :data="treeData" :props="defaultProps" @node-click="handleNodeClick">
                 <% if (hasUpdate || hasMove || hasDelete || hasToggleEnable) { %>
                     <template #default="{ data: row }">
@@ -46,7 +48,7 @@
                 <% } %>
             </el-tree>
         </div>
-        <div style="flex: 1;">
+        <div class="right">
             <% components.forEach(function (item) { %>
                 <<%= $imports.camelCaseToShortLine(item.name) %> />
             <% }) %>
@@ -212,15 +214,16 @@
 </script>
 
 <style scoped>
-    .title {
-        display:flex;
-        align-items:center;
+    .header {
+        padding: 12px;
     }
+    <% if (hasUpdate || hasMove || hasDelete || hasToggleEnable) { %>
     .custom-node {
         flex: 1;
         display: flex;
         align-items: center;
         overflow: hidden;
+        padding-right: 12px;
     }
     .custom-node .text {
         flex: 1;
@@ -231,6 +234,16 @@
     }
     .tree :deep(.el-tree-node__content:hover .more-icon), .tree .more-icon.show {
         display: block;
+    }
+    <% } %>
+    .left {
+        width: 320px;
+        border-right: 1px solid #eaeaea;
+        flex: none;
+    }
+    .right {
+        flex: 1;
+        padding: 12px;
     }
     <% if (hasCustomStyle && customStyle) { %>
     <%- customStyle %>

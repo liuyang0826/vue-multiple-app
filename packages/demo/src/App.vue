@@ -12,6 +12,9 @@
 #app {
   position: relative;
   background: #f2f7f8;
-  height: 100vh;
+}
+
+.el-form-item__content .el-range-editor.el-input__inner {
+  vertical-align: bottom;
 }
 </style>

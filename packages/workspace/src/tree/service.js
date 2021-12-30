@@ -33,7 +33,11 @@ export default function service({ name, data, utils, resolveService }) {
       data.hasUpdate && resolveService("dialog-form", {
         name: "updateForm",
         data: data.updateForm
-      })
+      }),
+      ...data.components.map((item) => resolveService(item.schemaId, {
+        name: item.name,
+        data: item.itemSchemas
+      }))
     ]
   }
 }

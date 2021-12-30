@@ -19,6 +19,7 @@ async function getSchemaById(ctx) {
 async function submit(ctx) {
   const data = ctx.request.body
   fs.writeFileSync(path.resolve("history.json"), JSON.stringify(data, null, 2), "utf8")
+  console.log(ctx.query.id);
   const { component, service } = cloudIdMap.get(ctx.query.id)
 
   function resolveComponent(cloudId, { name, data }) {

@@ -55,7 +55,11 @@
       {{ modelValue ? "收起" : "展开" }}<el-icon :class="{ 'active': modelValue }"><arrow-right /></el-icon>
     </div>
     <el-input v-else :model-value="modelValue" @update:modelValue="$emit('update:modelValue', $event)" :placeholder="placeholder">
-      <template v-if="prepend" #prepend>{{ prepend }}</template>
+      <template #suffix>
+        <div class="copy" @click="handleCopy">
+          <el-icon><document-copy /></el-icon>
+        </div>
+      </template>
     </el-input>
     <el-drawer v-if="hasDialog" v-model="visible" append-to-body :show-close="false" :size="`${dialogWidth || 800}px`">
       <template #title>
@@ -81,7 +85,8 @@
 </template>
 
 <script setup lang="ts">
-import { Edit, Warning, ArrowRight } from "@element-plus/icons-vue"
+import { Edit, Warning, ArrowRight, DocumentCopy } from "@element-plus/icons-vue"
+import { ElMessage } from "element-plus"
 import Codemirror from "./Codemirror.vue";
 
 const props = defineProps<{
@@ -106,6 +111,17 @@ const props = defineProps<{
 const visible = $ref(false)
 
 const hasDialog = $computed(() => (props.type === 'more' && props.isInnerTable) || ['list', 'code', 'table'].includes(props.type))
+
+function handleCopy() {
+  const input = document.createElement('input');
+  document.body.appendChild(input);
+  input.value = props.modelValue
+  input.select();
+  document.execCommand('Copy')
+  document.body.removeChild(input);
+  ElMessage.success("复制成功")
+}
+
 </script>
 
 <style>
@@ -122,5 +138,14 @@ const hasDialog = $computed(() => (props.type === 'more' && props.isInnerTable) 
 }
 .more-line .active {
   transform: rotate(90deg);
+}
+
+.copy {
+  width: 28px;
+  height: 100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
 }
 </style>

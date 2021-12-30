@@ -1,245 +1,124 @@
 {
-  "tabs": [
+  "hasCustomStyle": true,
+  "rootClass": "root",
+  "customStyle": ".root {\n  height: calc(100vh - 24px);\n  background: #fff;\n  margin: 12px;\n}",
+  "type": "tree",
+  "hasAdd": true,
+  "hasUpdate": true,
+  "hasDelete": true,
+  "hasToggleEnable": true,
+  "components": [
     {
-      "label": "用户管理",
       "name": "user",
       "schemaId": "table",
       "itemSchemas": {
         "tableCols": [
           {
             "label": "姓名",
-            "prop": "name",
-            "width": ""
+            "prop": "name"
           },
           {
-            "label": "性别",
-            "prop": "sex",
-            "width": "200"
-          },
-          {
-            "label": "年龄",
-            "prop": "age",
-            "width": "200",
-            "formatter": "export default function(row) {\n    return row.age + \"岁\"\n}"
-          },
-          {
-            "label": "是否可用",
-            "prop": "enable",
-            "width": "200"
+            "label": "职务",
+            "prop": "position"
           }
         ],
         "searchItems": [
           {
             "label": "姓名",
             "prop": "name",
-            "type": "text",
-            "optionType": "fixed",
-            "options": []
+            "showMore": false
           },
           {
-            "label": "性别",
-            "prop": "sex",
+            "label": "职务",
+            "prop": "position",
+            "showMore": true,
             "type": "select",
             "optionType": "fixed",
             "options": [
               {
-                "label": "男",
+                "label": "科长",
                 "value": "1"
               },
               {
-                "label": "女",
+                "label": "科员",
                 "value": "2"
               }
             ]
           },
           {
-            "label": "年龄",
-            "prop": "age",
-            "type": "select",
-            "optionType": "api",
-            "options": [
-              {}
-            ],
-            "api": "/dsd",
-            "optionsWhen": "export default function(form) {\n    return form.name?.length\n}"
+            "label": "出生日期",
+            "prop": "birthday",
+            "showMore": true,
+            "type": "date",
+            "dateType": "daterange"
           }
         ],
+        "dataApi": "/api/org/user/pageList",
         "hasAdd": true,
-        "hasUpdate": true,
         "hasIndex": true,
         "hasPagination": true,
+        "addFormType": "dialog",
         "addForm": {
-          "title": "新增用户",
           "formItems": [
             {
               "label": "姓名",
-              "prop": "name",
-              "required": true,
-              "tips": "<div style=\"color: orange;\">\n    这个字段的作用是xxx。\n</div>",
-              "type": "text",
-              "maxlength": "2",
-              "showMore": false,
-              "when": ""
+              "prop": "name"
             },
             {
-              "label": "性别",
-              "prop": "sex",
+              "label": "职务",
+              "prop": "position",
+              "showMore": true,
               "required": true,
-              "append": "",
-              "type": "radioGroup",
+              "type": "select",
               "optionType": "fixed",
               "options": [
                 {
-                  "label": "男",
+                  "label": "科长",
                   "value": "1"
                 },
                 {
-                  "label": "女",
+                  "label": "科员",
                   "value": "2"
                 }
               ]
-            },
-            {
-              "label": "年龄",
-              "prop": "age",
-              "required": true,
-              "type": "text",
-              "dateType": "date",
-              "append": "岁",
-              "when": "export default function(form) {\n    return form.name\n}"
-            },
-            {
-              "label": "生日",
-              "prop": "birthday",
-              "type": "date",
-              "required": true,
-              "dateType": "datetimerange"
-            },
-            {
-              "label": "爱好",
-              "prop": "hobby",
-              "type": "checkboxGroup",
-              "required": true,
-              "optionType": "fixed",
-              "options": [
-                {
-                  "label": "篮球",
-                  "value": "1"
-                },
-                {
-                  "label": "唱歌",
-                  "value": "2"
-                },
-                {
-                  "label": "游泳",
-                  "value": "3"
-                }
-              ]
             }
           ],
-          "api": "/api/user/add",
-          "formTransform": "export default function(form) {\n    return {\n        realName: form.name,\n        price: form.price * 100\n    }\n}"
-        },
-        "updateForm": {
-          "title": "编辑用户",
-          "formItems": [
-            {
-              "label": "姓名",
-              "prop": "name",
-              "required": true,
-              "tips": "姓名",
-              "type": "text"
-            },
-            {
-              "label": "性别",
-              "prop": "sex",
-              "required": true,
-              "type": "text"
-            },
-            {
-              "label": "年龄",
-              "prop": "age",
-              "required": true,
-              "append": "岁",
-              "type": "text"
-            }
-          ],
-          "api": "/api/user/update",
-          "formTransform": "export default function(form) {\n    return {\n        realName: form.name,\n        price: form.price * 100\n    }\n}"
-        },
-        "hasDelete": true,
-        "hasBatchDelete": true,
-        "hasToggleEnable": true,
-        "hasMove": true,
-        "enableProp": "enable",
-        "deleteApi": "/api/user/delete",
-        "batchDeleteApi": "/api/user/batchDelete",
-        "toggleEnableApi": "/api/user/toggleEnable",
-        "moveApi": "/api/user/move",
-        "addFormType": "dialog",
-        "dataApi": "/api/user/pageList",
-        "queryTransform": "export default function({\n    query,\n    pageSize,\n    pageNum\n}) {\n    return {\n        query: { ...query, category: 1 },\n        pageSize,\n        pageNum\n    }\n}",
-        "hasViewDetail": true,
-        "viewDetailType": "page",
-        "viewDetailFields": [
-          {}
-        ],
-        "hasCustomStyle": true,
-        "rootClass": "root",
-        "customStyle": ".root {\n  padding: 16px;\n}"
-      }
-    },
-    {
-      "label": "组织机构",
-      "name": "org",
-      "schemaId": "tree",
-      "itemSchemas": {
-        "type": "tree",
-        "dataApi": "/api/org/tree",
-        "hasAdd": true,
-        "hasUpdate": true,
-        "hasDelete": true,
-        "components": [],
-        "addFormType": "dialog",
-        "addForm": {
-          "title": "新增组织机构",
-          "formItems": [
-            {
-              "label": "名称",
-              "prop": "label",
-              "required": true,
-              "type": "text",
-              "showMore": true
-            }
-          ],
-          "api": "/api/org/add"
-        },
-        "updateForm": {
-          "title": "编辑组织机构",
-          "formItems": [
-            {
-              "label": "名称",
-              "prop": "label",
-              "required": true,
-              "type": "text"
-            }
-          ],
-          "api": "/api/org/update"
-        },
-        "deleteApi": "/api/org/delete",
-        "hasCustomStyle": true,
-        "rootClass": "root",
-        "customStyle": ".root {\n    height: calc(100vh - 54px);\n}",
-        "hasToggleEnable": true,
-        "hasMove": true,
-        "enableProp": "enable",
-        "moveApi": "/api/org/move",
-        "toggleEnableApi": "/api/org/toggleEnable",
-        "title": "组织机构"
+          "api": "/api/org/user/add",
+          "title": "新增人员"
+        }
       }
     }
   ],
-  "hasCustomStyle": false,
-  "rootClass": "root",
-  "customStyle": ".root {\n    height: calc(100vh - 54px);\n}"
+  "addFormType": "dialog",
+  "addForm": {
+    "formItems": [
+      {
+        "showMore": false,
+        "label": "名称",
+        "prop": "name",
+        "required": true,
+        "type": "text"
+      }
+    ],
+    "title": "新增组织机构",
+    "api": "/api/org/add"
+  },
+  "updateForm": {
+    "formItems": [
+      {
+        "label": "名称",
+        "prop": "name"
+      }
+    ],
+    "hasCustomStyle": true,
+    "api": "/api/org/update",
+    "title": "编辑组织机构"
+  },
+  "enableProp": "enable",
+  "title": "组织结构",
+  "dataApi": "/api/org/tree",
+  "hasMove": true,
+  "deleteApi": "/api/org/delete",
+  "toggleEnableApi": "/api/org/enable",
+  "moveApi": "/api/org/move"
 }

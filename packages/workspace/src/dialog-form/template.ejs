@@ -24,7 +24,7 @@
                           </div>
                       </template>
                   <% } %>
-                  <% if (item.type === "text") { %>
+                  <% if (!item.type || item.type === "text") { %>
                       <el-input
                           v-model="form.<%= item.prop %>"
                           placeholder="请输入<%= item.label %>"

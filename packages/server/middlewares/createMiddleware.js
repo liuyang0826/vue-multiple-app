@@ -51,7 +51,7 @@ async function resolveWalker(promise, cb) {
     if (children && children.filter(Boolean).length) {
       for (let i = 0; i < children.length; i++) {
         const item = children[i]
-        await fn(await item, entry.name)
+        item && await fn(await item, entry.name)
       }
     }
   }

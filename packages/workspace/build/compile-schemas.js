@@ -16,6 +16,9 @@ function findRefScope(path) {
   return null
 }
 
+/**
+ * 目前仅支持简单的import和函数传参，不支持逻辑判断
+ **/
 function compileSchemas(code) {
   const ast = babelParser.parse(code, {
     sourceType: "module"
