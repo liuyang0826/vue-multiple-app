@@ -1,6 +1,6 @@
 <script>
   import optionsWhenSchema from "../commons/options-when.c.ejs"
-  export default {
+  export default ({ textMoreSchemas = [] } = {}) => ({
       type: "select",
       prop: "type",
       label: "类型",
@@ -14,11 +14,7 @@
       ],
       effect({ model }) {
         if (model.type === "text") {
-          return [
-            {type: "text", prop: "maxlength", label: "最大长度" },
-            {type: "text", prop: "prepend", label: "前置内容",},
-            {type: "text", prop: "append", label: "后置内容",},
-          ]
+          return textMoreSchemas
         }
         if (model.type === "date") {
           return [
@@ -75,5 +71,5 @@
           ]
         }
       }
-    }
+    })
 </script>

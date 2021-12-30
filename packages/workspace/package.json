@@ -15,7 +15,6 @@
     "@babel/types": "^7.16.0",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
-    "magic-string": "^0.25.7",
     "rollup": "^2.62.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-pluginutils": "^2.8.2"

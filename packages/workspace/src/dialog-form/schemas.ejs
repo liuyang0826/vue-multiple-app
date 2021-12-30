@@ -1,8 +1,9 @@
-<script cols="2">
+<script>
   import styleSchema from "../commons/style.c.ejs"
   import formWhenSchema from "../commons/form-when.c.ejs"
   import formItemBaseSchemas from "../commons/form-item-base.c.ejs"
   import formItemTypeSchema from "../commons/form-item-type.c.ejs"
+  import formItemTextMoreSchema from "../commons/form-item-text-more.c.ejs"
   import formItemTipsSchema from "../commons/form-item-tips.c.ejs"
   export default {
     cols: 2,
@@ -25,7 +26,9 @@
               if (model.showMore) {
                 return [
                   {type: "switch", prop: "required", label: "必填", default: true},
-                  formItemTypeSchema,
+                  formItemTypeSchema({
+                    textMoreSchemas: formItemTextMoreSchema
+                  }),
                   formWhenSchema,
                   formItemTipsSchema,
                 ]

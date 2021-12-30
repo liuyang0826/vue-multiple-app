@@ -9,7 +9,6 @@
   import styleSchema from "../commons/style.c.ejs"
   import formItemBaseSchemas from "../commons/form-item-base.c.ejs"
   import formItemTypeSchema from "../commons/form-item-type.c.ejs"
-  import formItemTipsSchema from "../commons/form-item-tips.c.ejs"
   export default {
     cols: 2,
     schemas: [
@@ -51,7 +50,7 @@
             effect({model}) {
               if (model.showMore) {
                 return [
-                  formItemTypeSchema,
+                  formItemTypeSchema(),
                 ]
               }
             }
