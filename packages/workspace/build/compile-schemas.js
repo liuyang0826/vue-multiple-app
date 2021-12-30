@@ -3,6 +3,7 @@ const t = require("@babel/types")
 const traverse = require("@babel/traverse");
 const generate = require("@babel/generator")
 
+// 查找当前变量的引用作用域
 function findRefScope(path) {
   const name = path.node.name
   let curScope = path.scope
@@ -14,7 +15,6 @@ function findRefScope(path) {
   }
   return null
 }
-
 
 function compileSchemas(code) {
   const ast = babelParser.parse(code, {
