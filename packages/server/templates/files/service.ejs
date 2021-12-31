@@ -1,7 +1,0 @@
-import http from "../../../http"
-
-<% services.forEach(function({ name, method, api }) { %>
-    export const <%= name %> = async (params) => {
-        return await http.<%= method %>("<%= api %>", params)
-    }
-<% }) %>

@@ -1,8 +1,8 @@
 const artTemplate = require('art-template');
 const {firstToUpperCase, camelCaseToShortLine, firstToLowerCase} = require("../utils")
-const parseDefaultFunction = require("../templates/imports/parseDefaultFunction")
-const autoFormWidth = require("../templates/imports/autoFormWidth")
-const getFilePath = require("../templates/imports/getFilePath")
+const parseDefaultFunction = require("../utils/imports/parseDefaultFunction")
+const autoFormWidth = require("../utils/imports/autoFormWidth")
+const getFilePath = require("../utils/imports/getFilePath")
 
 function renderMiddlemare() {
   artTemplate.defaults.rules.pop()

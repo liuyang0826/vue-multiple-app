@@ -91,7 +91,7 @@
             </template>
           </el-popconfirm>
         </div>
-        <div class="list-wrap" :style="{gridTemplateColumns: `repeat(${item.cols || 1},minmax(0,1fr))`}">
+        <div class="list-wrap" :style="{gridTemplateColumns: `repeat(2, minmax(0,1fr))`}">
           <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.$subPaths || []), item.prop, $index]" :model="row"/>
         </div>
       </div>
@@ -101,7 +101,7 @@
         :key="item.key || [...paths, item.prop].join('.')"
         v-else-if="item.type === 'child'"
         class="group list-wrap"
-        :style="{gridTemplateColumns: `repeat(${item.cols || 1},minmax(0,1fr))`, ...itemStyle(item)}"
+        :style="{gridTemplateColumns: `repeat(2, minmax(0,1fr))`, ...itemStyle(item)}"
     >
       <FormPane :schemas="item.schemas" :paths="[...paths, ...(item.$subPaths || [])]" :model="getPropByPath(model, item.$subPaths)"/>
     </div>
@@ -218,12 +218,10 @@ const effect = debounce(async () => {
         if (!model[effect.prop]) {
           model[effect.prop] = {}
         }
-        const { cols, schemas } = await effect.schemas
         newFormItems.push({
           ...effect,
           type: "child",
-          schemas,
-          cols,
+          schemas: await effect.schemas,
           $subPaths: [...(schema.$subPaths || []), effect.prop]
         })
       }

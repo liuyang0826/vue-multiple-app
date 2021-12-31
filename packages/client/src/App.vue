@@ -9,14 +9,20 @@
               size="mini"
               ref="formRef"
               class="list-wrap"
-              :style="{gridTemplateColumns: `repeat(${cols || 1},minmax(0,1fr))`}"
+              :style="{gridTemplateColumns: 'repeat(2, minmax(0,1fr))'}"
           >
             <FormPane :schemas="schemas" :model="model" :paths="[]" />
           </el-form>
         </div>
       </div>
       <div class="footer">
-        <el-button size="mini" type="primary" @click="handleSubmit">保存</el-button>
+        <a href="http://127.0.0.1:5000/exportProject?id=tree" style="margin-right: 12px;" target="_blank">
+          <el-button size="mini" type="primary">导出项目</el-button>
+        </a>
+        <a href="http://127.0.0.1:5000/exportPage?id=tree" style="margin-right: 12px;" target="_blank">
+          <el-button size="mini" type="primary">导出页面</el-button>
+        </a>
+        <el-button size="mini" type="primary" @click="handlePreviewPage">预览</el-button>
       </div>
       <button class="toggle" type="button" @click="closed = !closed">
         <el-icon>
@@ -49,8 +55,7 @@ provide("model", model)
 
 onMounted(async () => {
   const result = await resolveSchemas("tree")
-  schemas = result.schemas
-  cols = result.cols
+  schemas = result
 })
 
 onMounted(async () => {
@@ -64,21 +69,37 @@ onMounted(async () => {
 const closed = $ref(false)
 const formRef = $ref()
 
-function handleSubmit() {
+function handlePreviewPage() {
   formRef.validate((flag, err) => {
     if (flag) {
-      fetch("http://127.0.0.1:5000/submit?id=tree", {
+      fetch("http://127.0.0.1:5000/previewPage?id=tree", {
         method: "post",
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(model)
+      }).then(async (res) => {
+        return {
+          blob: await res.blob(),
+          filename: res.headers.get('Content-Disposition').split(';')[1].split('=')[1]
+        }
+      })
+      .then(({blob, filename}) => {
+        const link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        URL.revokeObjectURL(link.href)
+        document.body.removeChild(link)
       })
     } else {
       ElMessage.warning(Object.values(err)[0][0].message)
     }
   })
 }
+
 </script>
 
 <style>

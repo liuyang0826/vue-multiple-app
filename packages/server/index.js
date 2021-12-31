@@ -1,6 +1,6 @@
 const app = new (require("koa"))
 const router = require("./router")
-const createMiddleware = require("./middlewares/createMiddleware")
+const createMiddleware = require("./middlewares/create")
 const schemaMiddleware = require("./middlewares/schemaMiddleware")
 const renderMiddleware = require("./middlewares/renderMiddlemare")
 const bodyParser = require('koa-bodyparser');

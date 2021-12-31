@@ -107,7 +107,10 @@
     "formItems": [
       {
         "label": "名称",
-        "prop": "name"
+        "prop": "name",
+        "showMore": true,
+        "required": true,
+        "type": "text"
       }
     ],
     "hasCustomStyle": true,

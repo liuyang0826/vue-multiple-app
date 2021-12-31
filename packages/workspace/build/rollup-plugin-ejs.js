@@ -1,5 +1,6 @@
 const {dataToEsm} = require("rollup-pluginutils")
 const compileSchemas = require("./compile-schemas")
+const compileTemplate = require("./compile-template")
 
 // 把ejs文件转成字符串即可
 module.exports = () => {
@@ -7,7 +8,7 @@ module.exports = () => {
     name: 'ejs',
     transform(code, tplFilePath) {
       if (/\.ejs$/.test(tplFilePath)) {
-        const [, attrs, schemas] = code.match(/^(?:\r|\n|\s)*<script(?:\s*(.*)\s*)?>([\w\W]+)<\/script>(?:\r\n|\s)*$/) || []
+        const [, schemas] = code.match(/^(?:\r|\n|\s)*<script(?:\s*.*\s*)?>([\w\W]+)<\/script>(?:\r\n|\s)*$/) || []
         // 预编译schemas
         if (schemas) {
           return {
@@ -16,7 +17,7 @@ module.exports = () => {
           }
         }
         return {
-          code: dataToEsm(code),
+          code: compileTemplate(code),
           map: {mappings: ''},
         }
       }

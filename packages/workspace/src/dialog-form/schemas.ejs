@@ -5,45 +5,42 @@
   import formItemTypeSchema from "../commons/form-item-type.ejs"
   import formItemTextMoreSchema from "../commons/form-item-text-more.ejs"
   import formItemTipsSchema from "../commons/form-item-tips.ejs"
-  export default {
-    cols: 2,
-    schemas: [
-      {type: "text", prop: "title", label: "标题", colspan: 2},
-      {
-        type: "list",
-        prop: "formItems",
-        label: "表单项",
-        colspan: 2,
-        cols: 2,
-        schemas: [
-          ...formItemBaseSchemas,
-          {
-            type: "more",
-            prop: "showMore",
-            label: "更多选项",
-            colspan: 2,
-            effect({model}) {
-              if (model.showMore) {
-                return [
-                  {type: "switch", prop: "required", label: "必填", default: true},
-                  formItemTypeSchema({
-                    textMoreSchemas: formItemTextMoreSchema
-                  }),
-                  formWhenSchema,
-                  formItemTipsSchema,
-                ]
-              }
+  export default [
+    {type: "text", prop: "title", label: "标题", colspan: 2},
+    {
+      type: "list",
+      prop: "formItems",
+      label: "表单项",
+      colspan: 2,
+      schemas: [
+        ...formItemBaseSchemas,
+        {
+          type: "more",
+          prop: "showMore",
+          label: "更多选项",
+          colspan: 2,
+          effect({model}) {
+            if (model.showMore) {
+              return [
+                {type: "switch", prop: "required", label: "必填", default: true},
+                formItemTypeSchema({
+                  textMoreSchemas: formItemTextMoreSchema
+                }),
+                formWhenSchema,
+                formItemTipsSchema,
+              ]
             }
-          },
-        ],
-      },
-      {type: "text", prop: "api", label: "接口地址",},
-      {
-        type: "code",
-        prop: "formTransform",
-        label: "表单格式化",
-        dialogWidth: 600,
-        tips: `
+          }
+        },
+      ],
+    },
+    {type: "text", prop: "api", label: "接口地址",},
+    {
+      type: "code",
+      prop: "formTransform",
+      label: "表单格式化",
+      dialogWidth: 600,
+      tips: `
 <div style="line-height: 20px;">
 <p>自定义一个用于转换保存数据的方法，默认会原样提交整个form对象。</p>
 <p>须遵循ES规范，示例如下：</p>
@@ -59,9 +56,8 @@ export default function(form) {
 </div>
 </div>
 `
-      },
-      styleSchema,
-    ]
-  }
+    },
+    styleSchema,
+  ]
 </script>
 

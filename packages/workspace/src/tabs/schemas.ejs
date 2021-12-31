@@ -1,50 +1,47 @@
 <script>
   import styleSchema from "../commons/style.ejs"
-  export default {
-    cols: 2,
-    schemas: [
-      {
-        type: "table",
-        label: "标签项",
-        prop: "tabs",
-        colspan: 2,
-        schemas: [
-          {type: "text", label: "标签名称", prop: "label"},
-          {
-            type: "text",
-            label: "标签id",
-            prop: "name",
-            rules: {required: true, trigger: ["blur", "change"], message: "标签id必须填写"}
-          },
-          {
-            type: "list",
-            label: "配置组件",
-            width: 70,
-            dialogWidth: 800,
-            schemas: [
-              {
-                type: "select",
-                label: "选择组件",
-                prop: "schemaId",
-                options: [],
-                async getOptions({ getAllSchemas }) {
-                  return (await getAllSchemas()).map(d => ({ label: d.name, value: d.id} ))
-                },
-                effect({model, resolveSchemas}) {
-                  if (model.schemaId) {
-                    return {
-                      prop: "itemSchemas",
-                      key: model.schemaId,
-                      schemas: resolveSchemas(model.schemaId)
-                    }
+  export default [
+    {
+      type: "table",
+      label: "标签项",
+      prop: "tabs",
+      colspan: 2,
+      schemas: [
+        {type: "text", label: "标签名称", prop: "label"},
+        {
+          type: "text",
+          label: "标签id",
+          prop: "name",
+          rules: {required: true, trigger: ["blur", "change"], message: "标签id必须填写"}
+        },
+        {
+          type: "list",
+          label: "配置组件",
+          width: 70,
+          dialogWidth: 800,
+          schemas: [
+            {
+              type: "select",
+              label: "选择组件",
+              prop: "schemaId",
+              options: [],
+              async getOptions({ getAllSchemas }) {
+                return (await getAllSchemas()).map(d => ({ label: d.name, value: d.id} ))
+              },
+              effect({model, resolveSchemas}) {
+                if (model.schemaId) {
+                  return {
+                    prop: "itemSchemas",
+                    key: model.schemaId,
+                    schemas: resolveSchemas(model.schemaId)
                   }
                 }
               }
-            ]
-          }
-        ]
-      },
-      styleSchema
-    ]
-  }
+            }
+          ]
+        }
+      ]
+    },
+    styleSchema
+  ]
 </script>
