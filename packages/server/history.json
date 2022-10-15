@@ -118,7 +118,7 @@
     "title": "编辑组织机构"
   },
   "enableProp": "enable",
-  "title": "组织结构",
+  "title": "组织结构1",
   "dataApi": "/api/org/tree",
   "hasMove": true,
   "deleteApi": "/api/org/delete",

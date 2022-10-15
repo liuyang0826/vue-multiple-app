@@ -1,5 +1,6 @@
 const fs = require("fs")
 const async = require("./async")
+const path = require("path")
 
 async function prepareDir(root) {
   const rootDir = path.resolve(`../preview/src/views/${root}`)

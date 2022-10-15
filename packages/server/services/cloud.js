@@ -21,7 +21,6 @@ async function previewPage(ctx) {
   fs.writeFileSync(path.resolve("history.json"), JSON.stringify(data, null, 2), "utf8")
 
   const { component, service } = cloudIdMap.get(ctx.query.id)
-
   function resolveComponent(cloudId, { name, data }) {
     const { component } = cloudIdMap.get(cloudId)
     return component({ name: utils.firstToUpperCase(name), data, resolveComponent })
